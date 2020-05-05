@@ -29,6 +29,36 @@ def check_db_path(database):
                              "the database path\n")
         sys.exit(1)
 
+def check_version(software):
+    """
+    Get version of software and return as string.Check for software error
+    :param software: string - path to software
+    :return: string of software version
+    """
+    try:
+        # get version
+        output = subprocess.run([software, "-v"], stdout=subprocess.PIPE,
+                                check=True)
+        version = ""
+        for line in output.stdout.decode('utf-8').splitlines():
+            if line != "":
+                version = line
+                break
+
+            else:
+                continue
+
+
+    except IOError:
+        sys.stderr.write(f"ERROR: Check path to software: {software}\n")
+        sys.exit(1)
+
+    except subprocess.CalledProcessError:
+        sys.stderr.write("ERROR: Check existence of correct  "
+                         f"program file at {software}\n")
+        sys.exit(1)
+
+    return version
 
 
 def create_dataframe(input_file, header = "Serotype"):

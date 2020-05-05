@@ -9,12 +9,10 @@ import argparse
 import glob
 import sys
 import os
-import subprocess
 import ctvdb
-import csv
 import pandas as pd
 from enum import Enum
-from run_scripts.utilities import check_db_path
+from run_scripts.utilities import check_db_path, check_version
 
 
 class Category(Enum):
@@ -42,6 +40,7 @@ class CtvdbError(Exception):
         else:
             return "CtvdbError has been raised - check CTV.db and folder integrity, missing or mismatching " \
                    "information may be present."
+
 
 def parse_args(workflow_version):
     """
@@ -116,7 +115,8 @@ def parse_args(workflow_version):
 
 
 class Analysis:
-    # Create object for analysis - update class attributes based on inputs
+    """Create object for analysis - update class attributes based on inputs,
+        includes methods for creation of report and csv from object"""
 
     def __init__(self, inputs, version):
         """set up analysis object according to input options
@@ -302,40 +302,13 @@ RED: Analysis failed
         sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
                          f"Output directory: {self.output_dir}\n")
 
+
     def create_objdf(self):
         """Creates dataframe from class object"""
         attribs = vars(self)
         frame = pd.DataFrame.from_dict(attribs, orient="index")
         frame = frame.transpose()
+        #TODO reorder columns and re-format datat make human sense
         return frame
 
-def check_version(software):
-    """
-    Get version of software and return as string.Check for software error
-    :param software: string - path to software
-    :return: string of software version
-    """
-    try:
-        # get version
-        output = subprocess.run([software, "-v"], stdout=subprocess.PIPE,
-                                check=True)
-        version = ""
-        for line in output.stdout.decode('utf-8').splitlines():
-            if line != "":
-                version = line
-                break
 
-            else:
-                continue
-
-
-    except IOError:
-        sys.stderr.write(f"ERROR: Check path to software: {software}\n")
-        sys.exit(1)
-
-    except subprocess.CalledProcessError:
-        sys.stderr.write("ERROR: Check existence of correct  "
-                         f"program file at {software}\n")
-        sys.exit(1)
-
-    return version
