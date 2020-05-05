@@ -140,6 +140,7 @@ def apply_filters(df, minkmer, minmulti, top_hits = True):
     return filtered, original, top_hits
 
 
+
 def create_csv(df, outpath, filename, index=False):
     """
     create csv of pandas dataframe and save

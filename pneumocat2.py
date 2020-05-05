@@ -8,7 +8,7 @@ Carmen Sheppard 2019-2020
 import os
 import sys
 from run_scripts.initialise_run import Analysis, parse_args, Category
-from run_scripts.utilities import run_mash_screen
+from run_scripts.utilities import run_mash_screen, create_csv
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
 
@@ -43,7 +43,13 @@ def main(input_args, workflow_version):
     # if typed in stage 1 only and not going through stringent analysis
     if analysis.category != Category.variants:
         analysis.final_result = analysis.stage1_result
+        # write text report and create csv of analysis object attributes
         analysis.write_report()
+        # create dataframe
+        df = analysis.create_objdf()
+        # write csv
+        create_csv(df,analysis.output_dir,f"{analysis.sampleid}_results.csv")
+
         # exit program if not going to stage 2
         sys.stdout.write(f"{analysis.workflow} run complete.\n")
         sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
@@ -63,9 +69,12 @@ def main(input_args, workflow_version):
                              f"{analysis.stage1_result}, no appropriate "
                                      "CTVdb folder specified\n")
             sys.exit(1)
-
+        # write text report and create csv of analysis object attributes
         analysis.write_report()
-        analysis.result_csv()
+        # create dataframe
+        df = analysis.create_objdf()
+        # write csv
+        create_csv(df,analysis.output_dir,f"{analysis.sampleid}_results.csv")
 
 if __name__ == "__main__":
     args = parse_args(version)

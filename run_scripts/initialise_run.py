@@ -12,6 +12,7 @@ import os
 import subprocess
 import ctvdb
 import csv
+import pandas as pd
 from enum import Enum
 from run_scripts.utilities import check_db_path
 
@@ -249,6 +250,7 @@ class Analysis:
         else:
             self.sampleid = inputs.sampleid
 
+
     def write_report(self):
         # Class function to write report output from completed Analysis object
         if self.assembly:
@@ -300,17 +302,12 @@ RED: Analysis failed
         sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
                          f"Output directory: {self.output_dir}\n")
 
-    # TODO: Check this works
-    def result_csv(self):
-        """Class function to write csv output from Analysis object"""
-        members = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
-        with open(os.path.join(self.output_dir, f"{self.sampleid}_final_results.csv"),"w+") as resultFile:
-            wr = csv.writer(resultFile, dialect='excel')
-            wr.writerows(members)
-
-        sys.stdout.write(f"{self.sampleid}final_results.csv written.\n"
-                         f"Output directory: {self.output_dir}\n")
-
+    def create_objdf(self):
+        """Creates dataframe from class object"""
+        attribs = vars(self)
+        frame = pd.DataFrame.from_dict(attribs, orient="index")
+        frame = frame.transpose()
+        return frame
 
 def check_version(software):
     """
