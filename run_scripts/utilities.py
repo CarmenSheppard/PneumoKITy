@@ -29,8 +29,7 @@ def check_db_path(database):
                              "the database path\n")
         sys.exit(1)
 
-<<<<<<< HEAD
-=======
+
 def check_version(software):
     """
     Get version of software and return as string.Check for software error
@@ -61,7 +60,6 @@ def check_version(software):
         sys.exit(1)
 
     return version
->>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
 
 
 def create_dataframe(input_file, header = "Serotype"):
@@ -197,7 +195,7 @@ def create_csv(df, outpath, filename, index=False):
         sys.exit(1)
 
 
-<<<<<<< HEAD
+
 def get_variant_ids(hit_variants, var_type, session, position=None):
     """
     Returns variant id's by comparing to database
@@ -205,47 +203,14 @@ def get_variant_ids(hit_variants, var_type, session, position=None):
     :param var_type: type of variant to search (eg allele)
     :param session: database session
     :param position: protein position of variant default to None
-=======
-def prep_vars(var, session):
     """
-    Prepare to run determinations - database queries for gene (ref file name) from variant
-    :param var: list of variants in genogroup
-    :param session: sessionmaker object
-    :return: gene associated with variant
-    """
-    variants = []
-    # query for gene name (file name for FASTA)
-    # retrieve genes from var id
-    records = searchexact(var.gene, Genes, Genes.id, session)
-    # there will only by 1 match as searching unique key.
-    # return the db match only
-    session.close()
-    return records[0]
-
-
-def get_variant_ids(hit_variants, var_type, session):
-    """
-    Returns variant id's by comparing to database
-    :param hit_variants: dict of hit alleles target:match
-    :param var_type: type of variant to search (eg allele)
-    :param session: database session
->>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
-    :return: list of variant ids
-    """
-
-    # for each target/hit  find the associated variant ID in database
+   # for each target/hit  find the associated variant ID in database
     for target in hit_variants:
-<<<<<<< HEAD
+
         # return variants associated with var type and variant result and position
         gene_var = session.query(Variants.id).join(Genes).filter(Genes.gene_name == target) \
             .filter(Variants.var_type == var_type, Variants.variant == hit_variants[target],
                     Variants.position == position).all()
-=======
-        # return variants associated with var type and variant result
-        gene_var = session.query(Variants.id).join(Genes).filter(Genes.gene_name == target) \
-            .filter(Variants.var_type == var_type, Variants.variant == hit_variants[target]).all()
->>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
-
         return gene_var
 
 def find_phenotype(var_id, session):
