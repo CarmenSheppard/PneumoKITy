@@ -23,8 +23,9 @@ def sort_alleles(gene, analysis, session):
     hit_alleles = run_alleles(analysis, genename)
     # append hit alleles output to analysis object
     analysis.stage2_result.append(hit_alleles)
-    # use variant query to get Variant records for hits
-    analysis.stage2_varids.append(get_variant_ids(hit_alleles, "allele", session)[0])
+    # use variant query to get Variant records for hit
+    stage2_var = get_variant_ids(hit_alleles, "allele", analysis.grp_id, session)[0]
+    analysis.stage2_varids.append(stage2_var)
     return analysis
 
 

@@ -8,7 +8,7 @@ import subprocess
 import os
 import sys
 from Database_tools.db_functions import  searchexact
-from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants
+from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup
 
 def check_db_path(database):
     """
@@ -196,7 +196,7 @@ def create_csv(df, outpath, filename, index=False):
 
 
 
-def get_variant_ids(hit_variants, var_type, session, position=None):
+def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
     """
     Returns variant id's by comparing to database
     :param hit_variants: dict of hit variants
@@ -208,9 +208,10 @@ def get_variant_ids(hit_variants, var_type, session, position=None):
    # for each target/hit  find the associated variant ID in database
     for target in hit_variants:
 
-        # return variants associated with var type and variant result and position
-        gene_var = session.query(Variants.id).join(Genes).filter(Genes.gene_name == target) \
-            .filter(Variants.var_type == var_type, Variants.variant == hit_variants[target],
+        # return variants associated with var type and variant result and position and SEROGROUP
+        gene_var = session.query(Variants.id).join(Genes).join(VariantGroup).filter(Genes.gene_name == target,
+                    VariantGroup.grp_id == groupid, Variants.var_type == var_type,
+                    Variants.variant == hit_variants[target],
                     Variants.position == position).all()
         return gene_var
 
