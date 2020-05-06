@@ -122,21 +122,21 @@ class Analysis:
         """set up analysis object according to input options
         :param inputs: input arguments (args)
         """
-        self.workflow = version
-        self.minmulti = inputs.minmulti
-        self.category = None
-        self.folder = None
+        self.workflow = version # version of PneumoCat workflow
+        self.minmulti = inputs.minmulti #minimum multiplicity cut off value
+        self.category = None # category for stage 2 analysis or not
+        self.folder = None # folder (genogroup) for stage 2 analysis
         self.stage1_result = ""
         self.stage2_result = ""
-        self.mash_v = ""
-        self.threads = str(inputs.threads)
-        self.final_result = ""
-        self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only"
+        self.mash_v = "" # version of Mash used
+        self.threads = str(inputs.threads) # number of threads used for subprocesses
+        self.final_result = "" # final serotype predicted phenotype result
+        self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
         self.rag_status = "RED"
-        self.top_hits = ""
-        self.max_percent = ""
-        self.var_list = []
-        self.grp_id = None
+        self.top_hits = "" # top five hits from stage 1 analysis
+        self.max_percent = "" # percentage of max top hit
+        self.gene_list = [] # genelist for stage 2 analysis
+        self.grp_id = None # database id of group for stage 3
 
         #self.stringent = inputs.stringent # next version!!
 

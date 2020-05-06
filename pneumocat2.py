@@ -19,7 +19,7 @@ def main(input_args, workflow_version):
     """
     Main function. Creates Analysis object containing parameters set up for
     the sample entered.    Creates directories for output and runs Stage 1.
-    Rest TBC!
+    Runs stage2
     """
 
     sys.stdout.write(f"\nRunning {workflow_version}\n")
@@ -41,25 +41,10 @@ def main(input_args, workflow_version):
     #  subtypes
 
     # if typed in stage 1 only and not going through stringent analysis
-    if analysis.category != Category.variants:
-        analysis.final_result = analysis.stage1_result
-        # write text report and create csv of analysis object attributes
-        analysis.write_report()
-        # create dataframe
-        df = analysis.create_objdf()
-        # write csv
-        create_csv(df,analysis.output_dir,f"{analysis.sampleid}_results.csv")
-
-        # exit program if not going to stage 2
-        sys.stdout.write(f"{analysis.workflow} run complete.\n")
-        sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
-        sys.stdout.write(f"Serotype hit is {analysis.final_result}\n")
-        sys.exit(0)
-
-    else:
+    if analysis.category == Category.variants:
         # Run Stage 2 Serotype analysis.
         # -------------------------------
-        # Run alleles etc
+        # check for found folder from CTVdb
         if analysis.folder:
             start_analysis(analysis)
 
@@ -67,14 +52,46 @@ def main(input_args, workflow_version):
         else:
             sys.stderr.write("ERROR: unexpected output from stage 1 for "
                              f"{analysis.stage1_result}, no appropriate "
-                                     "CTVdb folder specified\n")
-            sys.exit(1)
+                             "CTVdb folder specified\n")
+            analysis.stage1_result = "No CTV folder available"
+            # write text report and create csv of analysis object attributes
+        analysis.write_report()
+        # create dataframe
+        df = analysis.create_objdf()
+        # write csv
+        create_csv(df, analysis.output_dir, f"{analysis.sampleid}_results.csv")
+
+    # elif analysis.category == Category.subtype:
+    #     #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
+    #
+    #     analysis.final_result = analysis.stage1_result
+    #     # write text report and create csv of analysis object attributes
+    #     analysis.write_report()
+    #     # create dataframe
+    #     df = analysis.create_objdf()
+    #     # write csv
+    #     create_csv(df,analysis.output_dir,f"{analysis.sampleid}_results.csv")
+    #
+    #     # exit program if not going to stage 2
+    #     sys.stdout.write(f"{analysis.workflow} run complete.\n")
+    #     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
+    #     sys.stdout.write(f"Serotype hit is {analysis.final_result}\n")
+    #     sys.exit(0)
+
+    else:
+        analysis.final_result = analysis.stage1_result
         # write text report and create csv of analysis object attributes
         analysis.write_report()
         # create dataframe
         df = analysis.create_objdf()
         # write csv
-        create_csv(df,analysis.output_dir,f"{analysis.sampleid}_results.csv")
+        create_csv(df, analysis.output_dir, f"{analysis.sampleid}_results.csv")
+
+        # exit program if not going to stage 2
+        sys.stdout.write(f"{analysis.workflow} run complete.\n")
+        sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
+        sys.stdout.write(f"Serotype hit is {analysis.final_result}\n")
+        sys.exit(0)
 
 if __name__ == "__main__":
     args = parse_args(version)

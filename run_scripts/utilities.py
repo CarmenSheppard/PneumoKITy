@@ -164,37 +164,22 @@ def create_csv(df, outpath, filename, index=False):
         sys.exit(1)
 
 
-def prep_vars(var, session):
-    """
-    Prepare to run determinations - database queries for gene (ref file name) from variant
-    :param var: list of variants in genogroup
-    :param session: sessionmaker object
-    :return: gene associated with variant
-    """
-    variants = []
-    # query for gene name (file name for FASTA)
-    # retrieve genes from var id
-    records = searchexact(var.gene, Genes, Genes.id, session)
-    # there will only by 1 match as searching unique key.
-    # return the db match only
-    session.close()
-    return records[0]
-
-
-def get_variant_ids(hit_variants, var_type, session):
+def get_variant_ids(hit_variants, var_type, session, position=None):
     """
     Returns variant id's by comparing to database
-    :param hit_variants: dict of hit alleles target:match
+    :param hit_variants: dict of hit variants
     :param var_type: type of variant to search (eg allele)
     :param session: database session
+    :param position: protein position of variant default to None
     :return: list of variant ids
     """
 
     # for each target/hit  find the associated variant ID in database
     for target in hit_variants:
-        # return variants associated with var type and variant result
+        # return variants associated with var type and variant result and position
         gene_var = session.query(Variants.id).join(Genes).filter(Genes.gene_name == target) \
-            .filter(Variants.var_type == var_type, Variants.variant == hit_variants[target]).all()
+            .filter(Variants.var_type == var_type, Variants.variant == hit_variants[target],
+                    Variants.position == position).all()
 
         return gene_var
 
