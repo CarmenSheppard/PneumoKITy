@@ -215,8 +215,16 @@ def get_variant_ids(hit_variants, var_type, session, position=None):
         return gene_var
 
 def find_phenotype(var_id, session):
-
-    sero = session.query(Serotype.predicted_pheno).join(SerotypeVariants). \
+    """
+    Function to find phenotypes associated with a var id and return a list of them
+    :param var_id: variant ID from variants table
+    :param session: active DB session
+    :return: list of phenotypes
+    """
+    phenotypes = session.query(Serotype.predicted_pheno).join(SerotypeVariants). \
         filter(SerotypeVariants.variant_id == var_id).all()
-
-    return sero
+    pheno = []
+    for i in phenotypes:
+        # add query output elements to list
+        pheno.append(i[0])
+    return pheno

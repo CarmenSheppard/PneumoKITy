@@ -8,14 +8,12 @@ import os
 from Database_tools.db_functions import session_maker
 from Database_tools.sqlalchemydeclarative import VariantGroup, Variants, Genes
 from run_scripts.analyse_alleles import run_alleles, sort_alleles
-from run_scripts.utilities import get_variant_ids
+from run_scripts.utilities import find_phenotype
 from run_scripts import exceptions
 
 
 def start_analysis(analysis):
     """ Function to start processing for stage 2 using analysis object"""
-    # create path to relevant database folder for reference files
-    database_folder = os.path.join(analysis.database, analysis.folder)
 
     # find variants for serogroup (variant group table)
     session = session_maker(analysis.database)
@@ -60,7 +58,16 @@ def start_analysis(analysis):
             # raise exception for types of variants not found (eg error in DB)
             raise exceptions.CtvdbError(f"Could not find variant type {gene.var_type} for analysis\n")
 
+    # GET SEROTYPES FROM VAR IDS
+    seros = {}
+    # append expected phenotypes to list (should be just one unique pheno)
+    for i in analysis.stage2_varids:
+        # find all phenotypes associated with variant
+        phenotypes = find_phenotype(i[0],session)
+        # add phenotypes to a list and then add ot serotype dict
+        seros[i[0]] = phenotypes
 
+    #TODO go through dict and make sure that one pheno is in all dicts.
     session.close()
     analysis.stage2_output = f"""
 Stage 2 variants: {analysis.stage2_result}"""
