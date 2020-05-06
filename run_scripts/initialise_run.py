@@ -9,12 +9,19 @@ import argparse
 import glob
 import sys
 import os
+<<<<<<< HEAD
 import subprocess
 import ctvdb
 import csv
 import pandas as pd
 from enum import Enum
 from run_scripts.utilities import check_db_path
+=======
+import ctvdb
+import pandas as pd
+from enum import Enum
+from run_scripts.utilities import check_db_path, check_version
+>>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
 
 
 class Category(Enum):
@@ -43,6 +50,10 @@ class CtvdbError(Exception):
             return "CtvdbError has been raised - check CTV.db and folder integrity, missing or mismatching " \
                    "information may be present."
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
 def parse_args(workflow_version):
     """
     Mutually exclusive and required options  are -i | -f | -a
@@ -116,12 +127,18 @@ def parse_args(workflow_version):
 
 
 class Analysis:
+<<<<<<< HEAD
     # Create object for analysis - update class attributes based on inputs
+=======
+    """Create object for analysis - update class attributes based on inputs,
+        includes methods for creation of report and csv from object"""
+>>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
 
     def __init__(self, inputs, version):
         """set up analysis object according to input options
         :param inputs: input arguments (args)
         """
+<<<<<<< HEAD
         self.workflow = version # version of PneumoCat workflow
         self.minmulti = inputs.minmulti #minimum multiplicity cut off value
         self.category = None # category for stage 2 analysis or not
@@ -137,6 +154,23 @@ class Analysis:
         self.max_percent = "" # percentage of max top hit
         self.gene_list = [] # genelist for stage 2 analysis
         self.grp_id = None # database id of group for stage 3
+=======
+        self.workflow = version
+        self.minmulti = inputs.minmulti
+        self.category = None
+        self.folder = None
+        self.stage1_result = ""
+        self.stage2_result = ""
+        self.mash_v = ""
+        self.threads = str(inputs.threads)
+        self.final_result = ""
+        self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only"
+        self.rag_status = "RED"
+        self.top_hits = ""
+        self.max_percent = ""
+        self.var_list = []
+        self.grp_id = None
+>>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
 
         #self.stringent = inputs.stringent # next version!!
 
@@ -302,11 +336,16 @@ RED: Analysis failed
         sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
                          f"Output directory: {self.output_dir}\n")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
     def create_objdf(self):
         """Creates dataframe from class object"""
         attribs = vars(self)
         frame = pd.DataFrame.from_dict(attribs, orient="index")
         frame = frame.transpose()
+<<<<<<< HEAD
         return frame
 
 def check_version(software):
@@ -339,3 +378,9 @@ def check_version(software):
         sys.exit(1)
 
     return version
+=======
+        #TODO reorder columns and re-format datat make human sense
+        return frame
+
+
+>>>>>>> 38c070740042b8671f102a9b2b763a421db135ed
