@@ -203,6 +203,7 @@ def get_variant_ids(hit_variants, var_type, session, position=None):
     :param var_type: type of variant to search (eg allele)
     :param session: database session
     :param position: protein position of variant default to None
+    :return: variant ids for hits (db object)
     """
    # for each target/hit  find the associated variant ID in database
     for target in hit_variants:
