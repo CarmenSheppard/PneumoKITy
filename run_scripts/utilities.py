@@ -7,7 +7,7 @@ import numpy as np
 import subprocess
 import os
 import sys
-from Database_tools.db_functions import  searchexact
+from run_scripts.exceptions import CtvdbError
 from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup
 
 def check_db_path(database):
@@ -213,14 +213,18 @@ def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
                     VariantGroup.grp_id == groupid, Variants.var_type == var_type,
                     Variants.variant == hit_variants[target],
                     Variants.position == position).all()
-        return gene_var
+        if gene_var:
+            return gene_var
+
+        else:
+            raise CtvdbError
 
 def find_phenotype(var_id, session):
     """
     Function to find phenotypes associated with a var id and return a list of them
     :param var_id: variant ID from variants table
     :param session: active DB session
-    :return: list of phenotypes
+    :return: set of phenotypes (deduplicated)
     """
     phenotypes = session.query(Serotype.predicted_pheno).join(SerotypeVariants). \
         filter(SerotypeVariants.variant_id == var_id).all()
@@ -228,4 +232,12 @@ def find_phenotype(var_id, session):
     for i in phenotypes:
         # add query output elements to list
         pheno.append(i[0])
-    return pheno
+
+    pheno = set(pheno)
+
+    if pheno:
+        return pheno
+
+    else:
+        raise CtvdbError
+

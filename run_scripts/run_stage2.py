@@ -19,7 +19,7 @@ def start_analysis(analysis):
     session = session_maker(analysis.database)
     # retrieve genes from relevant variants from group id using join query grouped by genename (avoid dups)
     # Analysis in stage 2 is done by gene.
-    # pass query objects into analysis object
+    # Pass query objects into analysis object
     analysis.gene_list = session.query(Variants).join(VariantGroup).join(Genes).\
         filter(VariantGroup.grp_id == analysis.grp_id).group_by(Genes.gene_name).all()
 
@@ -67,7 +67,13 @@ def start_analysis(analysis):
         # add phenotypes to a list and then add ot serotype dict
         seros[i[0]] = phenotypes
 
-    #TODO go through dict and make sure that one pheno is in all dicts.
+    #TODO go through sets and make sure that one pheno is in all dicts.
+    for i in seros:
+        if len(seros[i]) == 1:
+            pass
+        #TODO THINK ABOUT THIS
+
+
     session.close()
     analysis.stage2_output = f"""
 Stage 2 variants: {analysis.stage2_result}"""
