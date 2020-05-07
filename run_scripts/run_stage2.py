@@ -4,10 +4,9 @@ serotypes
 Carmen Sheppard 2019-2020
 """
 import sys
-import os
 from Database_tools.db_functions import session_maker
 from Database_tools.sqlalchemydeclarative import VariantGroup, Variants, Genes
-from run_scripts.analyse_alleles import run_alleles, sort_alleles
+from run_scripts.analyse_alleles import sort_alleles
 from run_scripts.utilities import find_phenotype
 from run_scripts import exceptions
 
@@ -58,20 +57,10 @@ def start_analysis(analysis):
             # raise exception for types of variants not found (eg error in DB)
             raise exceptions.CtvdbError(f"Could not find variant type {gene.var_type} for analysis\n")
 
-    # GET SEROTYPES FROM VAR IDS
-    seros = {}
-    # append expected phenotypes to list (should be just one unique pheno)
-    for i in analysis.stage2_varids:
-        # find all phenotypes associated with variant
-        phenotypes = find_phenotype(i[0],session)
-        # add phenotypes to a list and then add ot serotype dict
-        seros[i[0]] = phenotypes
+     # GET SEROTYPES FROM VAR IDS
+    phenotype = find_phenotype(analysis,session)
 
-    #TODO go through sets and make sure that one pheno is in all dicts.
-    for i in seros:
-        if len(seros[i]) == 1:
-            pass
-        #TODO THINK ABOUT THIS
+
 
 
     session.close()

@@ -219,25 +219,19 @@ def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
         else:
             raise CtvdbError
 
-def find_phenotype(var_id, session):
+def find_phenotype(analysis, session):
     """
-    Function to find phenotypes associated with a var id and return a list of them
-    :param var_id: variant ID from variants table
+    Function to find phenotype(s) associated with a var ids from stage 2 analysis  return final result
+    :param var_id: variant IDs from analys
     :param session: active DB session
     :return: set of phenotypes (deduplicated)
     """
-    phenotypes = session.query(Serotype.predicted_pheno).join(SerotypeVariants). \
-        filter(SerotypeVariants.variant_id == var_id).all()
-    pheno = []
-    for i in phenotypes:
-        # add query output elements to list
-        pheno.append(i[0])
+    # get variant ids associated with group
+    serorecords = session.query(SerotypeVariants).join(Serotype).\
+        filter(Serotype.group_id == analysis.grp_id).all()
 
-    pheno = set(pheno)
+    group_sero_varids = []
+    # create var lists from group seros and isolate seros:
 
-    if pheno:
-        return pheno
 
-    else:
-        raise CtvdbError
 
