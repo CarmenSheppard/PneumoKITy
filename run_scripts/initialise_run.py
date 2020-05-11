@@ -27,22 +27,6 @@ class Category(Enum):
     no_hits = 6
 
 
-class CtvdbError(Exception):
-    """create custom error for missing or mismatching information in DB. Allows custom messages"""
-
-    def __init__(self, *args):
-        if args:
-            self.message = args[0]
-        else:
-            self.message = None
-
-    def __str__(self):
-        if self.message:
-            return f"CtvdbError, {self.message}"
-        else:
-            return "CtvdbError has been raised - check CTV.db and folder integrity, missing or mismatching " \
-                   "information may be present."
-
 
 def parse_args(workflow_version):
     """
@@ -133,6 +117,7 @@ class Analysis:
         self.folder = None # folder (genogroup) for stage 2 analysis
         self.stage1_result = ""
         self.stage2_result = ""
+        self.stage2_varids = None
         self.mash_v = "" # version of Mash used
         self.threads = str(inputs.threads) # number of threads used for subprocesses
         self.final_result = "" # final serotype predicted phenotype result
@@ -334,7 +319,6 @@ def check_version(software):
 
             else:
                 continue
-
 
     except IOError:
         sys.stderr.write(f"ERROR: Check path to software: {software}\n")

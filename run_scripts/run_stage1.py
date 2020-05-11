@@ -14,9 +14,9 @@ from Database_tools.sqlalchemydeclarative import Serotype, Group
 def get_pheno_list(serotype_hits, session):
     """
     Function to return phenotype list from list of serotype hits (deduplicated)
-    :param serotype_hits:
-    :param session:
-    :return:
+    :param serotype_hits: list of serotype hits from stage 1 mash analysis
+    :param session: DB session
+    :return: list of deduplicated phenotypes
     """
     out_res = []
 

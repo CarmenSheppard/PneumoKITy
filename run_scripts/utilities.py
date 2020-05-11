@@ -7,8 +7,8 @@ import numpy as np
 import subprocess
 import os
 import sys
-from Database_tools.db_functions import  searchexact
-from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants
+from run_scripts.exceptions import CtvdbError
+from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup, Group
 
 def check_db_path(database):
     """
@@ -196,26 +196,43 @@ def create_csv(df, outpath, filename, index=False):
 
 
 
-def get_variant_ids(hit_variants, var_type, session, position=None):
+def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
     """
     Returns variant id's by comparing to database
     :param hit_variants: dict of hit variants
     :param var_type: type of variant to search (eg allele)
     :param session: database session
     :param position: protein position of variant default to None
+    :return: variant ids for hits (db object)
     """
    # for each target/hit  find the associated variant ID in database
     for target in hit_variants:
 
-        # return variants associated with var type and variant result and position
-        gene_var = session.query(Variants.id).join(Genes).filter(Genes.gene_name == target) \
-            .filter(Variants.var_type == var_type, Variants.variant == hit_variants[target],
+        # return variants associated with var type and variant result and position and SEROGROUP
+        gene_var = session.query(Variants.id).join(Genes).join(VariantGroup).filter(Genes.gene_name == target,
+                    VariantGroup.grp_id == groupid, Variants.var_type == var_type,
+                    Variants.variant == hit_variants[target],
                     Variants.position == position).all()
-        return gene_var
+        if gene_var:
+            return gene_var
 
-def find_phenotype(var_id, session):
+        else:
+            raise CtvdbError
 
-    sero = session.query(Serotype.predicted_pheno).join(SerotypeVariants). \
-        filter(SerotypeVariants.variant_id == var_id).all()
+def find_phenotype(analysis, session):
+    """
+    Function to find phenotype(s) associated with a var ids from stage 2 analysis  return final result
+    :param var_id: variant IDs from analys
+    :param session: active DB session
+    :return: set of phenotypes (deduplicated)
+    """
+    # get variant ids associated with Serotype and group unique combintions only
+    serorecords = session.query(Serotype.predicted_pheno,SerotypeVariants.variant_id).\
+    outerjoin(SerotypeVariants).filter(Serotype.group_id == analysis.grp_id).distinct().all()
 
-    return sero
+    print(serorecords)
+
+    # create var lists from group seros and isolate seros:
+
+
+

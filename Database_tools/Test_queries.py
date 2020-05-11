@@ -13,16 +13,8 @@ grp_id = 12
 variants = {"wzy": 2}
 session = session_maker(database)
 
-
-
-# find all variants possible in group
-serotypes = session.query(SerotypeVariants).join(Variants). \
-    filter(Variants.variant_id == ).all()
-genotype = int
-for target in variants:
-    for group_var in group_vars:
-
-
+serorecords = session.query(VariantGroup.var_id).join(Group) \
+    .filter(VariantGroup.grp_id == grp_id).all()
 
 
 
