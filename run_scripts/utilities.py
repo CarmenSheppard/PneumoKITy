@@ -8,7 +8,7 @@ import subprocess
 import os
 import sys
 from run_scripts.exceptions import CtvdbError
-from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup
+from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup, Group
 
 def check_db_path(database):
     """
@@ -226,11 +226,12 @@ def find_phenotype(analysis, session):
     :param session: active DB session
     :return: set of phenotypes (deduplicated)
     """
-    # get variant ids associated with group
-    serorecords = session.query(SerotypeVariants).join(Serotype).\
-        filter(Serotype.group_id == analysis.grp_id).all()
+    # get variant ids associated with Serotype and group unique combintions only
+    serorecords = session.query(Serotype.predicted_pheno,SerotypeVariants.variant_id).\
+    outerjoin(SerotypeVariants).filter(Serotype.group_id == analysis.grp_id).distinct().all()
 
-    group_sero_varids = []
+    print(serorecords)
+
     # create var lists from group seros and isolate seros:
 
 
