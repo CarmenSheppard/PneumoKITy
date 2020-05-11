@@ -89,7 +89,7 @@ def parse_args(workflow_version):
 
     parser.add_argument('--csv', '-c',  type=str,
                         help='path to EXISTING folder for additional copy of results csv. [OPTIONAL]'
-                             'Useful for collation of csv results files.')
+                             ' Useful for collation of csv results files from multiple runs.')
 
     # parser.add_argument('--stringent', '-S', action='store_true',
     #                     help='Run stringent mode')
@@ -319,35 +319,6 @@ RED: Analysis failed
 
         return quality, results
 
-def check_version(software):
-    """
-    Get version of software and return as string.Check for software error
-    :param software: string - path to software
-    :return: string of software version
-    """
-    try:
-        # get version
-        output = subprocess.run([software, "-v"], stdout=subprocess.PIPE,
-                                check=True)
-        version = ""
-        for line in output.stdout.decode('utf-8').splitlines():
-            if line != "":
-                version = line
-                break
-
-            else:
-                continue
-
-    except IOError:
-        sys.stderr.write(f"ERROR: Check path to software: {software}\n")
-        sys.exit(1)
-
-    except subprocess.CalledProcessError:
-        sys.stderr.write("ERROR: Check existence of correct  "
-                         f"program file at {software}\n")
-        sys.exit(1)
-
-    return version
 
 
 
