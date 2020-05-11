@@ -258,14 +258,16 @@ def find_phenotype(analysis, session):
 
 
 def handle_results(analysis):
-    #creates output files
+    #creates output files and write to stdout for results.
     analysis.write_report()
 
     quality, results = analysis.create_objdf()
     # write csv
     create_csv(quality, analysis.output_dir, f"{analysis.sampleid}_quality_system_data.csv")
     create_csv(results, analysis.output_dir, f"{analysis.sampleid}_result_data.csv")
+    if analysis.csv_copy:
+        create_csv(results, analysis.csv_copy, f"{analysis.sampleid}_result_data.csv")
     sys.stdout.write(f"{analysis.workflow} run complete.\n")
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
-    sys.stdout.write(f"Serotype hit is {analysis.predicted_serotype}\n")
+    sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")
 

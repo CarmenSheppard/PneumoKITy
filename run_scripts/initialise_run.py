@@ -87,6 +87,10 @@ def parse_args(workflow_version):
     parser.add_argument('--threads', '-t', default="4", type=int,
                         help='Number of threads to use')
 
+    parser.add_argument('--csv', '-c',  type=str,
+                        help='path to EXISTING folder for additional copy of results csv. [OPTIONAL]'
+                             'Useful for collation of csv results files.')
+
     # parser.add_argument('--stringent', '-S', action='store_true',
     #                     help='Run stringent mode')
 
@@ -127,7 +131,7 @@ class Analysis:
         self.max_percent = "" # percentage of max top hit
         self.gene_list = [] # genelist for stage 2 analysis
         self.grp_id = None # database id of group for stage 3
-
+        self.csv_copy = None # folder for collating copy of results csv
         #self.stringent = inputs.stringent # next version!!
 
         # Determine input option
@@ -240,6 +244,14 @@ class Analysis:
         else:
             self.sampleid = inputs.sampleid
 
+        if inputs.csv:
+            if os.path.isdir(inputs.csv):
+                # set input dir to input dir of first fastq
+                self.csv_copy = inputs.csv
+            else:
+                sys.stderr.write("ERROR: Check copy csv directory path\n")
+                sys.exit(1)
+
 
     def write_report(self):
         # Class function to write report output from completed Analysis object
@@ -301,7 +313,7 @@ RED: Analysis failed
         frame = frame.transpose()
         # create separate dataframes of quality and result data
         quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minkmer",
-                             "mash", "database", "output_dir"], axis=1)
+                             "mash", "database", "output_dir","csv_copy"], axis=1)
         results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "stage2_varids",
                                 "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
 
