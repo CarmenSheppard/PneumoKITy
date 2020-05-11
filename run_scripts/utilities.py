@@ -230,6 +230,14 @@ def find_phenotype(analysis, session):
     serorecords = session.query(Serotype.predicted_pheno,SerotypeVariants.variant_id).\
     outerjoin(SerotypeVariants).filter(Serotype.group_id == analysis.grp_id).distinct().all()
 
+    # create dict of expected vars
+    expected_vars = {}
+    for item in serorecords:
+        if item not in expected_vars:
+            expected_vars[item[0]] = [item[1]]
+        else:
+            expected_vars[item[0]] = item[1]
+
     print(serorecords)
 
     # create var lists from group seros and isolate seros:
