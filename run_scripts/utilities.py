@@ -221,12 +221,11 @@ def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
 
 def find_phenotype(analysis, session):
     """
-    Function to find phenotype(s) associated with a var ids from stage 2 analysis  return final result
-    :param var_id: variant IDs from analys
+    Function to find phenotype associated with a var ids from stage 2 analysis  return final result
+    :param var_id: variant IDs from analysis
     :param session: active DB session
-    :return: set of phenotypes (deduplicated)
     """
-    # get variant ids associated with Serotype and group unique combintions only
+    # get variant ids associated with Serotype and group, unique combintions only
     serorecords = session.query(Serotype.predicted_pheno,SerotypeVariants.variant_id).\
     outerjoin(SerotypeVariants).filter(Serotype.group_id == analysis.grp_id).distinct().all()
 
@@ -238,9 +237,24 @@ def find_phenotype(analysis, session):
         else:
             expected_vars[item[0]] = item[1]
 
-    print(serorecords)
+    detected_vars = []
+    # create list of var ids from analysis
+    for i in analysis.stage2_varids:
+        detected_vars.append(i[0])
 
-    # create var lists from group seros and isolate seros:
+   #interpret results
+    for serotype in expected_vars:
+        a = set(expected_vars[serotype])
+        b = set(detected_vars)
+
+        if a == b:
+            analysis.predicted_serotype = serotype
+            sys.stdout.write(f"Analysis complete, predicted serotype result = {analysis.predicted_serotype}\n")
+            break
+        else:
+            # TODO add more information regarding unexpected pattern
+            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result}: Unexpected variant pattern"
+            sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
 

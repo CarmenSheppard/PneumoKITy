@@ -120,7 +120,7 @@ class Analysis:
         self.stage2_varids = None
         self.mash_v = "" # version of Mash used
         self.threads = str(inputs.threads) # number of threads used for subprocesses
-        self.final_result = "" # final serotype predicted phenotype result
+        self.predicted_serotype = "" # final serotype predicted phenotype result
         self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
         self.rag_status = "RED"
         self.top_hits = "" # top five hits from stage 1 analysis
@@ -277,7 +277,7 @@ Stage 1 max kmer percentage:\t{self.max_percent}
 
 {self.stage2_output}
 
-Final serotyping result:\t {self.final_result}
+Predicted serotype result:\t {self.predicted_serotype}
 Result RAG status:\t {self.rag_status}
 
 
