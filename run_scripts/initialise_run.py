@@ -294,12 +294,18 @@ RED: Analysis failed
 
 
     def create_objdf(self):
-        """Creates dataframe from class object"""
-        # TODO reorder columns and re-format datat make human sense
+        """Creates result and quality dataframes from Analysis object"""
+
         attribs = vars(self)
         frame = pd.DataFrame.from_dict(attribs, orient="index")
         frame = frame.transpose()
-        return frame
+        # create separate dataframes of quality and result data
+        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minkmer",
+                             "mash", "database", "output_dir"], axis=1)
+        results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "stage2_varids",
+                                "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
+
+        return quality, results
 
 def check_version(software):
     """

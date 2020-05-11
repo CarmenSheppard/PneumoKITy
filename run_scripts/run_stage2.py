@@ -60,9 +60,6 @@ def start_analysis(analysis):
      # GET SEROTYPES FROM VAR IDS
     find_phenotype(analysis, session)
 
-
-
-
     session.close()
     analysis.stage2_output = f"""
 Stage 2 variants: {analysis.stage2_result}"""
