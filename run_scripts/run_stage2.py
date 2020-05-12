@@ -58,10 +58,7 @@ def start_analysis(analysis):
             raise exceptions.CtvdbError(f"Could not find variant type {gene.var_type} for analysis\n")
 
      # GET SEROTYPES FROM VAR IDS
-    phenotype = find_phenotype(analysis,session)
-
-
-
+    find_phenotype(analysis, session)
 
     session.close()
     analysis.stage2_output = f"""

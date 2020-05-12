@@ -8,7 +8,7 @@ Carmen Sheppard 2019-2020
 import os
 import sys
 from run_scripts.initialise_run import Analysis, parse_args, Category
-from run_scripts.utilities import run_mash_screen, create_csv
+from run_scripts.utilities import run_mash_screen, create_csv, handle_results
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
 
@@ -54,43 +54,24 @@ def main(input_args, workflow_version):
                              f"{analysis.stage1_result}, no appropriate "
                              "CTVdb folder specified\n")
             analysis.stage1_result = "No CTV folder available"
-            # write text report and create csv of analysis object attributes
-        analysis.write_report()
-        # create dataframe
-        df = analysis.create_objdf()
-        # write csv
-        create_csv(df, analysis.output_dir, f"{analysis.sampleid}_results.csv")
 
-    # elif analysis.category == Category.subtype:
-    #     #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
-    #
-    #     analysis.final_result = analysis.stage1_result
-    #     # write text report and create csv of analysis object attributes
-    #     analysis.write_report()
-    #     # create dataframe
-    #     df = analysis.create_objdf()
-    #     # write csv
-    #     create_csv(df,analysis.output_dir,f"{analysis.sampleid}_results.csv")
-    #
-    #     # exit program if not going to stage 2
-    #     sys.stdout.write(f"{analysis.workflow} run complete.\n")
-    #     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
-    #     sys.stdout.write(f"Serotype hit is {analysis.final_result}\n")
-    #     sys.exit(0)
+        handle_results(analysis)
+        sys.exit(0)
+
+    elif analysis.category == Category.subtype:
+        #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
+
+        analysis.predicted_serotype = analysis.stage1_result
+        # write text report and create csv of analysis object attributes
+        handle_results(analysis)
+
+        sys.exit(0)
 
     else:
-        analysis.final_result = analysis.stage1_result
+        analysis.predicted_serotype = analysis.stage1_result
         # write text report and create csv of analysis object attributes
-        analysis.write_report()
-        # create dataframe
-        df = analysis.create_objdf()
-        # write csv
-        create_csv(df, analysis.output_dir, f"{analysis.sampleid}_results.csv")
+        handle_results(analysis)
 
-        # exit program if not going to stage 2
-        sys.stdout.write(f"{analysis.workflow} run complete.\n")
-        sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
-        sys.stdout.write(f"Serotype hit is {analysis.final_result}\n")
         sys.exit(0)
 
 if __name__ == "__main__":

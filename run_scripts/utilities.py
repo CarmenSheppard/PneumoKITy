@@ -7,8 +7,8 @@ import numpy as np
 import subprocess
 import os
 import sys
-from run_scripts.exceptions import CtvdbError
-from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup, Group
+from run_scripts.exceptions import CtvdbError, CtvdbFileError
+from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup
 
 def check_db_path(database):
     """
@@ -90,8 +90,11 @@ def create_dataframe(input_file, header = "Serotype"):
                          'file\n')
         sys.exit(1)
 
+    except pd.errors.EmptyDataError:
+        sys.stderr.write('ERROR: error occurred with reading Mash screen '
+                         'file\n')
 
-def run_mash_screen(analysis, ref_sketch, run_type="serotype"):
+def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     """
     Run MASH screen for any sketch file against any ref (stage 1 & 2)
     :param analysis: analysis object
@@ -100,7 +103,18 @@ def run_mash_screen(analysis, ref_sketch, run_type="serotype"):
     :param run_type: type of screen file for output (defaults to "serotype")
     :return: string of tsv outfile path and name (saved to tmp).
     """
-    # TODO capture mash output for logs instead of onscreen?
+
+    # check that ref file exists:
+    if not os.path.isfile(ref_sketch) or os.path.getsize(ref_sketch) == 0:
+        raise CtvdbFileError(f" Check ctvdb folder for presence of {analysis.folder} subfolder and correct reference sketch file.\n")
+        sys.exit(1)
+
+    elif run_type != "stage1":
+        sys.stdout.write(f"Screen reference:  {ref_sketch}\n")
+
+    else:
+        pass
+
     if analysis.fastq_files:
         argument = [analysis.mash, "screen", ref_sketch, "-p",
                     analysis.threads, analysis.fastq_files[0],
@@ -171,7 +185,6 @@ def apply_filters(df, minkmer, minmulti, top_hits = True):
     return filtered, original, top_hits
 
 
-
 def create_csv(df, outpath, filename, index=False):
     """
     create csv of pandas dataframe and save
@@ -193,7 +206,6 @@ def create_csv(df, outpath, filename, index=False):
         sys.stderr.write(" Error: Could not save csv. Please check output "
                          "path\n")
         sys.exit(1)
-
 
 
 def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
@@ -219,14 +231,14 @@ def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
         else:
             raise CtvdbError
 
+
 def find_phenotype(analysis, session):
     """
-    Function to find phenotype(s) associated with a var ids from stage 2 analysis  return final result
-    :param var_id: variant IDs from analys
+    Function to find phenotype associated with a var ids from stage 2 analysis  return final result
+    :param var_id: variant IDs from analysis
     :param session: active DB session
-    :return: set of phenotypes (deduplicated)
     """
-    # get variant ids associated with Serotype and group unique combintions only
+    # get variant ids associated with Serotype and group, unique combintions only
     serorecords = session.query(Serotype.predicted_pheno,SerotypeVariants.variant_id).\
     outerjoin(SerotypeVariants).filter(Serotype.group_id == analysis.grp_id).distinct().all()
 
@@ -238,9 +250,37 @@ def find_phenotype(analysis, session):
         else:
             expected_vars[item[0]] = item[1]
 
-    print(serorecords)
+    detected_vars = []
+    # create list of var ids from analysis
+    for i in analysis.stage2_varids:
+        detected_vars.append(i[0])
 
-    # create var lists from group seros and isolate seros:
+   #interpret results
+    for serotype in expected_vars:
+        a = set(expected_vars[serotype])
+        b = set(detected_vars)
+
+        if a == b:
+            analysis.predicted_serotype = serotype
+            break
+
+    if not analysis.predicted_serotype:        # TODO add more information regarding unexpected pattern
+        analysis.predicted_serotype = f"Serotype within {analysis.stage1_result}: Unexpected variant pattern"
+        analysis.rag_status = "AMBER"
+        sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
+def handle_results(analysis):
+    #creates output files and write to stdout for results.
+    analysis.write_report()
+
+    quality, results = analysis.create_objdf()
+    # write csv
+    create_csv(quality, analysis.output_dir, f"{analysis.sampleid}_quality_system_data.csv")
+    create_csv(results, analysis.output_dir, f"{analysis.sampleid}_result_data.csv")
+    if analysis.csv_copy:
+        create_csv(results, analysis.csv_copy, f"{analysis.sampleid}_result_data.csv")
+    sys.stdout.write(f"{analysis.workflow} run complete.\n")
+    sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
+    sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")
 

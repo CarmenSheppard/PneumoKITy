@@ -41,9 +41,16 @@ def run_alleles(analysis, genename):
         # get ref scketch for genename from database folder
         ref_sketch = os.path.join(analysis.database,analysis.folder,
                                   f"{genename}.msh")
+
+
         # run mash screen on the files
         outfile = run_mash_screen(analysis, ref_sketch, genename)
         #create dataframe from the TSV
+        if os.path.getsize(outfile) == 0:
+            sys.stderr.write(f"ERROR: No Mash data - empty file for {genename} analysis\n")
+            sys.exit(1)
+
+
         df = create_dataframe(outfile, "Allele")
         #TODO these are using the universally input mash cut offs  may need to change
         #Filter dataframe for cutoffs using the filtering function

@@ -9,7 +9,6 @@ import argparse
 import glob
 import sys
 import os
-import subprocess
 import ctvdb
 import pandas as pd
 from enum import Enum
@@ -18,7 +17,7 @@ from run_scripts.utilities import check_db_path, check_version
 
 
 class Category(Enum):
-    # deal with categories from stage 1 serotypes.txt
+    # deal with categories from stage 1
     type = 1
     subtype = 2
     variants = 3
@@ -87,6 +86,10 @@ def parse_args(workflow_version):
     parser.add_argument('--threads', '-t', default="4", type=int,
                         help='Number of threads to use')
 
+    parser.add_argument('--csv', '-c',  type=str,
+                        help='path to EXISTING folder for additional copy of results csv. [OPTIONAL]'
+                             ' Useful for collation of csv results files from multiple runs.')
+
     # parser.add_argument('--stringent', '-S', action='store_true',
     #                     help='Run stringent mode')
 
@@ -120,14 +123,14 @@ class Analysis:
         self.stage2_varids = None
         self.mash_v = "" # version of Mash used
         self.threads = str(inputs.threads) # number of threads used for subprocesses
-        self.final_result = "" # final serotype predicted phenotype result
+        self.predicted_serotype = "" # final serotype predicted phenotype result
         self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
         self.rag_status = "RED"
         self.top_hits = "" # top five hits from stage 1 analysis
         self.max_percent = "" # percentage of max top hit
         self.gene_list = [] # genelist for stage 2 analysis
         self.grp_id = None # database id of group for stage 3
-
+        self.csv_copy = None # folder for collating copy of results csv
         #self.stringent = inputs.stringent # next version!!
 
         # Determine input option
@@ -240,6 +243,14 @@ class Analysis:
         else:
             self.sampleid = inputs.sampleid
 
+        if inputs.csv:
+            if os.path.isdir(inputs.csv):
+                # set input dir to input dir of first fastq
+                self.csv_copy = inputs.csv
+            else:
+                sys.stderr.write("ERROR: Check copy csv directory path\n")
+                sys.exit(1)
+
 
     def write_report(self):
         # Class function to write report output from completed Analysis object
@@ -277,7 +288,7 @@ Stage 1 max kmer percentage:\t{self.max_percent}
 
 {self.stage2_output}
 
-Final serotyping result:\t {self.final_result}
+Predicted serotype result:\t {self.predicted_serotype}
 Result RAG status:\t {self.rag_status}
 
 
@@ -294,42 +305,16 @@ RED: Analysis failed
 
 
     def create_objdf(self):
-        """Creates dataframe from class object"""
-        # TODO reorder columns and re-format datat make human sense
+        """Creates result and quality dataframes from Analysis object"""
+
         attribs = vars(self)
         frame = pd.DataFrame.from_dict(attribs, orient="index")
         frame = frame.transpose()
-        return frame
+        # create separate dataframes of quality and result data
+        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minkmer",
+                             "mash", "database", "output_dir","csv_copy"], axis=1)
+        results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "stage2_varids",
+                                "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
 
-def check_version(software):
-    """
-    Get version of software and return as string.Check for software error
-    :param software: string - path to software
-    :return: string of software version
-    """
-    try:
-        # get version
-        output = subprocess.run([software, "-v"], stdout=subprocess.PIPE,
-                                check=True)
-        version = ""
-        for line in output.stdout.decode('utf-8').splitlines():
-            if line != "":
-                version = line
-                break
-
-            else:
-                continue
-
-    except IOError:
-        sys.stderr.write(f"ERROR: Check path to software: {software}\n")
-        sys.exit(1)
-
-    except subprocess.CalledProcessError:
-        sys.stderr.write("ERROR: Check existence of correct  "
-                         f"program file at {software}\n")
-        sys.exit(1)
-
-    return version
-
-
+        return quality, results
 
