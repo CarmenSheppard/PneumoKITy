@@ -72,11 +72,16 @@ def group_check(df, database):
     if len(set(grp)) > 1:
         # must contain non-group serotypes in addition
         # get phenotype info for hits to add to result output
-        pheno = get_pheno_list(results, session)
-        category = Category.mix
-        stage1_result = f"Mixed serotypes- {pheno}"
-        sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
+        pheno = set(get_pheno_list(results, session))
         session.close()
+        # deal with subtypes in stage 1
+        if len(pheno) > 1:
+            category = Category.mix
+            stage1_result = f"Mixed serotypes- {pheno}"
+            sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
+        else:
+            category= Category.subtype
+            stage1_result = pheno
 
     # if only one hit and that hit is not in a group
     elif not groups and len(results) == 1:

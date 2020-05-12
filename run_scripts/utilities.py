@@ -171,7 +171,6 @@ def apply_filters(df, minkmer, minmulti, top_hits = True):
     return filtered, original, top_hits
 
 
-
 def create_csv(df, outpath, filename, index=False):
     """
     create csv of pandas dataframe and save
@@ -193,7 +192,6 @@ def create_csv(df, outpath, filename, index=False):
         sys.stderr.write(" Error: Could not save csv. Please check output "
                          "path\n")
         sys.exit(1)
-
 
 
 def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
@@ -218,6 +216,7 @@ def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
 
         else:
             raise CtvdbError
+
 
 def find_phenotype(analysis, session):
     """

@@ -18,7 +18,7 @@ from run_scripts.utilities import check_db_path, check_version
 
 
 class Category(Enum):
-    # deal with categories from stage 1 serotypes.txt
+    # deal with categories from stage 1
     type = 1
     subtype = 2
     variants = 3
