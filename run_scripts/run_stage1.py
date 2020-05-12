@@ -98,14 +98,20 @@ def group_check(df, database):
         session.close()
         category = Category.type
 
-    # if more than one hit but they are all types with no groups
+    # if more than one hit but they are all types with no groups or SUBTYPES
     elif not grp and len(results) > 1:
         # get phenotypes for output
-        pheno = get_pheno_list(results, session)
-        category = Category.mix
-        stage1_result = f"Mixed serotypes- {pheno}"
-        sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
-        session.close()
+        pheno = set(get_pheno_list(results, session))
+        if len(pheno) > 1:
+            category = Category.mix
+            stage1_result = f"Mixed serotypes- {pheno}"
+            sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
+            session.close()
+        else:
+            category = Category.subtype
+            stage1_result = pheno
+            sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
+
     # if not meeting above criteria must be a group (even if only 1 hit)
     else:
         # retrieve group_name and group ID

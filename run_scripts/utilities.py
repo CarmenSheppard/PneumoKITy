@@ -7,7 +7,7 @@ import numpy as np
 import subprocess
 import os
 import sys
-from run_scripts.exceptions import CtvdbError
+from run_scripts.exceptions import CtvdbError, CtvdbFileError
 from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup
 
 def check_db_path(database):
@@ -90,6 +90,9 @@ def create_dataframe(input_file, header = "Serotype"):
                          'file\n')
         sys.exit(1)
 
+    except pd.errors.EmptyDataError:
+        sys.stderr.write('ERROR: error occurred with reading Mash screen '
+                         'file\n')
 
 def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     """
@@ -100,7 +103,18 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     :param run_type: type of screen file for output (defaults to "serotype")
     :return: string of tsv outfile path and name (saved to tmp).
     """
-    # TODO capture mash output for logs instead of onscreen?
+
+    # check that ref file exists:
+    if not os.path.isfile(ref_sketch) or os.path.getsize(ref_sketch) == 0:
+        raise CtvdbFileError(f" Check ctvdb folder for presence of {analysis.folder} subfolder and correct reference sketch file.\n")
+        sys.exit(1)
+
+    elif run_type != "stage1":
+        sys.stdout.write(f"Screen reference:  {ref_sketch}\n")
+
+    else:
+        pass
+
     if analysis.fastq_files:
         argument = [analysis.mash, "screen", ref_sketch, "-p",
                     analysis.threads, analysis.fastq_files[0],
