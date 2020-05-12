@@ -9,7 +9,6 @@ import argparse
 import glob
 import sys
 import os
-import subprocess
 import ctvdb
 import pandas as pd
 from enum import Enum
@@ -318,7 +317,4 @@ RED: Analysis failed
                                 "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
 
         return quality, results
-
-
-
 

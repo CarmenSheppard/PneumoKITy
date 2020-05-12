@@ -262,12 +262,12 @@ def find_phenotype(analysis, session):
 
         if a == b:
             analysis.predicted_serotype = serotype
-            sys.stdout.write(f"Analysis complete, predicted serotype result = {analysis.predicted_serotype}\n")
             break
-        else:
-            # TODO add more information regarding unexpected pattern
-            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result}: Unexpected variant pattern"
-            sys.stdout.write(f"{analysis.predicted_serotype}\n")
+
+    if not analysis.predicted_serotype:        # TODO add more information regarding unexpected pattern
+        analysis.predicted_serotype = f"Serotype within {analysis.stage1_result}: Unexpected variant pattern"
+        analysis.rag_status = "AMBER"
+        sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
 def handle_results(analysis):
