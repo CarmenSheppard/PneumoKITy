@@ -146,7 +146,7 @@ def run_parse(analysis, tsvfile):
             # Apply filters
             filtered_df, original, analysis.top_hits = \
                 apply_filters(df, analysis.minkmer, analysis.minmulti)
-            analysis.max_percent = original['percent'].max().round(2)
+            analysis.max_percent = round(original['percent'].max(),2)
 
             if not filtered_df.empty:
                 # sort dataframes by percent then identity descending.
