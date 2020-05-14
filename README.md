@@ -129,7 +129,7 @@ will be the ctvdb that is contained within the PneumoCaT2 program.
 
 An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish to use an 
  alternative ctvdb we recommend that this is stored in a separate folder location
- and called using the -r option. To avoid confusion when troubleshooting,
+ and called using the -d option. To avoid confusion when troubleshooting,
   please do **NOT**  overwrite the included ctvdb and run without specifying the option -d.
  eg: `-d path_to_alternative_CTV.db` 
   
@@ -162,6 +162,9 @@ sequencing errors only.
 **-s** (sampleid): Specify a sample ID for output files. If not specified 
 PneumoCaT2 will default to the assembly file name or the fastq file name 
 (split on first "."). eg: `-s sample-name`
+
+**-c** (collate): Specify a folder for PneumoCaT2 to collate results from the run into a file called "Collated_result_data.csv"
+This is useful when running multiple PneumoCaT2 jobs for a particular project, for example via a queue submission system or Bash loop command. The basic result data will be appended to this file until either the flag is not specified, a different folder is specified or the resulting file is moved or renamed.
 
 **Example command lines:**
 
