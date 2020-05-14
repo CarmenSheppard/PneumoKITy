@@ -270,6 +270,29 @@ def find_phenotype(analysis, session):
         sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
+def collate_results(collate_dir, results):
+    """
+    If selected this will add results to a csv file at a specified collation directory location.
+    :param collate_dir: directory for collated csv file
+    :param results: results dataframe created from analysis object
+    :return: None
+    """
+    collate_file = os.path.join(collate_dir, "Collated_result_data.csv")
+    #check whether collated result data file exists if not create it
+    try:
+        if os.path.isfile(collate_file):
+            # do something to append results
+            df = pd.read_csv(collate_file)
+            # append results
+            df = df.append(results,ignore_index=True)
+            create_csv(df,collate_dir,"Collated_result_data.csv")
+        else:
+            create_csv(results, collate_dir, "Collated_result_data.csv")
+    except IOError:
+        sys.stderr.write(" Error: Could not save collated csv. Please check copy output "
+                         "path\n")
+        sys.exit(1)
+
 def handle_results(analysis):
     #creates output files and write to stdout for results.
     analysis.write_report()
@@ -278,9 +301,12 @@ def handle_results(analysis):
     # write csv
     create_csv(quality, analysis.output_dir, f"{analysis.sampleid}_quality_system_data.csv")
     create_csv(results, analysis.output_dir, f"{analysis.sampleid}_result_data.csv")
-    if analysis.csv_copy:
-        create_csv(results, analysis.csv_copy, f"{analysis.sampleid}_result_data.csv")
-    sys.stdout.write(f"{analysis.workflow} run complete.\n")
+
+    # if copy option is taken collate results at directory path specified
+    if analysis.csv_collate:
+        collate_results(analysis.csv_collate, results)
+        sys.stdout.write(f"Results collated at {analysis.csv_collate}/Collated_result_data.csv \n")
+
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
     sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")
-
+    sys.stdout.write(f"{analysis.workflow} run complete.\n")
