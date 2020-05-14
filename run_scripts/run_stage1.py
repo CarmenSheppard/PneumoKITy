@@ -109,7 +109,7 @@ def group_check(df, database):
             session.close()
         else:
             category = Category.subtype
-            stage1_result = pheno[0]
+            stage1_result = list(pheno)[0]
             sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
 
     # if not meeting above criteria must be a group (even if only 1 hit)
