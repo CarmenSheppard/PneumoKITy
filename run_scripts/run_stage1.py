@@ -162,15 +162,9 @@ def run_parse(analysis, tsvfile):
 
             else:  # for samples with no hits
 
-                if analysis.max_percent < 20:
-                    analysis.category = Category.acapsular
-                    analysis.stage1_result = "Low match to any operon " \
-                                             "suggests acapsular organism. " \
-                                             "Check phenotype and species ID."
-                    analysis.rag_status = "AMBER"
 
                 # second chance, amber rag status for low top hits
-                elif analysis.max_percent > 70 and analysis.minkmer > 70:
+                if analysis.max_percent >= 70 and analysis.minkmer >= 70:
                     analysis.rag_status = "AMBER"
                     # reduce minkmer cut off to the max percentage - 10%
                     minkmer = analysis.max_percent - (analysis.max_percent*0.1)
@@ -182,7 +176,7 @@ def run_parse(analysis, tsvfile):
 
                 else:
                     analysis.category = Category.no_hits
-                    analysis.stage1_result = "No Hits - Poor Sequence " \
+                    analysis.stage1_result = "Below 70% hit - Poor Sequence " \
                                              "quality, variant or non-typeable"\
                                              " organism."
 
