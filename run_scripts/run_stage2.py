@@ -43,7 +43,7 @@ def start_analysis(analysis):
             sys.stdout.write("Gene analysis not available yet... SORRY!\n")
             pass
 
-        elif gene.var_type == "snps":
+        elif gene.var_type == "snp":
             sys.stdout.write("-----------------------------------------\n")
             sys.stdout.write("SNP analysis not available yet... SORRY!\n")
             pass
