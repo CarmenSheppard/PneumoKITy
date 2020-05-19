@@ -207,7 +207,7 @@ def create_csv(df, outpath, filename, index=False):
         sys.exit(1)
 
 
-def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
+def get_variant_ids(hit_variants, var_type, groupid, session, position=None):
     """
     Returns variant id's by comparing to database
     :param hit_variants: dict of hit variants
@@ -244,10 +244,10 @@ def find_phenotype(analysis, session):
     # create dict of expected vars
     expected_vars = {}
     for item in serorecords:
-        if item not in expected_vars:
+        if item[0] not in expected_vars:
             expected_vars[item[0]] = [item[1]]
         else:
-            expected_vars[item[0]] = item[1]
+            expected_vars[item[0]].append(item[1])
 
     detected_vars = []
     # create list of var ids from analysis
