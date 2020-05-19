@@ -35,7 +35,7 @@ def sort_genes(gene, analysis, allele_or_gene, session):
         sys.exit(1)
 
     # append hit genes output to analysis object
-    analysis.stage2_result.append(hit_genes)
+    analysis.stage2_result.update(hit_genes)
     # use variant query to get Variant records for hit
     stage2_var = get_variant_ids(hit_genes, allele_or_gene, analysis.grp_id, session)[0]
     analysis.stage2_varids.append(stage2_var)
@@ -90,9 +90,6 @@ def run_alleles(analysis, genename):
 
             else:  # for samples with no hits
                 if max_percent < 20:
-                    analysis.stage2_result = f"No match to expected {genename} allele " \
-                                             "suggests atypical organism. " \
-                                             "Check phenotype."
                     hit_alleles[genename]= "Unrecognised"
                     analysis.stage2_hits[genename] = "<20%"
                     analysis.rag_status = "RED"
@@ -168,7 +165,9 @@ def run_genes(analysis, genename):
                 # for samples with intermediate %match - possible variants
                 if max_percent < 50:
                     # Update status but avoid overwriting previous RED or Amber status
-
+                    if analysis.rag_status == "GREEN":
+                        analysis.rag_status = "AMBER"
+                    hit_genes[genename] = "not_detected"
                     sys.stdout.write(f"Gene {genename} not detected, however {max_percent} hit to gene, possible variant\n")
 
                 elif max_percent < hit_cut:
@@ -179,8 +178,6 @@ def run_genes(analysis, genename):
 
                 else:
                     # NB this shouldn't be triggered if all options covered above
-                    analysis.stage2_result = f"{genename}, percent " \
-                        f"match  = {max_percent}"
                     hit_genes[genename] = "No Match"
                     sys.stdout.write(f"Gene {genename} unrecognised, match = {max_percent} percent.\n")
 

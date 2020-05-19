@@ -141,11 +141,11 @@ def run_parse(analysis, tsvfile):
         if os.path.isfile(tsvfile) and os.path.getsize(tsvfile) > 0:
             df = create_dataframe(tsvfile)
             filename = os.path.basename(tsvfile)[:-4]
-            alldata = f'{filename}_all.csv'
+            alldata = f'{filename}.csv'
 
             # Apply filters
             filtered_df, original, analysis.top_hits = \
-                apply_filters(df, analysis.minkmer, analysis.minmulti)
+                apply_filters(df, analysis.minpercent, analysis.minmulti)
             analysis.max_percent = round(original['percent'].max(),2)
 
             if not filtered_df.empty:
@@ -162,15 +162,14 @@ def run_parse(analysis, tsvfile):
 
             else:  # for samples with no hits
 
-
                 # second chance, amber rag status for low top hits
-                if analysis.max_percent >= 70 and analysis.minkmer >= 70:
+                if analysis.max_percent >= 70 and analysis.minpercent >= 70:
                     analysis.rag_status = "AMBER"
-                    # reduce minkmer cut off to the max percentage - 10%
-                    minkmer = analysis.max_percent - (analysis.max_percent*0.1)
+                    # reduce minpercent cut off to the max percentage - 10%
+                    minpercent = analysis.max_percent - (analysis.max_percent*0.1)
                     # rerun filter
                     filtered_df, original, analysis.top_hits = apply_filters(df,
-                                                minkmer, analysis.minmulti)
+                                                minpercent, analysis.minmulti)
                     analysis.category, analysis.stage1_result, analysis.folder, analysis.grp_id\
                         = group_check(filtered_df, analysis.database)
 

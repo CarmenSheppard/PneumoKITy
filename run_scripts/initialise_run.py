@@ -60,9 +60,9 @@ def parse_args(workflow_version):
                              'otherwise splits on first "." for fastq file 1, '
                              'or uses base filename of assembly')
 
-    parser.add_argument("-k", "--minkmer", type=int,
+    parser.add_argument("-p", "--minpercent", type=int,
                         default=90,
-                        help="minimum kmer count %% of total, INTEGER. Value "
+                        help="minimum percentage kmer count %% of total, INTEGER. Value "
                              "between 20 and 100 accepted [OPTIONAL]; "
                              "Default = 90")
 
@@ -83,7 +83,7 @@ def parse_args(workflow_version):
                              ' will be created in the directory containing the'
                              ' fastq files')
 
-    parser.add_argument('--threads', '-t', default="4", type=int,
+    parser.add_argument('--threads', '-t', default=4, type=int,
                         help='Number of threads to use')
 
     parser.add_argument('--collate', '-c',  type=str,
@@ -181,9 +181,9 @@ class Analysis:
                 sys.stderr.write("ERROR: Check input assembly path\n")
                 sys.exit(1)
 
-        # check minkmer input:
-        if 20 <= inputs.minkmer <= 100:
-            self.minkmer = inputs.minkmer
+        # check minpercent input:
+        if 20 <= inputs.minpercent <= 100:
+            self.minpercent = inputs.minpercent
 
         else:
             sys.stderr.write("ERROR: Input min kmer percentage must be "
@@ -274,7 +274,7 @@ Run Metrics
 Workflow version\t{self.workflow}
 
 {inputfiles}
-Input kmer percent cut-off:\t{self.minkmer}
+Input kmer percent cut-off:\t{self.minpercent}
 Median multiplicity cut-off:\t{self.minmulti}
 CTV.db path:\t{self.database}
 Mash Version:\t{self.mash_v}
@@ -313,7 +313,7 @@ RED: Analysis failed
         frame = pd.DataFrame.from_dict(attribs, orient="index")
         frame = frame.transpose()
         # create separate dataframes of quality and result data
-        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minkmer",
+        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
                              "mash", "database", "output_dir","csv_collate"], axis=1)
         results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "stage2_varids",
                                 "stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"], axis=1)

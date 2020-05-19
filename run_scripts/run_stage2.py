@@ -26,8 +26,7 @@ def start_analysis(analysis):
     # create lists for gene names
     alleles = []
     genes = []
-    # reinitialise stage2 result attributes as list
-    analysis.stage2_result = []
+    # reinitialise stage2 varids attributes as list
     analysis.stage2_varids = []
 
     # go through different variants and run analyses

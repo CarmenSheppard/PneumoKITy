@@ -136,12 +136,12 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     return outfile
 
 
-def filter_kmerhits(df, minkmer):
+def filter_kmerhits(df, minpercent):
     """
     Function to calculate % hits for each query and reduce dataframe to
     those above the min kmer cut off.
     :param df: pandas dataframe of MASH output
-    :param minkmer: int representing % hits of total kmers for serotype
+    :param minpercent: int representing % hits of total kmers for serotype
     :return: pandas.dataframe of rows representing kmer hits above % cutoff
     and dataframe of all calculated kmer percents for reference
     """
@@ -150,12 +150,12 @@ def filter_kmerhits(df, minkmer):
     df["hit_hashes"] = pd.to_numeric(hashes[0])
     df["total_hashes"] = pd.to_numeric(hashes[1])
     df["percent"] = df["hit_hashes"] / df["total_hashes"] * 100
-    filtered_kmerhits = df[df["percent"] >= minkmer]
+    filtered_kmerhits = df[df["percent"] >= minpercent]
 
     return filtered_kmerhits, df
 
 
-def apply_filters(df, minkmer, minmulti, top_hits = True):
+def apply_filters(df, minpercent, minmulti, top_hits = True):
     """
     Apply specified filters to dataframe and get top 5 hits
     :param df: pandas dataframe
@@ -165,7 +165,7 @@ def apply_filters(df, minkmer, minmulti, top_hits = True):
     :return: filtered dataframe
     """
     # filter for kmer hits above percentage
-    filtered, original = filter_kmerhits(df, minkmer)
+    filtered, original = filter_kmerhits(df, minpercent)
 
     # filter for median-multiplicity if necessary (reads)
     if minmulti != 1:
