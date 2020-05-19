@@ -119,7 +119,7 @@ class Analysis:
         self.category = None # category for stage 2 analysis or not
         self.folder = None # folder (genogroup) for stage 2 analysis
         self.stage1_result = ""
-        self.stage2_result = ""
+        self.stage2_result = {}
         self.stage2_varids = None
         self.mash_v = "" # version of Mash used
         self.threads = str(inputs.threads) # number of threads used for subprocesses
@@ -127,6 +127,7 @@ class Analysis:
         self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
         self.rag_status = "RED"
         self.top_hits = "" # top five hits from stage 1 analysis
+        self.stage2_hits = {} # metrics for stage 2 hits
         self.max_percent = "" # percentage of max top hit
         self.gene_list = [] # genelist for stage 2 analysis
         self.grp_id = None # database id of group for stage 3
@@ -313,9 +314,9 @@ RED: Analysis failed
         frame = frame.transpose()
         # create separate dataframes of quality and result data
         quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minkmer",
-                             "mash", "database", "output_dir","csv_copy"], axis=1)
+                             "mash", "database", "output_dir","csv_collate"], axis=1)
         results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "stage2_varids",
-                                "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
+                                "stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
 
         return quality, results
 

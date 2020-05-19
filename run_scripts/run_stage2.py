@@ -6,9 +6,9 @@ Carmen Sheppard 2019-2020
 import sys
 from Database_tools.db_functions import session_maker
 from Database_tools.sqlalchemydeclarative import VariantGroup, Variants, Genes
-from run_scripts.analyse_alleles import sort_alleles
+from run_scripts.screen_genes import sort_genes
 from run_scripts.utilities import find_phenotype
-from run_scripts import exceptions
+import exceptions
 
 
 def start_analysis(analysis):
@@ -25,6 +25,7 @@ def start_analysis(analysis):
 
     # create lists for gene names
     alleles = []
+    genes = []
     # reinitialise stage2 result attributes as list
     analysis.stage2_result = []
     analysis.stage2_varids = []
@@ -36,12 +37,11 @@ def start_analysis(analysis):
         if gene.var_type == "allele":
             #append gene-variant object to list
             alleles.append(gene)
-            sort_alleles(gene, analysis, session)
+            sort_genes(gene, analysis, gene.var_type, session)
 
-        elif gene.var_type == "gene":
-            sys.stdout.write("-----------------------------------------\n")
-            sys.stdout.write("Gene analysis not available yet... SORRY!\n")
-            pass
+        elif gene.var_type == "gene_presence":
+            genes.append(gene)
+            sort_genes(gene, analysis, gene.var_type, session)
 
         elif gene.var_type == "snp":
             sys.stdout.write("-----------------------------------------\n")
@@ -62,6 +62,9 @@ def start_analysis(analysis):
 
     session.close()
     analysis.stage2_output = f"""
-Stage 2 variants: {analysis.stage2_result}"""
+Stage 2 variants: {analysis.stage2_result}
+Stage 2 hits: {analysis.stage2_hits}
+
+"""
 
 
