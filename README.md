@@ -1,8 +1,22 @@
 # README for PneumoCaT2 
 
+## Table of content
+
+* Introduction
+* [Dependencies](https://github.com/CarmenSheppard/pneumocat2#dependencies)
+* [Running PneumoCaT](https://github.com/CarmenSheppard/pneumocat2#running-pneumocat2)
+* [User customisable options](https://github.com/CarmenSheppard/pneumocat2#User-customisable-options)
+* [Quality checks](https://github.com/CarmenSheppard/pneumocat2#Quality-checks)
+* PneumoCaT Output
+* CTV database
+* Examples
+* Troubleshooting
+* Contact Information
+* Licence Agreement
+
+
 PneumoCaT2 (**Pneumo**coccal **Ca**psular **T**yping version 2) is a 
-rewrite of the original PneumoCaT capsular typing tool, written for **Python 3.6+** 
-and using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+complete from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
 kmer based analysis.  
 
 PneumoCaT2, like the original PneumoCaT tool assigns capsular types to
@@ -39,10 +53,10 @@ In the first stage, the input sequences are screened against a file of the
   percentage (kmers in sample / kmers in reference x 100) and then filtered according to
   the cut off values specified.
 
-- kmer percentage - Percentage of hit kmers against total reference kmers for a given
+-p kmer percentage - Percentage of hit kmers against total reference kmers for a given
 serotype reference sequence, calculated by PneumoCaT2.
 
-- median multiplicity -the median number of multiples of a given kmer in the dataset,
+-n median multiplicity -the median number of multiples of a given kmer in the dataset,
 given in mash screen output. Low kmer multiplicity could be caused by 
 sequencing errors or mixed samples - only applicable for input read files if
  assembly files are input this value is automatically set to 1.
@@ -68,18 +82,7 @@ variant or due to poor sequencing quality.
 If the `variants` category is returned in stage 1 then PneumoCaT2 proceeds to stage 2. 
 
 
-## Table of content
 
-* [Dependencies](https://github.com/CarmenSheppard/pneumocat2#dependencies)
-* [Running PneumoCaT](https://github.com/CarmenSheppard/pneumocat2#running-pneumocat2)
-* [User customisable options](https://github.com/CarmenSheppard/pneumocat2#User-customisable-options)
-* [Quality and Error checks](https://github.com/CarmenSheppard/pneumocat2#Quality-and-Error-checks)
-* PneumoCaT Output
-* CTV database
-* Examples
-* Troubleshooting
-* Contact Information
-* Licence Agreement
 
 ## Dependencies
 
@@ -93,8 +96,7 @@ PneumoCaT2 requires the following packages installed before running:
 * SQLite3 [https://www.sqlite.org/index.html](https://www.sqlite.org/index)
 * SQLalchemy [https://www.sqlalchemy.org/](https://www.sqlalchemy.org/)
 
-Due to the dependencies PneumoCaT2 can only be run on Linux based operating 
-systems.
+Due to the dependencies PneumoCaT2 can only be run on Linux based operating systems. Please note if using conda enviroments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.2 (or 2.1 - 2.2 recommended)
 
 ## Running PneumoCaT2
 #### Mandatory commandline inputs
@@ -150,10 +152,10 @@ command  `mash` which will only work if the mash software is included in the
  `PATH` variable. Otherwise the path to the mash software file location
   **must** be provided eg: `-m path_to_mash\mash`.
 
-**-k** (kmer percent): Alternative filter cut-off value for kmer percentage, ie 
-percentage of kmer hits to reference. eg:  `-k 80` (default = 90) NB: The software will automatically 
+**-p** (minpercent): Alternative filter cut-off value for kmer percentage, ie 
+percentage of kmer hits to reference. eg:  `-p 80` (default = 90) NB: The software will automatically 
 incrementally drop the kmer percentage if no hits are initially obtained - and report serotype with an amber 
-RAG status if determined with the dropped back cut off. 
+RAG status if determined with the dropped back cut off (auto drop min= 70%). 
 
 **-n** (minmulti): minimum, median-multiplicity value cut off (relevant for fastq 
 read input only). eg: `-n 2` (default = 4) Used to minimise the kmers present due to 
@@ -172,17 +174,25 @@ This is useful when running multiple PneumoCaT2 jobs for a particular project, f
 
 `python pneumocat2.py -i my_input_folder -t 8 -m path_to_mash/mash -s my_name`
 
-2. Input fastq file paths, custom output directory, path to mash, custom kmer percentage cut off
+2. Input read files, path to mash, custom output_dir, collate file folder location
+`python pneumocat2.py -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
+ -c path_to_collate_folder `
+
+3. Input fastq file paths, custom output directory, path to mash, custom kmer percentage cut off
 
 `python pneumocat2.py -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
  -m path_to_mash/mash -k 75`
 
-2. Input assembly, path to mash, custom initial kmer percentage cut off
+4. Input assembly, path to mash, custom initial kmer percentage cut off
+
+`python pneumocat2.py -a path_to_assembly/assembly  -m path_to_mash/mash -k 75`
+
+5. Input assembly, path to mash ,collate file folder location
 
 `python pneumocat2.py -a path_to_assembly/assembly  -m path_to_mash/mash -k 75`
 
 
-## Quality and Error checks
+## Quality checks
 
 PneumoCaT2 is written for use in an accredited laboratory and to aid this,
 stores various metrics which are reported in the final 
@@ -217,3 +227,28 @@ analysis.
 version of the overall PneumoCaT software (eg. from version 2.0 to 2.0.1). 
 However if an alternative version of the ctvdb is used it is up to the user to record 
 which version is used for their analysis.
+
+## Output Files
+
+PneumoCaT2 produces several output files. 
+
+`SAMPLEID_serotyping_results.txt` *(All serotypes)*
+
+A text file contaning human-readable formatted information about the run metrics and sample results
+
+`SAMPLEID_quality_system_data.csv` *(All serotypes)*
+
+A csv file containing information about the run metrics (folder and file locations, software versions, cut offs etc)
+
+`SAMPLEID_result_data.csv` *(All serotypes)*
+
+csv file containing final result data from run
+
+`SAMPLEID_stage1_screen.csv` *(All serotypes)*
+
+csv file containing all of the stage1 screen MASH run hits.
+
+
+`SAMPLEID_GENE_screen.csv` *(Serotypes resulting at stage 2 only)*
+
+csv files containing MASH screen run hits information for the relevant variant genes.
