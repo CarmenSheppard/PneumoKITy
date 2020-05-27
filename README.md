@@ -6,8 +6,10 @@
 * [Dependencies](https://github.com/CarmenSheppard/pneumocat2#dependencies)
 * [Running PneumoCaT](https://github.com/CarmenSheppard/pneumocat2#running-pneumocat2)
 * [User customisable options](https://github.com/CarmenSheppard/pneumocat2#User-customisable-options)
+* [Example command lines](https://github.com/CarmenSheppard/pneumocat2#Example-command-lines)
+* [How PneumoCaT2 works](https://github.com/CarmenSheppard/pneumocat2#How-PneumoCaT2-works)
 * [Quality checks](https://github.com/CarmenSheppard/pneumocat2#Quality-checks)
-* PneumoCaT Output
+* [PneumoCaT Output](https://github.com/CarmenSheppard/pneumocat2#Output-files)
 * CTV database
 * Examples
 * Troubleshooting
@@ -43,44 +45,6 @@ PneumoCaT 2 is now a real database, running in SQLite3. We felt that, though
  determinants are added. The use of this format will also allow us to store 
  extra related information about the serotypes, such as subtype information 
  (subtyping is planned in a future update). 
-
-Stage 1 of PneumoCaT2 (and some calls in stage 2) use a kmer based approach to 
-screen the read files or input assembly file against the capsular operon 
-references (references.fasta) which is stored as a mash sketch file (references.msh).
-
-In the first stage, the input sequences are screened against a file of the
- capsular operon references (references.msh). The resulting data is analysed for hit
-  percentage (kmers in sample / kmers in reference x 100) and then filtered according to
-  the cut off values specified.
-
--p kmer percentage - Percentage of hit kmers against total reference kmers for a given
-serotype reference sequence, calculated by PneumoCaT2.
-
--n median multiplicity -the median number of multiples of a given kmer in the dataset,
-given in mash screen output. Low kmer multiplicity could be caused by 
-sequencing errors or mixed samples - only applicable for input read files if
- assembly files are input this value is automatically set to 1.
-
-  
-This results in several stage 1 outcome categories and also come with a RAG 
-status (see Quality and Error checking):
-
-- `type` - A serotype that can be determined in stage 1 only. Resulted as final result 
-when run in normal mode 
-- `subtype` - a serotype that determined in stage 1 only but also has subtypes which 
-can be determined to add further information (*future update*)
-- `variants`  - a serotype that cannot determined in stage 1 only - needs further 
-determination against capsular type variant database.
-- `mix` - Mixed serotypes are present
-- `acapsular` - the kmer percentages against all capsular operon references were 20% and 
-suggests that the sample does NOT have a capsular operon present and may be an acapsular 
-organism. Check phenotype and species ID.
-- `No hits` - No hits were determined but the kmer percentage to the reference operons
- was higher than that that might suggest an acapsular organism. Could be due to serotype
-variant or due to poor sequencing quality. 
-
-If the `variants` category is returned in stage 1 then PneumoCaT2 proceeds to stage 2. 
-
 
 
 
@@ -168,7 +132,7 @@ PneumoCaT2 will default to the assembly file name or the fastq file name
 **-c** (collate): Specify a folder for PneumoCaT2 to collate results from the run into a file called "Collated_result_data.csv"
 This is useful when running multiple PneumoCaT2 jobs for a particular project, for example via a queue submission system or Bash loop command. The basic result data will be appended to this file until either the flag is not specified, a different folder is specified or the resulting file is moved or renamed.
 
-**Example command lines:**
+## Example command lines
 
 1. Input folder containing read 1 and read 2, 8 threads, path to mash, custom sample name.
 
@@ -189,7 +153,47 @@ This is useful when running multiple PneumoCaT2 jobs for a particular project, f
 
 5. Input assembly, path to mash ,collate file folder location
 
-`python pneumocat2.py -a path_to_assembly/assembly  -m path_to_mash/mash -k 75`
+`python pneumocat2.py -a path_to_assembly/assembly  -m path_to_mash/mash -c path_to_collate_folder`
+
+
+## How PneumoCaT2 works  
+
+Stage 1 of PneumoCaT2 (and some calls in stage 2) use a kmer based approach to 
+screen the read files or input assembly file against the capsular operon 
+references (references.fasta) which is stored as a mash sketch file (references.msh).
+
+In the first stage, the input sequences are screened against a file of the
+ capsular operon references (references.msh). The resulting data is analysed for hit
+  percentage (kmers in sample / kmers in reference x 100) and then filtered according to
+  the cut off values specified.
+
+-p kmer percentage - Percentage of hit kmers against total reference kmers for a given
+serotype reference sequence, calculated by PneumoCaT2.
+
+-n median multiplicity -the median number of multiples of a given kmer in the dataset,
+given in mash screen output. Low kmer multiplicity could be caused by 
+sequencing errors or mixed samples - only applicable for input read files if
+ assembly files are input this value is automatically set to 1.
+
+
+This results in several stage 1 outcome categories and also come with a RAG 
+status (see Quality and Error checking):
+
+- `type` - A serotype that can be determined in stage 1 only. Resulted as final result 
+when run in normal mode 
+- `subtype` - a serotype that determined in stage 1 only but also has subtypes which 
+can be determined to add further information (*future update*)
+- `variants`  - a serotype that cannot determined in stage 1 only - needs further 
+determination against capsular type variant database.
+- `mix` - Mixed serotypes are present
+- `acapsular` - the kmer percentages against all capsular operon references were 20% and 
+suggests that the sample does NOT have a capsular operon present and may be an acapsular 
+organism. Check phenotype and species ID.
+- `No hits` - No hits were determined but the kmer percentage to the reference operons
+ was higher than that that might suggest an acapsular organism. Could be due to serotype
+variant or due to poor sequencing quality. 
+
+If the `variants` category is returned in stage 1 then PneumoCaT2 proceeds to stage 2. 
 
 
 ## Quality checks
