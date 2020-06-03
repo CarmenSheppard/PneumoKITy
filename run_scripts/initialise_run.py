@@ -60,9 +60,9 @@ def parse_args(workflow_version):
                              'otherwise splits on first "." for fastq file 1, '
                              'or uses base filename of assembly')
 
-    parser.add_argument("-k", "--minkmer", type=int,
+    parser.add_argument("-p", "--minpercent", type=int,
                         default=90,
-                        help="minimum kmer count %% of total, INTEGER. Value "
+                        help="minimum percentage kmer count %% of total, INTEGER. Value "
                              "between 20 and 100 accepted [OPTIONAL]; "
                              "Default = 90")
 
@@ -83,12 +83,12 @@ def parse_args(workflow_version):
                              ' will be created in the directory containing the'
                              ' fastq files')
 
-    parser.add_argument('--threads', '-t', default="4", type=int,
+    parser.add_argument('--threads', '-t', default=4, type=int,
                         help='Number of threads to use')
 
-    parser.add_argument('--csv', '-c',  type=str,
-                        help='path to EXISTING folder for additional copy of results csv. [OPTIONAL]'
-                             ' Useful for collation of csv results files from multiple runs.')
+    parser.add_argument('--collate', '-c',  type=str,
+                        help='path to EXISTING folder for collating results. Adds results to file "Collated_results.csv"'
+                             ' at the specified location [OPTIONAL]. Useful for collation of multiple runs.')
 
     # parser.add_argument('--stringent', '-S', action='store_true',
     #                     help='Run stringent mode')
@@ -119,7 +119,7 @@ class Analysis:
         self.category = None # category for stage 2 analysis or not
         self.folder = None # folder (genogroup) for stage 2 analysis
         self.stage1_result = ""
-        self.stage2_result = ""
+        self.stage2_result = {}
         self.stage2_varids = None
         self.mash_v = "" # version of Mash used
         self.threads = str(inputs.threads) # number of threads used for subprocesses
@@ -127,10 +127,11 @@ class Analysis:
         self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
         self.rag_status = "RED"
         self.top_hits = "" # top five hits from stage 1 analysis
+        self.stage2_hits = {} # metrics for stage 2 hits
         self.max_percent = "" # percentage of max top hit
         self.gene_list = [] # genelist for stage 2 analysis
         self.grp_id = None # database id of group for stage 3
-        self.csv_copy = None # folder for collating copy of results csv
+        self.csv_collate = None # folder for collating of results
         #self.stringent = inputs.stringent # next version!!
 
         # Determine input option
@@ -180,9 +181,9 @@ class Analysis:
                 sys.stderr.write("ERROR: Check input assembly path\n")
                 sys.exit(1)
 
-        # check minkmer input:
-        if 20 <= inputs.minkmer <= 100:
-            self.minkmer = inputs.minkmer
+        # check minpercent input:
+        if 20 <= inputs.minpercent <= 100:
+            self.minpercent = inputs.minpercent
 
         else:
             sys.stderr.write("ERROR: Input min kmer percentage must be "
@@ -243,10 +244,11 @@ class Analysis:
         else:
             self.sampleid = inputs.sampleid
 
-        if inputs.csv:
-            if os.path.isdir(inputs.csv):
+        if inputs.collate:
+            # get collate dir location
+            if os.path.isdir(inputs.collate):
                 # set input dir to input dir of first fastq
-                self.csv_copy = inputs.csv
+                self.csv_collate = inputs.collate
             else:
                 sys.stderr.write("ERROR: Check copy csv directory path\n")
                 sys.exit(1)
@@ -272,7 +274,7 @@ Run Metrics
 Workflow version\t{self.workflow}
 
 {inputfiles}
-Input kmer percent cut-off:\t{self.minkmer}
+Input kmer percent cut-off:\t{self.minpercent}
 Median multiplicity cut-off:\t{self.minmulti}
 CTV.db path:\t{self.database}
 Mash Version:\t{self.mash_v}
@@ -311,10 +313,10 @@ RED: Analysis failed
         frame = pd.DataFrame.from_dict(attribs, orient="index")
         frame = frame.transpose()
         # create separate dataframes of quality and result data
-        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minkmer",
-                             "mash", "database", "output_dir","csv_copy"], axis=1)
+        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
+                             "mash", "database", "output_dir","csv_collate"], axis=1)
         results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "stage2_varids",
-                                "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
+                                "stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
 
         return quality, results
 

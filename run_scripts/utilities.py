@@ -7,7 +7,7 @@ import numpy as np
 import subprocess
 import os
 import sys
-from run_scripts.exceptions import CtvdbError, CtvdbFileError
+from exceptions import CtvdbError, CtvdbFileError
 from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup
 
 def check_db_path(database):
@@ -136,12 +136,12 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     return outfile
 
 
-def filter_kmerhits(df, minkmer):
+def filter_kmerhits(df, minpercent):
     """
     Function to calculate % hits for each query and reduce dataframe to
     those above the min kmer cut off.
     :param df: pandas dataframe of MASH output
-    :param minkmer: int representing % hits of total kmers for serotype
+    :param minpercent: int representing % hits of total kmers for serotype
     :return: pandas.dataframe of rows representing kmer hits above % cutoff
     and dataframe of all calculated kmer percents for reference
     """
@@ -150,12 +150,12 @@ def filter_kmerhits(df, minkmer):
     df["hit_hashes"] = pd.to_numeric(hashes[0])
     df["total_hashes"] = pd.to_numeric(hashes[1])
     df["percent"] = df["hit_hashes"] / df["total_hashes"] * 100
-    filtered_kmerhits = df[df["percent"] >= minkmer]
+    filtered_kmerhits = df[df["percent"] >= minpercent]
 
     return filtered_kmerhits, df
 
 
-def apply_filters(df, minkmer, minmulti, top_hits = True):
+def apply_filters(df, minpercent, minmulti, top_hits = True):
     """
     Apply specified filters to dataframe and get top 5 hits
     :param df: pandas dataframe
@@ -165,7 +165,7 @@ def apply_filters(df, minkmer, minmulti, top_hits = True):
     :return: filtered dataframe
     """
     # filter for kmer hits above percentage
-    filtered, original = filter_kmerhits(df, minkmer)
+    filtered, original = filter_kmerhits(df, minpercent)
 
     # filter for median-multiplicity if necessary (reads)
     if minmulti != 1:
@@ -200,7 +200,6 @@ def create_csv(df, outpath, filename, index=False):
         df.to_csv(os.path.join(outpath, filename), header=True,
                   index=index,
                   float_format=np.float32)
-        sys.stdout.write(f"CSV file {filename} written.\n")
 
     except IOError:
         sys.stderr.write(" Error: Could not save csv. Please check output "
@@ -208,7 +207,7 @@ def create_csv(df, outpath, filename, index=False):
         sys.exit(1)
 
 
-def get_variant_ids(hit_variants, var_type, groupid, session,position=None):
+def get_variant_ids(hit_variants, var_type, groupid, session, position=None):
     """
     Returns variant id's by comparing to database
     :param hit_variants: dict of hit variants
@@ -245,10 +244,10 @@ def find_phenotype(analysis, session):
     # create dict of expected vars
     expected_vars = {}
     for item in serorecords:
-        if item not in expected_vars:
+        if item[0] not in expected_vars:
             expected_vars[item[0]] = [item[1]]
         else:
-            expected_vars[item[0]] = item[1]
+            expected_vars[item[0]].append(item[1])
 
     detected_vars = []
     # create list of var ids from analysis
@@ -270,6 +269,29 @@ def find_phenotype(analysis, session):
         sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
+def collate_results(collate_dir, results):
+    """
+    If selected this will add results to a csv file at a specified collation directory location.
+    :param collate_dir: directory for collated csv file
+    :param results: results dataframe created from analysis object
+    :return: None
+    """
+    collate_file = os.path.join(collate_dir, "Collated_result_data.csv")
+    #check whether collated result data file exists if not create it
+    try:
+        if os.path.isfile(collate_file):
+            # do something to append results
+            df = pd.read_csv(collate_file)
+            # append results
+            df = df.append(results,ignore_index=True)
+            create_csv(df,collate_dir,"Collated_result_data.csv")
+        else:
+            create_csv(results, collate_dir, "Collated_result_data.csv")
+    except IOError:
+        sys.stderr.write(" Error: Could not save collated csv. Please check copy output "
+                         "path\n")
+        sys.exit(1)
+
 def handle_results(analysis):
     #creates output files and write to stdout for results.
     analysis.write_report()
@@ -278,9 +300,12 @@ def handle_results(analysis):
     # write csv
     create_csv(quality, analysis.output_dir, f"{analysis.sampleid}_quality_system_data.csv")
     create_csv(results, analysis.output_dir, f"{analysis.sampleid}_result_data.csv")
-    if analysis.csv_copy:
-        create_csv(results, analysis.csv_copy, f"{analysis.sampleid}_result_data.csv")
-    sys.stdout.write(f"{analysis.workflow} run complete.\n")
+
+    # if copy option is taken collate results at directory path specified
+    if analysis.csv_collate:
+        collate_results(analysis.csv_collate, results)
+        sys.stdout.write(f"Results collated at {analysis.csv_collate}/Collated_result_data.csv \n")
+    sys.stdout.write(f"CSV files written to {analysis.output_dir}.\n")
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
     sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")
-
+    sys.stdout.write(f"{analysis.workflow} run complete.\n")
