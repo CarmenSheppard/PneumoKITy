@@ -165,7 +165,7 @@ def run_parse(analysis, tsvfile):
                 # second chance, amber rag status for low top hits
                 if analysis.max_percent >= 70 and analysis.minpercent >= 70:
                     analysis.rag_status = "AMBER"
-                    # reduce minpercent cut off to the max percentage - 10%
+                    # reduce minpercent cut off to: max percentage - 10%
                     minpercent = analysis.max_percent - (analysis.max_percent*0.1)
                     # rerun filter
                     filtered_df, original, analysis.top_hits = apply_filters(df,
