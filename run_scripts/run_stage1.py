@@ -56,21 +56,24 @@ def group_check(df, database):
     # create db session
     session = session_maker(database)
 
-    # initialise empty list for group ids
+    # initialise empty list for group ids and group info
     groups = []
+    grp_info = []
+
+    #initialise empty list for types
+    types = []
     # go through query results and append to groups list if not "no results".
     for i in results:
         genogroup = session.query(Serotype).join(Group).filter(Serotype.serotype_hit == i).all()
         if genogroup:
-            groups.append(genogroup[0])
+            groups.append(genogroup[0].group_id)
+            grp_info.append(genogroup[0])
+        else: # if not in a group add the type that was found
+            types.append(i)
 
-    # check length of set grp.ids if > 1 then not all group's were identical, hence Mixed,
-    grp = []
-    for g in groups:
-        grp.append(g.group_id)
-
-    if len(set(grp)) > 1:
-        # must contain non-group serotypes in addition
+    # check length of set group is > 1 then not all group's were identical, hence Mixed. Or there are
+    # mixed groups and types
+    if len(set(groups)) > 1 or groups and types:
         # get phenotype info for hits to add to result output
         pheno = set(get_pheno_list(results, session))
         session.close()
@@ -80,7 +83,7 @@ def group_check(df, database):
             stage1_result = f"Mixed serotypes- {pheno}"
             sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
         else:
-            category= Category.subtype
+            category = Category.subtype
             stage1_result = pheno
 
     # if only one hit and that hit is not in a group
@@ -99,7 +102,7 @@ def group_check(df, database):
         category = Category.type
 
     # if more than one hit but they are all types with no groups or SUBTYPES
-    elif not grp and len(results) > 1:
+    elif not groups and len(results) > 1:
         # get phenotypes for output
         pheno = set(get_pheno_list(results, session))
         if len(pheno) > 1:
@@ -115,8 +118,8 @@ def group_check(df, database):
     # if not meeting above criteria must be a group (even if only 1 hit)
     else:
         # retrieve group_name and group ID
-        if grp:
-            for record in groups:
+        if grp_info:
+            for record in set(grp_info):
                 folder = record.genogroup.group_name
                 grp_id = record.group_id
             category = Category.variants
