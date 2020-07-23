@@ -45,7 +45,7 @@ def sort_genes(gene, analysis, allele_or_gene, session):
 
 def run_alleles(analysis, genename):
     """
-    Run allele determinations using mash screen
+    Run allele determinations using mash screen cut off 90%
     :param analysis: analysis object
     :param genename: genename
     :return: list of alleles
@@ -77,8 +77,9 @@ def run_alleles(analysis, genename):
             filename = f"{analysis.sampleid}_{genename}_screen.csv"
             create_csv(original, analysis.output_dir, filename)
 
-            # find max percent hit for result display
+            # find max percent hit and variant for result display
             max_percent = round(original['percent'].max(), 2)
+            max_hit_var = original['Allele'][original['percent'] == original['percent'].max()].iloc[0]
 
             #analyse outputs
             if not filtered_df.empty:
@@ -92,15 +93,15 @@ def run_alleles(analysis, genename):
             else:  # for samples with no hits
                 if max_percent < 20:
                     hit_alleles[genename] = 0
-                    analysis.stage2_hits[genename] = "<20%"
+                    analysis.stage2_hits[genename] = [f"{max_hit_var}: {max_percent}"]
                     analysis.rag_status = "RED"
-                    sys.stdout.write(f"Allele {genename} did not match references, match <20%\n")
+                    sys.stdout.write(f"Allele {genename} did not match references, hit <20% t\n")
                 # for samples with intermediate %match - unusual alleles
                 else:
                     hit_alleles[genename] = 0
-                    analysis.stage2_hits[genename] = ["<70%"]
+                    analysis.stage2_hits[genename] = [f"{max_hit_var}: {max_percent}"]
                     analysis.rag_status = "RED"
-                    sys.stderr.write(f"Allele {genename} unrecognised possible variant\n")
+                    sys.stdout.write(f"Allele {genename}- hit <90%  to possible variant or seq quality issue\n")
 
         return hit_alleles
 
@@ -149,9 +150,11 @@ def run_genes(analysis, genename):
             #create csv of original mash output with added percent fields
             filename = f"{analysis.sampleid}_{genename}_screen.csv"
             create_csv(original, analysis.output_dir, filename)
+
             # find max percent hit for result display
             max_percent = round(original['percent'].max(), 2)
             analysis.stage2_hits[genename] = max_percent
+
             #analyse outputs
             if not filtered_df.empty:
                 # if over upper cut off only one sequence so only 1 row possible
