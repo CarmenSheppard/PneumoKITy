@@ -36,8 +36,9 @@ def sort_genes(gene, analysis, allele_or_gene, session):
 
     # append hit genes output to analysis object
     analysis.stage2_result.update(hit_genes)
+
     # use variant query to get Variant records for hit
-    stage2_var = get_variant_ids(hit_genes, allele_or_gene, analysis.grp_id, session)[0]
+    stage2_var = get_variant_ids(hit_genes, allele_or_gene, analysis.grp_id, session)
     analysis.stage2_varids.append(stage2_var)
     return analysis
 
@@ -52,7 +53,7 @@ def run_alleles(analysis, genename):
     hit_alleles = {}
 
     try:
-        # get ref scketch for genename from database folder
+        # get ref sketch for genename from database folder
         ref_sketch = os.path.join(analysis.database,analysis.folder,
                                   f"{genename}.msh")
 
@@ -84,19 +85,19 @@ def run_alleles(analysis, genename):
                 # collate hits
                 for index, rows in filtered_df.iterrows():
                     result = rows.Allele
-                    hit_alleles[genename]= result
+                    hit_alleles[genename] = result
                     analysis.stage2_hits[genename] = [result, max_percent]
                     sys.stdout.write(f"Completed {genename} allele analysis.\n")
 
             else:  # for samples with no hits
                 if max_percent < 20:
-                    hit_alleles[genename]= "Unrecognised"
+                    hit_alleles[genename] = 0
                     analysis.stage2_hits[genename] = "<20%"
                     analysis.rag_status = "RED"
                     sys.stdout.write(f"Allele {genename} did not match references, match <20%\n")
                 # for samples with intermediate %match - unusual alleles
                 else:
-                    hit_alleles[genename]= "Variant allele"
+                    hit_alleles[genename] = 0
                     analysis.stage2_hits[genename] = ["<70%"]
                     analysis.rag_status = "RED"
                     sys.stderr.write(f"Allele {genename} unrecognised possible variant\n")
@@ -138,7 +139,7 @@ def run_genes(analysis, genename):
             df = create_dataframe(outfile, "Gene_presence")
 
             #Filter dataframe for cutoffs using the filtering function
-            # use 90% initial hit cut off (Green RAG)
+            # use 80% initial hit cut off (Green RAG)
             filtered_df, original = apply_filters(df, hit_cut,
                                                   analysis.minmulti, False)
 
@@ -159,7 +160,7 @@ def run_genes(analysis, genename):
 
             else:  # for samples with no hits
                 if max_percent < 20:
-                    hit_genes[genename]= "not_detected"
+                    hit_genes[genename] = "not_detected"
                     sys.stdout.write(f"Gene {genename} not detected\n")
 
                 # for samples with intermediate %match - possible variants
