@@ -175,7 +175,7 @@ def apply_filters(df, minpercent, minmulti, top_hits = True):
         return filtered, original
 
     # get top 5 hits as dict with percent (rounded to 2 dp)
-    top_hits_df = filtered.nlargest(5, 'percent').round(2)
+    top_hits_df = original.nlargest(5, 'percent').round(2)
     top_hits_dict = top_hits_df.to_dict('index')
     top_hits = {}
     for i in top_hits_dict:
