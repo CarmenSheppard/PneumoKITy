@@ -6,8 +6,8 @@ Carmen Sheppard 2019-2020
 import os
 import sys
 from run_scripts.initialise_run import Category
-from run_scripts.utilities import apply_filters, create_csv, create_dataframe
-from Database_tools.db_functions import searchexact, session_maker
+from run_scripts.tools import apply_filters, create_csv, create_dataframe
+from Database_tools.db_functions import session_maker
 from Database_tools.sqlalchemydeclarative import Serotype, Group
 
 

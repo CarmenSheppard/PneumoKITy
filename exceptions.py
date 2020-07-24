@@ -29,7 +29,7 @@ class CtvdbFileError(Exception):
 
     def __str__(self):
         if self.message:
-            return f"CtvdbFileError: {self.message}"
+            return f"CtvdbFileError:  {self.message}"
         else:
             return "CtvdbFileError: check folder integrity for missing or misnamed " \
                    " reference files.\n"

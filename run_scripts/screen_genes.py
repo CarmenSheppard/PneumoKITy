@@ -5,7 +5,7 @@ Carmen Sheppard 2019-2020
 import sys
 import os
 import exceptions
-from run_scripts.utilities import run_mash_screen, create_dataframe, \
+from run_scripts.tools import run_mash_screen, create_dataframe, \
     apply_filters, create_csv, get_variant_ids
 
 
@@ -106,7 +106,7 @@ def run_alleles(analysis, genename):
         return hit_alleles
 
     except IOError:
-        sys.stderr.write(f"CTV.db/file integrity error. Reference files not found")
+        sys.stderr.write(f"CTV.db/file integrity error - {analysis.sampleid}. Reference files not found")
         raise exceptions.CtvdbError()
 
 def run_genes(analysis, genename):
@@ -188,6 +188,6 @@ def run_genes(analysis, genename):
         return hit_genes
 
     except IOError:
-        sys.stderr.write(f"CTV.db/file integrity error. Reference files not found")
+        sys.stderr.write(f"CTV.db/file integrity error {analysis.sampleid}. Reference files not found")
         raise exceptions.CtvdbError()
 

@@ -7,7 +7,7 @@ import sys
 from Database_tools.db_functions import session_maker
 from Database_tools.sqlalchemydeclarative import VariantGroup, Variants, Genes
 from run_scripts.screen_genes import sort_genes
-from run_scripts.utilities import find_phenotype
+from run_scripts.tools import find_phenotype
 import exceptions
 
 
@@ -54,7 +54,7 @@ def start_analysis(analysis):
 
         else:
             # raise exception for types of variants not found (eg error in DB)
-            raise exceptions.CtvdbError(f"Could not find variant type {gene.var_type} for analysis\n")
+            raise exceptions.CtvdbError(f" Could not find variant type {gene.var_type} for analysis\n")
 
      # GET SEROTYPES FROM VAR IDS
     find_phenotype(analysis, session)

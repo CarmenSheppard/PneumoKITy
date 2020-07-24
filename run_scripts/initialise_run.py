@@ -12,9 +12,7 @@ import os
 import ctvdb
 import pandas as pd
 from enum import Enum
-from run_scripts.utilities import check_db_path, check_version
-
-
+from run_scripts.tools import check_db_path, check_version
 
 class Category(Enum):
     # deal with categories from stage 1
@@ -24,8 +22,6 @@ class Category(Enum):
     mix = 4
     acapsular = 5
     no_hits = 6
-
-
 
 def parse_args(workflow_version):
     """
@@ -107,7 +103,6 @@ class Analysis:
 
     """Create object for analysis - update class attributes based on inputs,
         includes methods for creation of report and csv from object"""
-
 
     def __init__(self, inputs, version):
         """set up analysis object according to input options
@@ -227,7 +222,7 @@ class Analysis:
                 os.makedirs(os.path.join(self.output_dir, "tmp"))
 
         except IOError:
-            sys.stderr.write("ERROR: cannot access/write to output paths")
+            sys.stderr.write("ERROR: cannot access/write to output paths\n")
             sys.exit(1)
 
         # get sample id from files
@@ -240,6 +235,7 @@ class Analysis:
                 # get filename from assembly
                 assembly_name = os.path.basename(self.assembly)
                 self.sampleid = assembly_name.split(".", 1)[0]
+
 
         else:
             self.sampleid = inputs.sampleid

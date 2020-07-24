@@ -12,7 +12,7 @@ import ctvdb
 from Database_tools.db_functions import searchexact, session_maker
 from Database_tools.sqlalchemydeclarative import Serotype, SerotypeVariants, Group, Variants, Genes, \
     VariantGroup
-from run_scripts.utilities import check_db_path
+from run_scripts.tools import check_db_path
 
 
 def parse_args():

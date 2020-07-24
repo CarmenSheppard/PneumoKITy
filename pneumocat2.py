@@ -8,7 +8,7 @@ Carmen Sheppard 2019-2020
 import os
 import sys
 from run_scripts.initialise_run import Analysis, parse_args, Category
-from run_scripts.utilities import run_mash_screen, create_csv, handle_results
+from run_scripts.tools import run_mash_screen, handle_results
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
 
@@ -26,6 +26,7 @@ def main(input_args, workflow_version):
 
     # set up analysis object using inputs from commandline
     analysis = Analysis(input_args, workflow_version)
+    sys.stdout.write(f"\nSample: {analysis.sampleid}\n")
 
     # Run Stage 1 Serotype analysis.
     # -------------------------------
