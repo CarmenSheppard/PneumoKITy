@@ -79,8 +79,8 @@ def parse_args(workflow_version):
                              ' will be created in the directory containing the'
                              ' fastq files')
 
-    parser.add_argument('--threads', '-t', default=4, type=int,
-                        help='Number of threads to use')
+    parser.add_argument('--threads', '-t', default=1, type=int,
+                        help='Number of threads to use [Default = 1]')
 
     parser.add_argument('--collate', '-c',  type=str,
                         help='path to EXISTING folder for collating results. Adds results to file "Collated_results.csv"'
