@@ -101,7 +101,7 @@ An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish 
   
  The alternative ctvdb folder location **MUST** contain a `references.msh` file 
  created using [mash](https://mash.readthedocs.io/en/latest/) sketch 
- **with sketch parameters -k 31 and -s 25000** run on all the references that you wish to include,
+ **with sketch parameters -k 31 and (default) -s 1000** run on all the references that you wish to include,
   and a `CTV.db` which is an sqlite database file containing information about all serotypes for inclusion 
   in the serotype determination. The database structure (table and field names) should
    match that defined in the sqlalchemydeclarative.py script. Matching foldernames 
@@ -109,7 +109,7 @@ An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish 
     ctvdb root folder.
      Further information on creation of custom db will be added in the future.
  
-**-t** (threads) Number of threads to use for subprocesses (default = 4) eg: `-t 8`
+**-t** (threads) Number of threads to use for subprocesses (default = 1) eg: `-t 8`
 
 **-m** (mash): path to mash software. By default PneumoCaT2 will use the 
 command  `mash` which will only work if the mash software is included in the
@@ -193,7 +193,14 @@ organism. Check phenotype and species ID.
  was higher than that that might suggest an acapsular organism. Could be due to serotype
 variant or due to poor sequencing quality. 
 
-If the `variants` category is returned in stage 1 then PneumoCaT2 proceeds to stage 2. 
+If the `variants` category is returned in stage 1 then PneumoCaT2 proceeds to stage 2.
+
+**Stage 2** - currently only two categories of variants are available in stage 2, these are
+gene presence/absence and allele variants. Both of these methods are implemented using MASH in
+a similar procedure to described above. Only serotype 15A and 19A / variant 19F(A) are able to
+determine in stage 2. All other serotypes requiring variant analysiswill return an error message
+regarding unrecognised variant profile as the methods for determining SNPS and gene function/non-function
+variants are not yet implemented.
 
 
 ## Quality checks
@@ -216,6 +223,9 @@ kmer percentage cut of is automatically dropped by 10% from the initial cut
 off (so usually reset to 81% unless the user has input a custom kmer percent
  cut off) and analysis is run again. This was implemented to help avoid 
  those annoying situations when a sample would miss just below the cut off.
+
+Amber result status also occurs in stage 2 for unrecognised variant profiles.
+
 The analysis is given the RAG status AMBER to flag to the user that 
   they should check the results. This type of result may occur in situations
    when the local pneumococcal population has differing clones than that to 
