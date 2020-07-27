@@ -287,14 +287,15 @@ def collate_results(collate_dir, results):
     #check whether collated result data file exists if not create it
 
     try:
-        if os.path.isfile(collate_file):
-            #  append results
-            df = pd.read_csv(collate_file)
-            # append results
-            df = df.append(results, ignore_index=True)
-            create_csv(df,collate_dir,"Collated_result_data.csv")
-        else:
-            create_csv(results, collate_dir, "Collated_result_data.csv")
+        with open(collate_file, 'a') as f:
+            results.to_csv(f, header=f.tell() == 0,index=False)
+            # if os.path.isfile(collate_file):
+            # #  append results
+            # df = pd.read_csv(collate_file)
+            # # append results
+            # df = df.append(results, ignore_index=True)
+            # create_csv(df, collate_dir,"Collated_result_data.csv")
+
     except IOError:
         sys.stderr.write(" Error: Could not save  data to collated csv. Please check output "
                          "path\n")

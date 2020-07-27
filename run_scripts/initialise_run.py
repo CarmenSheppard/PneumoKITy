@@ -243,7 +243,7 @@ class Analysis:
         if inputs.collate:
             # get collate dir location
             if os.path.isdir(inputs.collate):
-                # set input dir to input dir of first fastq
+                # set collate dir
                 self.csv_collate = inputs.collate
             else:
                 sys.stderr.write("ERROR: Check copy csv directory path\n")
