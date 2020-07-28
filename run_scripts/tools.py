@@ -288,7 +288,7 @@ def collate_results(collate_dir, results):
 
     try:
         with open(collate_file, 'a') as f:
-            results.to_csv(f, header=f.tell() == 0,index=False)
+            results.to_csv(f, header=f.tell() == 0, index=False)
             # if os.path.isfile(collate_file):
             # #  append results
             # df = pd.read_csv(collate_file)

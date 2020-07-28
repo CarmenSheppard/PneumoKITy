@@ -176,6 +176,11 @@ def run_parse(analysis, tsvfile):
                     analysis.category, analysis.stage1_result, analysis.folder, analysis.grp_id\
                         = group_check(filtered_df, analysis.database)
 
+                elif analysis.max_percent < 20:
+                    analysis.category = Category.acapsular
+                    analysis.stage1_result = "Below 20% hit - possible acapsular"\
+                                             " organism, check species identity and sequence quality."
+
                 else:
                     analysis.category = Category.no_hits
                     analysis.stage1_result = "Below 70% hit - Poor Sequence " \
