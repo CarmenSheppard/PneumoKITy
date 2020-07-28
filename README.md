@@ -10,6 +10,7 @@
 * [How PneumoCaT2 works](https://github.com/CarmenSheppard/pneumocat2#How-PneumoCaT2-works)
 * [Quality checks](https://github.com/CarmenSheppard/pneumocat2#Quality-checks)
 * [PneumoCaT Output](https://github.com/CarmenSheppard/pneumocat2#Output-files)
+* [Interpretation of results](https://github.com/CarmenSheppard/pneumocat2#Interpretation-of-results)
 * CTV database
 * Examples
 * Troubleshooting
@@ -38,9 +39,7 @@ serotype calling and generally improve PneumoCaT. This version uses very differe
  methods to previous versions and requires a new running environment.
 
  The **C**apsular **T**ype **V**ariant database (CTVdb) used in 
-PneumoCaT 2 is now a real database, running in SQLite3. We felt that, though
- the database is currently small, the use of a true database structure
- allows for much easier updating of information and gives better 
+PneumoCaT 2 is now a real database, running in SQLite3, allowing  for much easier updating of information and better 
  scope for the database to grow in the future as more variants and serotype 
  determinants are added. The use of this format will also allow us to store 
  extra related information about the serotypes, such as subtype information 
@@ -89,25 +88,7 @@ PneumoCaT2 defaults to using the input directory for either read1 if using
 fastq input or the assembly in this case ensure the input directory is writable or an
 error will occur.
  
-**-d** (database): path to capsular type variant database (ctvdb). By default this 
-will be the ctvdb that is contained within the PneumoCaT2 program. 
 
-
-An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish to use an 
- alternative ctvdb we recommend that this is stored in a separate folder location
- and called using the -d option. To avoid confusion when troubleshooting,
-  please do **NOT**  overwrite the included ctvdb and run without specifying the option -d.
- eg: `-d path_to_alternative_CTV.db` 
-  
- The alternative ctvdb folder location **MUST** contain a `references.msh` file 
- created using [mash](https://mash.readthedocs.io/en/latest/) sketch 
- **with sketch parameters -k 31 and (default) -s 1000** run on all the references that you wish to include,
-  and a `CTV.db` which is an sqlite database file containing information about all serotypes for inclusion 
-  in the serotype determination. The database structure (table and field names) should
-   match that defined in the sqlalchemydeclarative.py script. Matching foldernames 
-   for each serogroup contained with the CTV.db must be added within the
-    ctvdb root folder.
-     Further information on creation of custom db will be added in the future.
  
 **-t** (threads) Number of threads to use for subprocesses (default = 1) eg: `-t 8`
 
@@ -130,7 +111,27 @@ PneumoCaT2 will default to the assembly file name or the fastq file name
 (split on first "."). eg: `-s sample-name`
 
 **-c** (collate): Specify a folder for PneumoCaT2 to collate results from the run into a file called "Collated_result_data.csv"
-This is useful when running multiple PneumoCaT2 jobs for a particular project, for example via a queue submission system or Bash loop command. The basic result data will be appended to this file until either the flag is not specified, a different folder is specified or the resulting file is moved or renamed.
+This is useful when running multiple PneumoCaT2 jobs for a particular project, for example via a queue submission system or Bash loop command. The basic result data will be appended to this file until either the flag is not specified, a different folder is specified or the resulting file is moved or renamed. In rare instances multiple processing MAY result in this file not being writable, and a result beng missed from the collation. The original data files from the run will be saved in their output location.
+
+**-d** (database): path to capsular type variant database (ctvdb). By default this 
+will be the ctvdb that is contained within the PneumoCaT2 program. 
+
+
+An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish to use an 
+ alternative ctvdb we recommend that this is stored in a separate folder location
+ and called using the -d option. To avoid confusion when troubleshooting,
+  please do **NOT**  overwrite the included ctvdb and run without specifying the option -d.
+ eg: `-d path_to_alternative_CTV.db` 
+  
+ The alternative ctvdb folder location **MUST** contain a `references.msh` file 
+ created using [mash](https://mash.readthedocs.io/en/latest/) sketch 
+ **with sketch parameters -k 31 and (default) -s 1000** run on all the references that you wish to include,
+  and a `CTV.db` which is an sqlite database file containing information about all serotypes for inclusion 
+  in the serotype determination. The database structure (table and field names) should
+   match that defined in the sqlalchemydeclarative.py script. Matching foldernames 
+   for each serogroup contained with the CTV.db must be added within the
+    ctvdb root folder.
+     Further information on creation of custom db will be added in the future.
 
 ## Example command lines
 
@@ -173,7 +174,7 @@ serotype reference sequence, calculated by PneumoCaT2.
 -n median multiplicity -the median number of multiples of a given kmer in the dataset,
 given in mash screen output. Low kmer multiplicity could be caused by 
 sequencing errors or mixed samples - only applicable for input read files if
- assembly files are input this value is automatically set to 1.
+ assembly files are input this value is automatically set to 1. The default for fastq is 4.
 
 
 This results in several stage 1 outcome categories and also come with a RAG 
@@ -266,3 +267,37 @@ csv file containing all of the stage1 screen MASH run hits.
 `SAMPLEID_GENE_screen.csv` *(Serotypes resulting at stage 2 only)*
 
 csv files containing MASH screen run hits information for the relevant variant genes.
+
+
+## Interpretation of results
+
+`predicted serotype` -  This is the predicted PHENOTYPICAL type of the organism if characterised using the commercially available [SSI Diagnostica serotyping sera](https://www.ssidiagnostica.com/antisera/pneumococcus-antisera/). However, the organism could have a specific underlying genetic type as in the case of 23B1 and 19A/F for example. 
+
+Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference.
+
+New genetic types are being discovered all the time and it is not possible for us to keep up with them, however we hope that the outputs obtained from PneumoCaT2 will help the user to determine if their isolate may be a novel genetic serotype for which a reference is not available in the ctvdb,a nd can then be further investigated.
+
+if the sample has failed to hit a serotype a description of the result is output in this field.
+
+`top hits` - this is a list of the top 5 hits in the stage 1 analysis, with their MASH hit kmer percentage score in order highest to lowest. For serogroups 6 and 19, subtype references from [Elberse et al](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0025018_ are included in the stage 1 references (eg 19F-III, 19A-IV).  Subtypes are not yet interpreted in the program but the closest hit subtype can be determined by reference to the top hit.
+
+`max percent` - the kmer percentage of the maximum hit in the MASH screen stage 1 analysis.
+
+`folder` - the folder location within the \ctvdb folder used for the stage 2 analysis/
+
+`stage 1 result` - the outcome of stage 1 analysis.
+
+`stage 2 varids` - the variant ID (keys) in the ctvdb sql database of the variants used for determination in stage2.
+
+`stage 2 hits` - the variant genes and results of stage 2 analysis, eg for those variants determined using MASH screen (gene presence/absence and allele) the result will be a hit % of kmers from sample vs kmers in the gene. 
+
+`stage 2 result` - interpreted version f stage 1, eg hit variant determined (eg detected, not detected)
+
+`rag status` - the overal quality status (traffic light system) of the run as described above.
+
+
+
+
+
+
+
