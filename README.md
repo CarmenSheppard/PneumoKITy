@@ -271,29 +271,29 @@ csv files containing MASH screen run hits information for the relevant variant g
 
 ## Interpretation of results
 
-`predicted serotype` -  This is the predicted PHENOTYPICAL type of the organism if characterised using the commercially available [SSI Diagnostica serotyping sera](https://www.ssidiagnostica.com/antisera/pneumococcus-antisera/). However, the organism could have a specific underlying genetic type as in the case of 23B1 and 19A/F for example. 
+**`predicted serotype`** -  This is the predicted PHENOTYPICAL type of the organism if characterised using the commercially available [SSI Diagnostica serotyping sera](https://www.ssidiagnostica.com/antisera/pneumococcus-antisera/). However, the organism could have a specific underlying genetic type as in the case of 23B1 and 19A/F for example. 
 
 Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference.
 
-New genetic types are being discovered all the time and it is not possible for us to keep up with them, however we hope that the outputs obtained from PneumoCaT2 will help the user to determine if their isolate may be a novel genetic serotype for which a reference is not available in the ctvdb,a nd can then be further investigated.
+New genetic types are being discovered all the time and it is not possible for us to keep up with them, however we hope that the outputs obtained from PneumoCaT2 will help the user to determine if their isolate may be a novel genetic serotype for which a reference is not available in the ctvdb, and can then be further investigated.
 
 if the sample has failed to hit a serotype a description of the result is output in this field.
 
-`top hits` - this is a list of the top 5 hits in the stage 1 analysis, with their MASH hit kmer percentage score in order highest to lowest. For serogroups 6 and 19, subtype references from [Elberse et al](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0025018_ are included in the stage 1 references (eg 19F-III, 19A-IV).  Subtypes are not yet interpreted in the program but the closest hit subtype can be determined by reference to the top hit.
+**`top hits`** - this is a list of the top 5 hits in the stage 1 analysis, with their MASH hit kmer percentage score in order highest to lowest. For serogroups 6 and 19, subtype references from [Elberse et al](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0025018_) are included in the stage 1 references (eg 19F-III, 19A-IV).  Subtypes are not yet interpreted in the program but the closest hit subtype can be determined by reference to the top hit.
 
-`max percent` - the kmer percentage of the maximum hit in the MASH screen stage 1 analysis.
+**`max percent`** - the kmer percentage of the maximum hit in the MASH screen stage 1 analysis.
 
-`folder` - the folder location within the \ctvdb folder used for the stage 2 analysis/
+**`folder`** - the folder location within the \ctvdb folder used for the stage 2 analysis/
 
-`stage 1 result` - the outcome of stage 1 analysis.
+**`stage 1 result`** - the outcome of stage 1 analysis.
 
-`stage 2 varids` - the variant ID (keys) in the ctvdb sql database of the variants used for determination in stage2.
+**`stage 2 varids`** - the variant ID (keys) in the ctvdb sql database of the variants used for determination in stage2.
 
-`stage 2 hits` - the variant genes and results of stage 2 analysis, eg for those variants determined using MASH screen (gene presence/absence and allele) the result will be a hit % of kmers from sample vs kmers in the gene. 
+**`stage 2 hits`** - the variant genes and results of stage 2 analysis, eg for those variants determined using MASH screen (gene presence/absence and allele) the result will be a hit % of kmers from sample vs kmers in the gene. 
 
-`stage 2 result` - interpreted version f stage 1, eg hit variant determined (eg detected, not detected)
+**`stage 2 result`** - interpreted version f stage 1, eg hit variant determined (eg detected, not detected)
 
-`rag status` - the overal quality status (traffic light system) of the run as described above.
+**`rag status`** - the overal quality status (traffic light system) of the run as described above.
 
 
 
