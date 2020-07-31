@@ -215,9 +215,11 @@ specified.
 
 Outputs from PneumoCaT2 are automatically assigned a RAG status:
 
-* GREEN: Analysis passed within expected cut-off
-* AMBER: Result obtained but caution advised, check top hit percentages.
-* RED: Analysis failed
+![#4CAF50](https://via.placeholder.com/15/4CAF50/000000?text=+) GREEN: Analysis passed within expected cut-off
+
+![#F39C12](https://via.placeholder.com/15/F39C12/000000?text=+) AMBER: Result obtained but caution advised, check top hit percentages.
+
+![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) RED: Analysis failed.
 
 Amber result status is assigned when no-hits occur in stage 1 analysis, the 
 kmer percentage cut of is automatically dropped by 10% from the initial cut 
@@ -227,12 +229,7 @@ off (so usually reset to 81% unless the user has input a custom kmer percent
 
 Amber result status also occurs in stage 2 for unrecognised variant profiles.
 
-The analysis is given the RAG status AMBER to flag to the user that 
-  they should check the results. This type of result may occur in situations
-   when the local pneumococcal population has differing clones than that to 
-   which the CTVdb was created, and may help avoid many fails in this 
-   situation while still alerting users to the issue. Local procedures can then be 
-   implemented to interpret these results.
+The analysis is given the RAG status AMBER to flag to the user that they should check the results. This type of result may occur in situations when the local pneumococcal population has differing clones than that to which the CTVdb was created, and may help avoid many fails in this situation while still alerting users to the issue. Local procedures can then be implemented to interpret these results.
    
 RED rag status alerts the user to failure of the serotyping. This could be 
 due to an unexpected pattern of results, mixed serotypes or no-hits in the 
