@@ -16,6 +16,7 @@ def check_db_path(database):
     :param obj: args.database object
     :return: None
     """
+
     if os.path.isfile(os.path.join(database, "references.msh")) and \
             os.path.isfile(os.path.join(database, "CTV.db")):
 

@@ -5,7 +5,6 @@ Carmen Sheppard 2020
 import argparse
 import os
 import sys
-
 import pandas as pd
 
 import ctvdb
@@ -14,6 +13,9 @@ from Database_tools.sqlalchemydeclarative import Serotype, SerotypeVariants, Gro
     VariantGroup
 from run_scripts.tools import check_db_path
 
+# change to home location (for running from PyCharm only TEMPORARY)
+#TODO update to argument in main PneumoCaT2 function
+#os.chdir("../")
 
 def parse_args():
     """
