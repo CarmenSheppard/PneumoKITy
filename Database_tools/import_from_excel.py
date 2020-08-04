@@ -15,7 +15,7 @@ from run_scripts.tools import check_db_path
 
 # change to home location (for running from PyCharm only TEMPORARY)
 #TODO update to argument in main PneumoCaT2 function
-#os.chdir("../")
+os.chdir("../")
 
 def parse_args():
     """
