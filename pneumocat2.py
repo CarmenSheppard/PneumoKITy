@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """python 3.6+, tested with Mash version 2.1 and 2.2
 Main PneumoCaT2 script run serotyping from WGS data (Fastq or assembly)
 1. Run MASH screen tsv output -> tmp folder
