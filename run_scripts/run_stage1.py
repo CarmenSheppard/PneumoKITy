@@ -9,7 +9,7 @@ from run_scripts.initialise_run import Category
 from run_scripts.tools import apply_filters, create_csv, create_dataframe
 from Database_tools.db_functions import session_maker
 from Database_tools.sqlalchemydeclarative import Serotype, Group
-
+from exceptions import  CtvdbError
 
 def get_pheno_list(serotype_hits, session):
     """
@@ -19,21 +19,25 @@ def get_pheno_list(serotype_hits, session):
     :return: list of deduplicated phenotypes
     """
     out_res = []
-
     for hit in serotype_hits:
-        # get back
-        grp = session.query(Serotype).join(Group).filter(Serotype.serotype_hit == hit).all()
-        # if hit is in group get group name
-        if grp:
-            for g in grp:
-                out_res.append(g.genogroup.group_name)
-        # if hit is type get phenotype name
-        else:
-            pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == hit) \
-                .all()
-            out_res.append(pheno[0][0])
-    out_res = set(out_res)
-    return out_res
+        try:
+
+            grp = session.query(Serotype).join(Group).filter(Serotype.serotype_hit == hit).all()
+            # if hit is in group get group name
+            if grp:
+                for g in grp:
+                    out_res.append(g.genogroup.group_name)
+            # if hit is type get phenotype name
+            else:
+                pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == hit) \
+                    .all()
+                out_res.append(pheno[0][0])
+            # remove duplicates
+            out_res = set(out_res)
+            return out_res
+        # catch non-matching hits due to errors in CTVdb set up
+        except IndexError:
+            raise CtvdbError(f"No phenotype found for hit {hit} check CTVdb integrity")
 
 
 def group_check(df, database):
