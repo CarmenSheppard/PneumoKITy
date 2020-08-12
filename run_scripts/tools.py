@@ -10,10 +10,11 @@ import sys
 from exceptions import CtvdbError, CtvdbFileError
 from Database_tools.sqlalchemydeclarative import Genes, Variants, Serotype, SerotypeVariants, VariantGroup
 
+
 def check_db_path(database):
     """
     Checks path for CTVdb for integrity
-    :param obj: args.database object
+    :param database:
     :return: None
     """
 
@@ -98,7 +99,6 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     """
     Run MASH screen for any sketch file against any ref (stage 1 & 2)
     :param analysis: analysis object
-    :param sketch: string of path to sketch file
     :param ref_sketch: String of path to reference sketch file
     :param run_type: type of screen file for output (defaults to "serotype")
     :return: string of tsv outfile path and name (saved to tmp).
@@ -158,8 +158,8 @@ def filter_kmerhits(df, minpercent):
 def apply_filters(df, minpercent, minmulti, top_hits = True):
     """
     Apply specified filters to dataframe and get top 5 hits
+    :param minpercent:
     :param df: pandas dataframe
-    :param minkmer: minimum kmer value
     :param minmulti: minimum multiplicity value
     :param top_hits: create 5 hits output or not
     :return: filtered dataframe
@@ -210,6 +210,7 @@ def create_csv(df, outpath, filename, index=False):
 def get_variant_ids(hit_variants, var_type, groupid, session, position=None):
     """
     Returns variant id's by comparing to database
+    :param groupid:
     :param hit_variants: dict of hit variants
     :param var_type: type of variant to search (eg allele)
     :param session: database session
@@ -240,7 +241,7 @@ def get_variant_ids(hit_variants, var_type, groupid, session, position=None):
 def find_phenotype(analysis, session):
     """
     Function to find phenotype associated with a var ids from stage 2 analysis  return final result
-    :param var_id: variant IDs from analysis
+    :param analysis:
     :param session: active DB session
     """
     # get variant ids associated with Serotype and group, unique combinations only

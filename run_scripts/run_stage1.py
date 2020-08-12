@@ -16,12 +16,13 @@ def get_pheno_list(serotype_hits, session):
     Function to return phenotype list from list of serotype hits (deduplicated)
     :param serotype_hits: list of serotype hits from stage 1 mash analysis
     :param session: DB session
-    :return: list of deduplicated phenotypes
+    :return: list of deduplicated phenotypes or groups
     """
     out_res = []
     for hit in serotype_hits:
+        grp = []
         try:
-
+            #check if group
             grp = session.query(Serotype).join(Group).filter(Serotype.serotype_hit == hit).all()
             # if hit is in group get group name
             if grp:
@@ -32,12 +33,14 @@ def get_pheno_list(serotype_hits, session):
                 pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == hit) \
                     .all()
                 out_res.append(pheno[0][0])
-            # remove duplicates
-            out_res = set(out_res)
-            return out_res
+
         # catch non-matching hits due to errors in CTVdb set up
         except IndexError:
             raise CtvdbError(f"No phenotype found for hit {hit} check CTVdb integrity")
+     # remove duplicates
+    out_res = set(out_res)
+    return out_res
+
 
 
 def group_check(df, database):
