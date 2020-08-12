@@ -43,8 +43,7 @@ def parse_args():
 def sort_sheets(args):
     """
     Parse in the input excel file process sheets specified in args.
-    :param import_file: Excel file in standardised format
-    :param tables:  list with sheet numbers (eg. [1,3,4])
+    :param args:  list with sheet numbers (eg. [1,3,4])
     :return: dict of dataframes
     """
 
@@ -432,6 +431,6 @@ if __name__ == "__main__":
 
     # if only serotype sheet added.
     else:
-        sdf = add_serotype(dfs['Serotype'])
+        add_serotype(dfs['Serotype'])
 
     sys.stdout.write("Database updated\n")

@@ -76,6 +76,7 @@ def main(input_args, workflow_version):
 
         sys.exit(0)
 
+
 if __name__ == "__main__":
     args = parse_args(version)
     main(args, version)

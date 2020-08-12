@@ -167,7 +167,7 @@ def run_genes(analysis, genename):
                     sys.stdout.write(f"Gene {genename} not detected\n")
 
                 # for samples with intermediate %match - possible variants
-                if max_percent < 50:
+                elif max_percent < 50:
                     # Update status but avoid overwriting previous RED or Amber status
                     if analysis.rag_status == "GREEN":
                         analysis.rag_status = "AMBER"
