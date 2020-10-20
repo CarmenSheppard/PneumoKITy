@@ -1,4 +1,4 @@
-# README for PneumoCaT2 
+# README for PneumoKITy
 
 ## Table of content
 
@@ -18,14 +18,13 @@
 * Licence Agreement
 
 
-PneumoCaT2 (**Pneumo**coccal **Ca**psular **T**yping version 2) is a 
-complete from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+PneumoKITt (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
+lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
 kmer based analysis.  
 
-PneumoCaT2, like the original PneumoCaT tool assigns capsular types to
+PneumoKITy, like the original PneumoCaT tool assigns capsular types to
 *S.pneumoniae* genomic data  using a using a two step 
-approach. PneumoCaT2 has the advantage that it can be used on assembly files
- as well as illumina fastq read files. 
+approach, however PneumoKITy, is limited only to determinations that can be assessed using presence of absence variants. PneumoKITy has the advantage that it can be used on assembly files as well as illumina fastq read files and it is incredibly fast
   
 This version incorporates developments that we hope are useful, drawing on 
 experience of running PneumoCaT routinely for over 2 years on thousands of 
@@ -34,7 +33,7 @@ our own clinical reference service. PneumoCaT has always been written primarily
 for our own use in the PHE pipeline but we have now tried to incorporate changes to make running and interpreting 
  outputs more user-friendly for external users. 
  
-PneumoCaT2 aims to improve the accuracy, sensitivity and efficiency of 
+PneumoKITy is available aims to improve the accuracy, sensitivity and efficiency of 
 serotype calling and generally improve PneumoCaT. This version uses very different
  methods to previous versions and requires a new running environment.
 
