@@ -5,17 +5,15 @@ Carmen Sheppard 2020
 import argparse
 import os
 import sys
+
 import pandas as pd
 
 import ctvdb
 from Database_tools.db_functions import searchexact, session_maker
 from Database_tools.sqlalchemydeclarative import Serotype, SerotypeVariants, Group, Variants, Genes, \
     VariantGroup
-from run_scripts.tools import check_db_path
+from run_scripts.utilities import check_db_path
 
-# change to home location (for running from PyCharm only TEMPORARY)
-#TODO update to argument in main PneumoCaT2 function
-os.chdir("../")
 
 def parse_args():
     """
@@ -43,7 +41,8 @@ def parse_args():
 def sort_sheets(args):
     """
     Parse in the input excel file process sheets specified in args.
-    :param args:  list with sheet numbers (eg. [1,3,4])
+    :param import_file: Excel file in standardised format
+    :param tables:  list with sheet numbers (eg. [1,3,4])
     :return: dict of dataframes
     """
 
@@ -431,6 +430,6 @@ if __name__ == "__main__":
 
     # if only serotype sheet added.
     else:
-        add_serotype(dfs['Serotype'])
+        sdf = add_serotype(dfs['Serotype'])
 
     sys.stdout.write("Database updated\n")
