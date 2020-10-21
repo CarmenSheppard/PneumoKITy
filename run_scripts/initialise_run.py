@@ -56,6 +56,10 @@ def parse_args(workflow_version):
                              'otherwise splits on first "." for fastq file 1, '
                              'or uses base filename of assembly')
 
+    parser.add_argument('--split', '-S',
+                        help='Split-to character for sample name [Default = .]',
+                        default=".")
+
     parser.add_argument("-p", "--minpercent", type=int,
                         default=90,
                         help="minimum percentage kmer count %% of total, INTEGER. Value "
@@ -116,6 +120,7 @@ class Analysis:
         self.stage1_result = ""
         self.stage2_result = {}
         self.stage2_varids = None
+        self.split = str(inputs.split) #input split value
         self.mash_v = "" # version of Mash used
         self.threads = str(inputs.threads) # number of threads used for subprocesses
         self.predicted_serotype = "" # final serotype predicted phenotype result
@@ -134,8 +139,8 @@ class Analysis:
         if inputs.input_dir:
             glob_pattern = "*fastq*"
             if os.path.isdir(inputs.input_dir):
-                self.fastq_files = glob.glob(os.path.join(inputs.input_dir,
-                                                          glob_pattern))
+                self.fastq_files = sorted(glob.glob(os.path.join(inputs.input_dir,
+                                                          glob_pattern)))
                 self.input_dir = inputs.input_dir
                 self.assembly = None
 
@@ -230,11 +235,11 @@ class Analysis:
             if not inputs.assembly:
                 # get a file name from first seq input file to use for output
                 seq_file_name = os.path.basename(self.fastq_files[0])
-                self.sampleid = seq_file_name.split(".", 1)[0]
+                self.sampleid = seq_file_name.split(self.split, 1)[0]
             else:
                 # get filename from assembly
                 assembly_name = os.path.basename(self.assembly)
-                self.sampleid = assembly_name.split(".", 1)[0]
+                self.sampleid = assembly_name.split(self.split, 1)[0]
 
 
         else:
