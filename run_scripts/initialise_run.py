@@ -67,10 +67,10 @@ def parse_args(workflow_version):
                              "Default = 90")
 
     parser.add_argument("-n", "--minmulti", type=int,
-                        default=4,
+                        default=10,
                         help="minimum kmer multiplicity (read input only).["
                              "OPTIONAL];"
-                             " Default = 4 for reads, uses 1 for assembly")
+                             " Default = 10 for reads, uses 1 for assembly")
 
     parser.add_argument('--database', '-d',
                         help='path to alternative ctvdb folder'

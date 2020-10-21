@@ -43,13 +43,9 @@ def start_analysis(analysis):
             sort_genes(gene, analysis, gene.var_type, session)
 
         elif gene.var_type == "snp":
-            sys.stdout.write("-----------------------------------------\n")
-            sys.stdout.write("SNP analysis not available yet... SORRY!\n")
             pass
 
         elif gene.var_type == "gene_nonfunc":
-            sys.stdout.write("-----------------------------------------\n")
-            sys.stdout.write("gene_nonfunc analysis not available yet... SORRY!\n")
             pass
 
         else:

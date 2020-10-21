@@ -272,9 +272,8 @@ def find_phenotype(analysis, session):
             analysis.predicted_serotype = serotype
             break
 
-    if not analysis.predicted_serotype:        # TODO add more information regarding unexpected pattern
-        analysis.predicted_serotype = f"Serotype within {analysis.stage1_result}: Unexpected variant pattern"
-        analysis.rag_status = "AMBER"
+    if not analysis.predicted_serotype:
+        analysis.predicted_serotype = f"Serotype within {analysis.stage1_result}"
         sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
@@ -291,12 +290,6 @@ def collate_results(collate_dir, results):
     try:
         with open(collate_file, 'a') as f:
             results.to_csv(f, header=f.tell() == 0, index=False)
-            # if os.path.isfile(collate_file):
-            # #  append results
-            # df = pd.read_csv(collate_file)
-            # # append results
-            # df = df.append(results, ignore_index=True)
-            # create_csv(df, collate_dir,"Collated_result_data.csv")
 
     except IOError:
         sys.stderr.write(" Error: Could not save  data to collated csv. Please check output "
