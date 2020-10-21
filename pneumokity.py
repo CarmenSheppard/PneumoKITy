@@ -13,7 +13,7 @@ from run_scripts.tools import run_mash_screen, handle_results
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
 
-version = "PneumoCaT 2.0a - Development"
+version = "PneumoKITy V1.0"
 
 
 def main(input_args, workflow_version):
