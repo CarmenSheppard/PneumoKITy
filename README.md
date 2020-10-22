@@ -11,12 +11,6 @@
 * [Quality checks](https://github.com/CarmenSheppard/PneumoKITy#Quality-checks)
 * [PneumoKITy Output](https://github.com/CarmenSheppard/PneumoKITy#Output-files)
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
-* CTV database
-* Examples
-* Troubleshooting
-* Contact Information
-* Licence Agreement
-
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
@@ -147,7 +141,7 @@ An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish 
 
 6. Input assembly, path to mash ,specified split character for filename
 
-`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -S _
+`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -S _`
 
 
 ## How PneumoKITy works  
