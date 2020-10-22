@@ -20,8 +20,8 @@
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
-kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to release the prototype version as PneumoKITy as it 
-could still be very useful for fast serotype assessment even though it is not capable of fully serotyping all serotypes. 
+kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) and allow access to collaborators on an **in confidence** basis,
+as itcould still be very useful for fast serotype assessment even though it is not capable of fully serotyping all serotypes. 
 PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some 
 information regarding subtypes and genetic types. 
 
@@ -89,7 +89,7 @@ error will occur.
 **-m** (mash): path to mash software. By default PneumoKITy will use the 
 command  `mash` which will only work if the mash software is included in the
  `PATH` variable. Otherwise the path to the mash software file location
-  **must** be provided eg: `-m path_to_mash\mash`.
+  **must** be provided eg: `-m path_to_mash/mash`.
 
 **-p** (minpercent): Alternative filter cut-off value for kmer percentage, ie 
 percentage of kmer hits to reference. eg:  `-p 80` (default = 90) NB: The software will automatically 
@@ -105,8 +105,8 @@ PneumoKITy will default to the assembly file name or the fastq file name
 (split on character as specified in -S or on "." default). eg: `-s sample-name`
 
 **-S** (split): Specify a split character to split filename on for sample ID for output files. If not specified 
-PneumoKITy will default to using ".". Eg filename= `sampleid.1.fastq.gz` becomes sampleID `sampleid`
-(split on first "."). eg: `-s sample-name`
+PneumoKITy will default to using ".". Eg if using `-S _`, filename `sampleid_1.fastq.gz` becomes sampleID `sampleid`
+(split on first "_").
 
 **-c** (collate): Specify a folder for PneumoKITy to collate results from the run into a file called "Collated_result_data.csv"
 This is useful when running multiple PneumoKITy jobs for a particular project, for example via a queue submission system or Bash loop command. The basic result data will be appended to this file until either the flag is not specified, a different folder is specified or the resulting file is moved or renamed. In rare instances multiple processing MAY result in this file not being writable, and a result beng missed from the collation. The original data files from the run will be saved in their output location.
