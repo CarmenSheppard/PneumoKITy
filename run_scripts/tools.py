@@ -95,6 +95,7 @@ def create_dataframe(input_file, header = "Serotype"):
         sys.stderr.write('ERROR: error occurred with reading Mash screen '
                          'file\n')
 
+
 def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     """
     Run MASH screen for any sketch file against any ref (stage 1 & 2)

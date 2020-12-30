@@ -35,10 +35,9 @@ def main(input_args, workflow_version):
     reference = os.path.join(analysis.database, "references.msh")
     # run and parse screen
     tsvfile = run_mash_screen(analysis, reference)
+
     sys.stdout.write(f"Used {analysis.mash_v}\n")
     run_parse(analysis, tsvfile)
-
-    # TODO add stringent mode
     # TODO add subtype to stage 2 later as 19F can type in stage 1 but has
     #  subtypes
 
