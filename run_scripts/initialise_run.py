@@ -132,6 +132,7 @@ class Analysis:
         self.gene_list = [] # genelist for stage 2 analysis
         self.grp_id = None # database id of group for stage 3
         self.csv_collate = None # folder for collating of results
+        self.mix_mm = None # initialise multiplicity for if sample Mixed (for extimating ratios)
         #self.stringent = inputs.stringent # next version!!
 
         # Determine input option
@@ -288,7 +289,7 @@ Stage 1 screen results:\t{self.stage1_result}
 Stage 1 category:\t{self.category.name}
 Stage 1 top hits: \t{self.top_hits}
 Stage 1 max kmer percentage:\t{self.max_percent}
-
+Stage 1 mixture multiplicities (if mixed and fastq only):\t{self.mix_mm}
 {self.stage2_output}
 
 Predicted serotype result:\t {self.predicted_serotype}
@@ -316,8 +317,9 @@ RED: Analysis failed
         # create separate dataframes of quality and result data
         quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
                              "mash", "database", "output_dir","csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "stage2_varids",
-                                "stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"], axis=1)
+        results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "mix_mm",
+                                "stage2_varids","stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"],
+                               axis=1)
 
         return quality, results
 
