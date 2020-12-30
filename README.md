@@ -97,8 +97,9 @@ incrementally drop the kmer percentage if no hits are initially obtained - and r
 RAG status if determined with the dropped back cut off (auto drop min= 70%). 
 
 **-n** (minmulti): minimum, median-multiplicity value cut off (relevant for fastq 
-read input only). eg: `-n 2` (default = 10) Used to minimise the kmers present due to 
-sequencing errors only.  Default set quite stringently to avoid over sensitive detection of mixed samples.
+read input only). eg: `-n 4` (default = 10) Used to minimise the kmers present due to 
+sequencing errors only.  Default set quite stringently to avoid over sensitive detection
+ of mixed samples. Reduce to increase serotype mixture sensitivity. Recommended min 4. 
 
 **-s** (sampleid): Specify a sample ID for output files. If not specified 
 PneumoKITy will default to the assembly file name or the fastq file name 
@@ -272,6 +273,10 @@ if the sample has failed to hit a serotype a description of the result is output
 **`folder`** - the folder location within the \ctvdb folder used for the stage 2 analysis/
 
 **`stage 1 result`** - the outcome of stage 1 analysis.
+
+**`mix_mm`** - the median multiplicity value for the individual hits (with percent >cut off) in a 
+serotype mix. This value reflects an estimation of the relative abundance of the kmers in the mix. 
+- Only applicable if input is fastq and mixed serotypes are found
 
 **`stage 2 varids`** - the variant ID (keys) in the ctvdb sql database of the variants used for determination in stage2.
 
