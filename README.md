@@ -63,6 +63,11 @@ Move the mash tar file into a relevant place on your system and untar e.g. `tar 
 Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.2/mash` unless you have fully installed the software or added it to your PATH variable.
 If successful you will see the Mash software command line help options. 
 
+For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
+
+Eg: `export PATH="/home/username/mash-Linux64-v2.2:$PATH"
+The above can be added to ~/.profile to preserve the path variable for future sessions. 
+
 Once this is working you should be able to run PneumoKITy as detailed below.
 
 ## Running PneumoKITy
