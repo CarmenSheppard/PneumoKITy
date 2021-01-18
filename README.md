@@ -65,7 +65,9 @@ If successful you will see the Mash software command line help options.
 
 For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
 
-Eg: `export PATH="/home/username/mash-Linux64-v2.2:$PATH"
+Eg: `export PATH="/home/username/mash-Linux64-v2.2:$PATH"`
+
+
 The above can be added to ~/.profile to preserve the path variable for future sessions. 
 
 Once this is working you should be able to run PneumoKITy as detailed below.
