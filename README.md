@@ -38,7 +38,7 @@ PneumoKITy is now a real database, running in SQLite3, allowing  for much easier
 
 
 
-## Dependencies
+## Dependencies and getting up and running 
 
 
 PneumoKITy is written for Python 3.6+ and is **NOT** compatible with earlier versions of Python.
@@ -50,7 +50,20 @@ PneumoKITy requires the following packages installed before running:
 * SQLite3 [https://www.sqlite.org/index.html](https://www.sqlite.org/index)
 * SQLalchemy [https://www.sqlalchemy.org/](https://www.sqlalchemy.org/)
 
-Due to the dependencies PneumoKITy can only be run on Linux based operating systems. Please note if using conda enviroments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.2 (or 2.1 - 2.2 recommended)
+Due to the dependencies PneumoKITy can only be run on Linux based operating systems however the software can be run on Windows 10 using the Windows Subsystem for Linux [WSL](https://docs.microsoft.com/en-us/windows/wsl/). Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.2 (or 2.1 - 2.2 recommended). 
+
+An easy way to install the dependencies is to use a Python 3 conda or venv environment.  
+
+Install numpy, pandas and SQLalchemy in the environment (SQLite3 is likely to be bundled anyway).
+
+Download Mash 2.2 as a tar file from [here](https://github.com/marbl/Mash/releases/download/v2.2/mash-Linux64-v2.2.tar) for linux or [here](https://github.com/marbl/Mash/releases/download/v2.2/mash-Linux64-v2.2.tar) for OSX. 
+
+Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
+
+Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file unless you have fully installed the software - eg. `/home/software/mash-Linux64-v2.2/mash`
+If successful you will see the Mash software command line help options. 
+
+Once this is working you should be able to run PneumoKITy as detailed below.
 
 ## Running PneumoKITy
 #### Mandatory commandline inputs
