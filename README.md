@@ -60,7 +60,7 @@ Download Mash 2.2 as a tar file from [here](https://github.com/marbl/Mash/releas
 
 Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
 
-Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file unless you have fully installed the software - eg. `/home/software/mash-Linux64-v2.2/mash`
+Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.2/mash` unless you have fully installed the software or added it to your PATH variable.
 If successful you will see the Mash software command line help options. 
 
 Once this is working you should be able to run PneumoKITy as detailed below.
