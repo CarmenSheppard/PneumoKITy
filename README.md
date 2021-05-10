@@ -11,17 +11,11 @@
 * [Quality checks](https://github.com/CarmenSheppard/PneumoKITy#Quality-checks)
 * [PneumoKITy Output](https://github.com/CarmenSheppard/PneumoKITy#Output-files)
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
-* CTV database
-* Examples
-* Troubleshooting
-* Contact Information
-* Licence Agreement
-
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
-kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to release the prototype version as PneumoKITy as it 
-could still be very useful for fast serotype assessment even though it is not capable of fully serotyping all serotypes. 
+kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) and allow access to collaborators on an **in confidence** basis,
+as itcould still be very useful for fast serotype assessment even though it is not capable of fully serotyping all serotypes. 
 PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some 
 information regarding subtypes and genetic types. 
 
@@ -44,19 +38,39 @@ PneumoKITy is now a real database, running in SQLite3, allowing  for much easier
 
 
 
-## Dependencies
+## Dependencies and getting up and running 
 
 
 PneumoKITy is written for Python 3.6+ and is **NOT** compatible with earlier versions of Python.
 
 PneumoKITy requires the following packages installed before running:
-* Mash version 2.2 (or 2.1) [https://github.com/marbl/Mash](https://github.com/marbl/Mash)
+* Mash version 2.3 (or 2.0+) [https://github.com/marbl/Mash](https://github.com/marbl/Mash)
 * numpy [http://www.scipy.org/scipylib/download.html](http://www.scipy.org/scipylib/download.html)
 * pandas [https://pandas.pydata.org/](https://pandas.pydata.org/)
 * SQLite3 [https://www.sqlite.org/index.html](https://www.sqlite.org/index)
 * SQLalchemy [https://www.sqlalchemy.org/](https://www.sqlalchemy.org/)
 
-Due to the dependencies PneumoKITy can only be run on Linux based operating systems. Please note if using conda enviroments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.2 (or 2.1 - 2.2 recommended)
+Due to the dependencies PneumoKITy can only be run on Linux based operating systems however the software can be run on Windows 10 using the Windows Subsystem for Linux [WSL](https://docs.microsoft.com/en-us/windows/wsl/). Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.3 (or 2.0+, - 2.3 recommended). 
+
+An easy way to install the dependencies is to use a Python 3 conda or venv environment.  
+
+Install numpy, pandas and SQLalchemy in the environment (SQLite3 is likely to be bundled anyway).
+
+Download Mash 2.3 as a tar file from [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for linux or [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for OSX. 
+
+Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
+
+Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.2/mash` unless you have fully installed the software or added it to your PATH variable.
+If successful you will see the Mash software command line help options. 
+
+For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
+
+Eg: `export PATH="/home/username/mash-Linux64-v2.3:$PATH"`
+
+
+The above can be added to ~/.profile to preserve the path variable for future sessions. 
+
+Once this is working you should be able to run PneumoKITy as detailed below.
 
 ## Running PneumoKITy
 #### Mandatory commandline inputs
@@ -89,7 +103,7 @@ error will occur.
 **-m** (mash): path to mash software. By default PneumoKITy will use the 
 command  `mash` which will only work if the mash software is included in the
  `PATH` variable. Otherwise the path to the mash software file location
-  **must** be provided eg: `-m path_to_mash\mash`.
+  **must** be provided eg: `-m path_to_mash/mash`.
 
 **-p** (minpercent): Alternative filter cut-off value for kmer percentage, ie 
 percentage of kmer hits to reference. eg:  `-p 80` (default = 90) NB: The software will automatically 
@@ -106,8 +120,8 @@ PneumoKITy will default to the assembly file name or the fastq file name
 (split on character as specified in -S or on "." default). eg: `-s sample-name`
 
 **-S** (split): Specify a split character to split filename on for sample ID for output files. If not specified 
-PneumoKITy will default to using ".". Eg filename= `sampleid.1.fastq.gz` becomes sampleID `sampleid`
-(split on first "."). eg: `-s sample-name`
+PneumoKITy will default to using ".". Eg if using `-S _`, filename `sampleid_1.fastq.gz` becomes sampleID `sampleid`
+(split on first "_").
 
 **-c** (collate): Specify a folder for PneumoKITy to collate results from the run into a file called "Collated_result_data.csv"
 This is useful when running multiple PneumoKITy jobs for a particular project, for example via a queue submission system or Bash loop command. The basic result data will be appended to this file until either the flag is not specified, a different folder is specified or the resulting file is moved or renamed. In rare instances multiple processing MAY result in this file not being writable, and a result beng missed from the collation. The original data files from the run will be saved in their output location.
@@ -129,6 +143,7 @@ An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish 
 `python pneumokity.py -i my_input_folder -t 8 -m path_to_mash/mash -s my_name`
 
 2. Input read files, path to mash, custom output_dir, collate file folder location
+
 `python pneumokity.py -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
  -c path_to_collate_folder `
 
@@ -144,6 +159,10 @@ An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish 
 5. Input assembly, path to mash ,collate file folder location
 
 `python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -c path_to_collate_folder`
+
+6. Input assembly, path to mash ,specified split character for filename
+
+`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -S _`
 
 
 ## How PneumoKITy works  
@@ -260,9 +279,9 @@ csv files containing MASH screen run hits information for the relevant variant g
 
 **`predicted serotype`** -  This is the predicted PHENOTYPICAL type of the organism if characterised using the commercially available [SSI Diagnostica serotyping sera](https://www.ssidiagnostica.com/antisera/pneumococcus-antisera/). However, the organism could have a specific underlying genetic type as in the case of 23B1 and 19A/F for example. 
 
-Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference.
+Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference. At present there is no specific "genetic subtype" result field implemented, so the user needs to look at the stage 1 hits to determine these.
 
-New genetic types are being discovered all the time and it is not possible for us to keep up with them, however we hope that the outputs obtained from PneumoCaT2 will help the user to determine if their isolate may be a novel genetic serotype for which a reference is not available in the ctvdb, and can then be further investigated.
+New genetic types are being discovered all the time and it is not possible for us to keep up with them, however we hope that the outputs obtained from PneumoKITy will help the user to determine if their isolate may be a novel genetic serotype for which a reference is not available in the ctvdb, and can then be further investigated.
 
 if the sample has failed to hit a serotype a description of the result is output in this field.
 
