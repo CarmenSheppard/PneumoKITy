@@ -44,19 +44,19 @@ PneumoKITy is now a real database, running in SQLite3, allowing  for much easier
 PneumoKITy is written for Python 3.6+ and is **NOT** compatible with earlier versions of Python.
 
 PneumoKITy requires the following packages installed before running:
-* Mash version 2.2 (or 2.1) [https://github.com/marbl/Mash](https://github.com/marbl/Mash)
+* Mash version 2.3 (or 2.0+) [https://github.com/marbl/Mash](https://github.com/marbl/Mash)
 * numpy [http://www.scipy.org/scipylib/download.html](http://www.scipy.org/scipylib/download.html)
 * pandas [https://pandas.pydata.org/](https://pandas.pydata.org/)
 * SQLite3 [https://www.sqlite.org/index.html](https://www.sqlite.org/index)
 * SQLalchemy [https://www.sqlalchemy.org/](https://www.sqlalchemy.org/)
 
-Due to the dependencies PneumoKITy can only be run on Linux based operating systems however the software can be run on Windows 10 using the Windows Subsystem for Linux [WSL](https://docs.microsoft.com/en-us/windows/wsl/). Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.2 (or 2.1 - 2.2 recommended). 
+Due to the dependencies PneumoKITy can only be run on Linux based operating systems however the software can be run on Windows 10 using the Windows Subsystem for Linux [WSL](https://docs.microsoft.com/en-us/windows/wsl/). Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.3 (or 2.0+, - 2.3 recommended). 
 
 An easy way to install the dependencies is to use a Python 3 conda or venv environment.  
 
 Install numpy, pandas and SQLalchemy in the environment (SQLite3 is likely to be bundled anyway).
 
-Download Mash 2.2 as a tar file from [here](https://github.com/marbl/Mash/releases/download/v2.2/mash-Linux64-v2.2.tar) for linux or [here](https://github.com/marbl/Mash/releases/download/v2.2/mash-Linux64-v2.2.tar) for OSX. 
+Download Mash 2.3 as a tar file from [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for linux or [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for OSX. 
 
 Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
 
@@ -65,7 +65,7 @@ If successful you will see the Mash software command line help options.
 
 For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
 
-Eg: `export PATH="/home/username/mash-Linux64-v2.2:$PATH"`
+Eg: `export PATH="/home/username/mash-Linux64-v2.3:$PATH"`
 
 
 The above can be added to ~/.profile to preserve the path variable for future sessions. 
