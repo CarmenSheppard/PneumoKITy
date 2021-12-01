@@ -225,14 +225,14 @@ Outputs from PneumoKITy are automatically assigned a RAG status:
 ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) RED: Analysis failed.
 
 Amber result status is assigned when no-hits occur in stage 1 analysis, the 
-kmer percentage cut of is automatically dropped by 10% from the initial cut 
+kmer percentage cut off is automatically dropped by 10% from the initial cut 
 off (so usually reset to 81% unless the user has input a custom kmer percent
  cut off) and analysis is run again. This was implemented to help avoid 
- those annoying situations when a sample would miss just below the cut off as sometimes happened with PneumoCaT1 while also warnign the user that something may be wrong with the result. If an AMBER result is obtained it could be due to either poor sequence quality, or a variant of the sequence which does not match very well with the reference sequences available in the CTVdb - please check the results. 
+ those annoying situations when a sample would miss just below the cut off as sometimes happened with PneumoCaT1 while also warning the user that something may be wrong with the result. 
+If an AMBER result is obtained it could be due to either poor sequence quality, or a variant of the sequence which does not match very well with the reference sequences available in the CTVdb - please check the results. 
 
 Amber result status also occurs in stage 2 for unrecognised variant profiles.
 
-The analysis is given the RAG status AMBER to flag to the user that they should check the results. This type of result may occur in situations when the local pneumococcal population has differing clones than that to which the CTVdb was created, and may help avoid many fails in this situation while still alerting users to the issue. Local procedures can then be implemented to interpret these results.
    
 RED rag status alerts the user to failure of the serotyping. This could be 
 due to an unexpected pattern of results, mixed serotypes or no-hits in the 
