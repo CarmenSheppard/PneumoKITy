@@ -251,7 +251,7 @@ which version is used for their analysis.
 
 ## Output Files
 
-PneumoCaT2 produces several output files. 
+PneumoKIty produces several output files. 
 
 `SAMPLEID_serotyping_results.txt` *(All serotypes)*
 
@@ -279,7 +279,7 @@ csv files containing MASH screen run hits information for the relevant variant g
 
 **`predicted serotype`** -  This is the predicted PHENOTYPICAL type of the organism if characterised using the commercially available [SSI Diagnostica serotyping sera](https://www.ssidiagnostica.com/antisera/pneumococcus-antisera/). However, the organism could have a specific underlying genetic type as in the case of 23B1 and 19A/F for example. 
 
-Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference. At present there is no specific "genetic subtype" result field implemented, so the user needs to look at the stage 1 hits to determine these.
+Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference. At present there is no specific "genetic subtype" result field implemented (this is planned in a future version), so the user needs to look at the stage 1 hits to determine these.
 
 New genetic types are being discovered all the time and it is not possible for us to keep up with them, however we hope that the outputs obtained from PneumoKITy will help the user to determine if their isolate may be a novel genetic serotype for which a reference is not available in the ctvdb, and can then be further investigated.
 
