@@ -14,27 +14,21 @@
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
-kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) and allow access to collaborators on an **in confidence** basis,
-as itcould still be very useful for fast serotype assessment even though it is not capable of fully serotyping all serotypes. 
-PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some 
+kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) basis,
+as it could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data even though it is not capable of fully serotyping all serotypes. PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some useful
 information regarding subtypes and genetic types. 
 
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
-*S.pneumoniae* genomic data  using a using a two step 
-approach, however PneumoKITy, is limited only to determinations that can be assessed using presence or absence or gene 
- allele variants.
-Serotypes the require determination using alternative variants such as SNPs cannot be distinquished using PneumoKITy.
-PneumoKITy has the advantage that it can be used on assembly files OR illumina fastq read files and it is incredibly fast
-  
- 
+*S.pneumoniae* genomic data  using a using a two step approach, however PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
+
+Serotypes that require determination using alternative variants such as SNPs cannot be distinquished using PneumoKITy.
+PneumoKITy has the advantage that it can be used on assembly files OR illumina fastq read files and it is incredibly fast.
+   
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.
 
- The **C**apsular **T**ype **V**ariant database (CTVdb) used in 
-PneumoKITy is now a real database, running in SQLite3, allowing  for much easier updating of information and better 
- scope for the database to grow in the future as more variants and serotype 
- determinants are added. The use of this format will also allow us to store 
- extra related information about the serotypes, such as subtype information 
- (subtyping is planned in a future update). 
+ The **C**apsular **T**ype **V**ariant database (CTVdb) used in PneumoKITy is now a real database, running in SQLite3, allowing  for much easier updating of information and better scope for the database to grow in the future as more variants and serotype 
+ determinants are added. The use of this format will also allow us to store  extra related information about the serotypes, such as subtype information 
+ (subtyping etc is planned in a future update). 
 
 
 
@@ -226,7 +220,7 @@ Outputs from PneumoKITy are automatically assigned a RAG status:
 
 ![#4CAF50](https://via.placeholder.com/15/4CAF50/000000?text=+) GREEN: Analysis passed within expected cut-off
 
-![#F39C12](https://via.placeholder.com/15/F39C12/000000?text=+) AMBER: Result obtained but caution advised, check top hit percentages.
+![#F39C12](https://via.placeholder.com/15/F39C12/000000?text=+) AMBER: Result obtained but caution advised, check top hit percentages .
 
 ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) RED: Analysis failed.
 
@@ -234,7 +228,7 @@ Amber result status is assigned when no-hits occur in stage 1 analysis, the
 kmer percentage cut of is automatically dropped by 10% from the initial cut 
 off (so usually reset to 81% unless the user has input a custom kmer percent
  cut off) and analysis is run again. This was implemented to help avoid 
- those annoying situations when a sample would miss just below the cut off.
+ those annoying situations when a sample would miss just below the cut off as sometimes happened with PneumoCaT1 while also warnign the user that something may be wrong with the result. If an AMBER result is obtained it could be due to either poor sequence quality, or a variant of the sequence which does not match very well with the reference sequences available in the CTVdb - please check the results. 
 
 Amber result status also occurs in stage 2 for unrecognised variant profiles.
 
