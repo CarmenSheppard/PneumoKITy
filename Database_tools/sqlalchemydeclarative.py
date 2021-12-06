@@ -1,8 +1,8 @@
 """
-Python 3.6+
+Python 3.7+
 Database SQLalchemy declarative script for ORM.
 Creates CTV.db structure
-Carmen Sheppard 2020
+Carmen Sheppard 2020-21
 """
 
 from sqlalchemy import Boolean, Column, String, Integer, ForeignKey
@@ -158,7 +158,7 @@ class SerotypeVariants(Base):
 
 if __name__ == "__main__":
     #### CREATE DATABASE
-    engine = create_engine('sqlite:///ctvdb/CTV.db')
+    engine = create_engine('sqlite:///../ctvdb/CTV.db')
 
     # Create all tables
     Base.metadata.create_all(engine)
