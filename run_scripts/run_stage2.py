@@ -1,7 +1,7 @@
-"""python 3.6+
+"""python 3.7+
 Decide which methods are needed in stage 2, run analysis scripts and collate  and compare results to expected for
 serotypes
-Carmen Sheppard 2019-2020
+Carmen Sheppard 2019-2021
 """
 import sys
 from Database_tools.db_functions import session_maker
@@ -43,10 +43,10 @@ def start_analysis(analysis):
             sort_genes(gene, analysis, gene.var_type, session)
 
         elif gene.var_type == "snp":
-            pass
+            analysis.predicted_serotype = "Group"
 
         elif gene.var_type == "gene_nonfunc":
-            pass
+            analysis.predicted_serotype = "Group"
 
         else:
             # raise exception for types of variants not found (eg error in DB)

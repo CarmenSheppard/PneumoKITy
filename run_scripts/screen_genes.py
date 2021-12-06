@@ -1,6 +1,6 @@
-"""python 3.6+
+"""python 3.7+
 Run allele analysis methods.
-Carmen Sheppard 2019-2020
+Carmen Sheppard 2019-2021
 """
 import sys
 import os

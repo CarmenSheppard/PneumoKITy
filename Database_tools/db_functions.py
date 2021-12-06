@@ -1,6 +1,6 @@
 """
 Script to set up DB sessions and other common functions for accessing CTV.db
-Python 3.6+
+Python 3.7+
 Carmen Sheppard January 2020
 """
 

@@ -12,7 +12,7 @@ import ctvdb
 from Database_tools.db_functions import searchexact, session_maker
 from Database_tools.sqlalchemydeclarative import Serotype, SerotypeVariants, Group, Variants, Genes, \
     VariantGroup
-from run_scripts.utilities import check_db_path
+from run_scripts.tools import check_db_path
 
 
 def parse_args():
@@ -25,9 +25,6 @@ def parse_args():
 
     parser.add_argument('--serotype', '-s', help="Import only SEROTYPE sheet (ONLY for TYPES not in a group)"
                                                  "- see documentation for help")
-    parser.add_argument('--database', '-d',
-                        help='path to  ctvdb folder'
-                             '[OPTIONAL] defaults to standard repository /ctvdb directory', default="ctvdb")
     try:
         args = parser.parse_args()
 
@@ -65,7 +62,7 @@ def sort_sheets(args):
             df = pd.read_excel(args.infile, sheet_name=int(table) - 1,
                                dtype={"predicted_pheno": str, "subtypes": bool,
                                       "alt_vars": str, "var1": str, "serotype_1": str,
-                                      "position": float})
+                                      "position": float},engine='openpyxl')
 
             # drop any empty rows
             df = df.dropna(how="all")
@@ -402,15 +399,10 @@ def add_serotypevariants(df, dbpath):
 if __name__ == "__main__":
     # collect arguments from commandline
     args = parse_args()
-
-    # find absolute path for database
-    if not args.database:
-        db_path = os.path.dirname(ctvdb.__file__)
-
-    else:
-        # use given database folder
-        db_path = args.database
-
+    #change directory to PneumoKITy home
+   # find root path for database
+    path_parent = os.path.dirname(os.getcwd())
+    db_path = os.path.join(path_parent, "ctvdb")
     # check integrity of given path
     check_db_path(db_path)
 

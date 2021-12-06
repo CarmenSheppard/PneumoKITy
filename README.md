@@ -13,28 +13,22 @@
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
-lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.6+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
-kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) and allow access to collaborators on an **in confidence** basis,
-as itcould still be very useful for fast serotype assessment even though it is not capable of fully serotyping all serotypes. 
-PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some 
+lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.7+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) basis,
+as it could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data even though it is not capable of fully serotyping all serotypes. PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some useful
 information regarding subtypes and genetic types. 
 
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
-*S.pneumoniae* genomic data  using a using a two step 
-approach, however PneumoKITy, is limited only to determinations that can be assessed using presence or absence or gene 
- allele variants.
-Serotypes the require determination using alternative variants such as SNPs cannot be distinquished using PneumoKITy.
-PneumoKITy has the advantage that it can be used on assembly files OR illumina fastq read files and it is incredibly fast
-  
- 
+*S.pneumoniae* genomic data  using a using a two step approach, however PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
+
+Serotypes that require determination using alternative variants such as SNPs cannot be distinquished using PneumoKITy.
+PneumoKITy has the advantage that it can be used on assembly files OR illumina fastq read files and it is incredibly fast.
+   
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.
 
- The **C**apsular **T**ype **V**ariant database (CTVdb) used in 
-PneumoKITy is now a real database, running in SQLite3, allowing  for much easier updating of information and better 
- scope for the database to grow in the future as more variants and serotype 
- determinants are added. The use of this format will also allow us to store 
- extra related information about the serotypes, such as subtype information 
- (subtyping is planned in a future update). 
+ The **C**apsular **T**ype **V**ariant database (CTVdb) used in PneumoKITy is now a real database, running in SQLite3, allowing  for much easier updating of information and better scope for the database to grow in the future as more variants and serotype 
+ determinants are added. The use of this format will also allow us to store  extra related information about the serotypes, such as subtype information 
+ (subtyping etc is planned in a future update). 
 
 
 
@@ -226,19 +220,19 @@ Outputs from PneumoKITy are automatically assigned a RAG status:
 
 ![#4CAF50](https://via.placeholder.com/15/4CAF50/000000?text=+) GREEN: Analysis passed within expected cut-off
 
-![#F39C12](https://via.placeholder.com/15/F39C12/000000?text=+) AMBER: Result obtained but caution advised, check top hit percentages.
+![#F39C12](https://via.placeholder.com/15/F39C12/000000?text=+) AMBER: Result obtained but caution advised, check top hit percentages .
 
 ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) RED: Analysis failed.
 
 Amber result status is assigned when no-hits occur in stage 1 analysis, the 
-kmer percentage cut of is automatically dropped by 10% from the initial cut 
+kmer percentage cut off is automatically dropped by 10% from the initial cut 
 off (so usually reset to 81% unless the user has input a custom kmer percent
  cut off) and analysis is run again. This was implemented to help avoid 
- those annoying situations when a sample would miss just below the cut off.
+ those annoying situations when a sample would miss just below the cut off as sometimes happened with PneumoCaT1 while also warning the user that something may be wrong with the result. 
+If an AMBER result is obtained it could be due to either poor sequence quality, or a variant of the sequence which does not match very well with the reference sequences available in the CTVdb - please check the results. 
 
 Amber result status also occurs in stage 2 for unrecognised variant profiles.
 
-The analysis is given the RAG status AMBER to flag to the user that they should check the results. This type of result may occur in situations when the local pneumococcal population has differing clones than that to which the CTVdb was created, and may help avoid many fails in this situation while still alerting users to the issue. Local procedures can then be implemented to interpret these results.
    
 RED rag status alerts the user to failure of the serotyping. This could be 
 due to an unexpected pattern of results, mixed serotypes or no-hits in the 
@@ -251,7 +245,7 @@ which version is used for their analysis.
 
 ## Output Files
 
-PneumoCaT2 produces several output files. 
+PneumoKIty produces several output files. 
 
 `SAMPLEID_serotyping_results.txt` *(All serotypes)*
 
@@ -279,7 +273,7 @@ csv files containing MASH screen run hits information for the relevant variant g
 
 **`predicted serotype`** -  This is the predicted PHENOTYPICAL type of the organism if characterised using the commercially available [SSI Diagnostica serotyping sera](https://www.ssidiagnostica.com/antisera/pneumococcus-antisera/). However, the organism could have a specific underlying genetic type as in the case of 23B1 and 19A/F for example. 
 
-Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference. At present there is no specific "genetic subtype" result field implemented, so the user needs to look at the stage 1 hits to determine these.
+Some previously described important genetic subtypes **are** represented in the ctvdb and can be determined by looking at the stage 1 hits. Eg. in the case of the variant 19A/F isolates that have the [genetic background of a 19A but produce a 19F capsular polysaccharide](https://pubmed.ncbi.nlm.nih.gov/19439547/) , the predicted serotype result would be 19F, but the stage 1 result is recorded as 19AF and the result is determined from 19A in stage 2 via wzy analysis, whereas a standard 19F isolate would be determine in stage 1 analysis alone by hit to the 19F reference. For 23B1 the top hit in stage 1 will be the 23B1 reference. At present there is no specific "genetic subtype" result field implemented (this is planned in a future version), so the user needs to look at the stage 1 hits to determine these.
 
 New genetic types are being discovered all the time and it is not possible for us to keep up with them, however we hope that the outputs obtained from PneumoKITy will help the user to determine if their isolate may be a novel genetic serotype for which a reference is not available in the ctvdb, and can then be further investigated.
 
