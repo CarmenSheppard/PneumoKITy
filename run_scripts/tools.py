@@ -1,6 +1,6 @@
-""" Python 3.6+
+""" Python 3.7+
 Utility functions for PneumoCaT 2 - used in more than one of the other run scripts
-Carmen Sheppard 2019-2020
+Carmen Sheppard 2019-2021
 """
 import pandas as pd
 import numpy as np
@@ -128,7 +128,8 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
 
     data = subprocess.run(argument, capture_output=True, check=True, timeout=3600)
     result = data.stdout.decode('utf-8')
-    sys.stderr.write(data.stderr.decode('utf-8'))
+    # TODO write mash output to log file once logging implemented in PneumoKITy
+    #sys.stderr.write(data.stderr.decode('utf-8'))
     outfile = os.path.join(analysis.output_dir, "tmp",
                            f"{analysis.sampleid}_{run_type}_screen.tsv")
 
@@ -272,10 +273,14 @@ def find_phenotype(analysis, session):
         if a == b:
             analysis.predicted_serotype = serotype
             break
+        if  a != b and not analysis.predicted_serotype:
+            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unexpected variant pattern"
 
-    if not analysis.predicted_serotype:
-        analysis.predicted_serotype = f"Serotype within {analysis.stage1_result}"
-        sys.stdout.write(f"{analysis.predicted_serotype}\n")
+        else:
+            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unable to determine" \
+                                           f" serotype using PneumoKITy due " \
+                                           f"to requirement for sensitive sequence analysis."
+            sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
 def collate_results(collate_dir, results):

@@ -1,9 +1,9 @@
-"""python 3.6+,
+"""python 3.7+,
 PneumoCaT2 run initialisation.
 Set up command line arguments, custom error, Enum categories initialise analysis run object
 and deal with options from command line arguments
 
-Carmen Sheppard 2019-2020
+Carmen Sheppard 2019-2021
 """
 import argparse
 import glob
@@ -113,7 +113,7 @@ class Analysis:
         :param inputs: input arguments (args)
         """
 
-        self.workflow = version # version of PneumoCat workflow
+        self.workflow = version # version of PneumoKITy workflow
         self.minmulti = inputs.minmulti #minimum multiplicity cut off value
         self.category = None # category for stage 2 analysis or not
         self.folder = None # folder (genogroup) for stage 2 analysis
@@ -268,7 +268,7 @@ class Analysis:
                                f"{self.sampleid}_serotyping_results.txt"),
                   "w+") as f:
             f.write(f"""----------------------------------------
-PneumoCaT serotyping result report
+PneumoKITy serotyping result report
 ----------------------------------------
 
 Run Metrics
