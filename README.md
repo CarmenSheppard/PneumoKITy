@@ -35,7 +35,7 @@ PneumoKITy uses very different methods to previous PneumoCaT versions and requir
 ## Dependencies and getting up and running 
 
 
-PneumoKITy is written for Python 3.6+ and is **NOT** compatible with earlier versions of Python.
+PneumoKITy is written for Python 3.7+ and is **NOT** compatible with earlier versions of Python.
 
 PneumoKITy requires the following packages installed before running:
 * Mash version 2.3 (or 2.0+) [https://github.com/marbl/Mash](https://github.com/marbl/Mash)
@@ -238,7 +238,7 @@ RED rag status alerts the user to failure of the serotyping. This could be
 due to an unexpected pattern of results, mixed serotypes or no-hits in the 
 analysis.
 
-**IMPORTANT:** Each time an update is added to the included ctvdb we increment the 
+**IMPORTANT:** Once software is released publically - each time an update is added to the included ctvdb we increment the 
 version of the overall PneumoKITy software (eg. from version 2.0 to 2.0.1). 
 However if an alternative version of the ctvdb is used it is up to the user to record 
 which version is used for their analysis.
