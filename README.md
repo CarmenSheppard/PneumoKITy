@@ -13,9 +13,12 @@
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
-lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT) capsular typing tool, written for **Python 3.7+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT)
+capsular typing tool, written for **Python 3.7+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
 kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) basis,
-as it could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data even though it is not capable of fully serotyping all serotypes. PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some useful
+as this lite version could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data 
+even though it is not capable of fully serotyping all serotypes.
+PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some useful
 information regarding subtypes and genetic types. 
 
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
@@ -26,16 +29,22 @@ PneumoKITy has the advantage that it can be used on assembly files OR illumina f
    
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.
 
- The **C**apsular **T**ype **V**ariant database (CTVdb) used in PneumoKITy is now a real database, running in SQLite3, allowing  for much easier updating of information and better scope for the database to grow in the future as more variants and serotype 
+ The **C**apsular **T**ype **V**ariant database (CTVdb) used in PneumoKITy is now a real database, running in SQLite3,
+ allowing  for much easier updating of information and better scope for the database to grow in the future as more variants and serotype 
  determinants are added. The use of this format will also allow us to store  extra related information about the serotypes, such as subtype information 
  (subtyping etc is planned in a future update). 
 
+For PneumoKITy specifically any snp or gene_function variants have been removed from the CTVdb as it is not possible to perform
+these determinations usign kmer screening alone, so the database is very small. 
+The database is populated from the included excel template in database_tools. 
 
+At present the database import script can only import new data and has not yet been programmed with any functions to update existing records (future update)
 
 ## Dependencies and getting up and running 
 
+PneumoKITy is written for Python 3.7+ and is **NOT** compatible with earlier versions of Python. In particular the
+method of running the mash subprocess requires python 3.7+ (not 3.6)
 
-PneumoKITy is written for Python 3.7+ and is **NOT** compatible with earlier versions of Python.
 
 PneumoKITy requires the following packages installed before running:
 * Mash version 2.3 (or 2.0+) [https://github.com/marbl/Mash](https://github.com/marbl/Mash)
@@ -44,7 +53,10 @@ PneumoKITy requires the following packages installed before running:
 * SQLite3 [https://www.sqlite.org/index.html](https://www.sqlite.org/index)
 * SQLalchemy [https://www.sqlalchemy.org/](https://www.sqlalchemy.org/)
 
-Due to the dependencies PneumoKITy can only be run on Linux based operating systems however the software can be run on Windows 10 using the Windows Subsystem for Linux [WSL](https://docs.microsoft.com/en-us/windows/wsl/). Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoCaT2. Please use 2.3 (or 2.0+, - 2.3 recommended). 
+Due to the dependencies PneumoKITy can only be run on Linux based operating systems,
+however the software can be run on Windows 10 using the Windows Subsystem for Linux 
+[WSL](https://docs.microsoft.com/en-us/windows/wsl/). 
+Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoKITy. Please use 2.3 (or 2.0+, - 2.3 recommended). 
 
 An easy way to install the dependencies is to use a Python 3 conda or venv environment.  
 
@@ -90,7 +102,6 @@ PneumoKITy defaults to using the input directory for either read1 if using
 fastq input or the assembly in this case ensure the input directory is writable or an
 error will occur.
  
-
  
 **-t** (threads) Number of threads to use for subprocesses (default = 1) eg: `-t 8`
 
@@ -201,10 +212,19 @@ If the `variants` category is returned in stage 1 and the serotype has presence 
 
 **Stage 2** -  only two categories of variants are available in stage 2, these are
 gene presence/absence and allele variants. Both of these methods are implemented using MASH in
-a similar procedure to described above. Only serotype 15A and 19A / variant 19F(A) are able to fully
-determine in stage 2. All other serotypes requiring variant analysis will return a genogroup and possibly a 
-partial variant profile as the methods for determining SNPS and gene function/non-function
-variants are not available.
+a similar procedure to described above. Only genogroups 15F_15A and 19A_19AF(variant) are able to fully
+determine in stage 2. However some genogroups contain types that can be separated using the kmer screening determinations
+eg 12F from 12A_12B_44_46 and 38 from 25F_25A. So depending on the serotype with in a genogroup you
+may get either a type specific or genogroup specific result.
+
+Additional reference files have been added to the CTVdb for serotypes 24F and 33F due to the extra specificity of the 
+kmer screening method causing many test samples to give low top hits and AMBER calls, due to divergence between the old reference strains
+used for the original PneumoCaT reference.fasta and isolates now circulating (in the UK). Once more data has been collected, potentially 
+it may be possible to call other serotypes from groups to serotype level due to the greater specificity of the kmer method and increased
+match with the new references (eg 24F from B), however additional testing is needed to validate this.
+
+All other serotypes requiring variant analysis will return a genogroup as the methods for determining SNPS and gene function/non-function
+variants are not available. A partial gene profile will be present for those where some of the determinations are allele or presence/absence based.
 
 
 ## Quality checks
@@ -220,7 +240,7 @@ Outputs from PneumoKITy are automatically assigned a RAG status:
 
 ![#4CAF50](https://via.placeholder.com/15/4CAF50/000000?text=+) GREEN: Analysis passed within expected cut-off
 
-![#F39C12](https://via.placeholder.com/15/F39C12/000000?text=+) AMBER: Result obtained but caution advised, check top hit percentages .
+![#F39C12](https://via.placeholder.com/15/F39C12/000000?text=+) AMBER: Result obtained but caution advised, check top hit percentages possible variant or low sequence quality.
 
 ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) RED: Analysis failed.
 
