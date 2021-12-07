@@ -247,7 +247,7 @@ def find_phenotype(analysis, session):
     :param session: active DB session
     """
     # get variant ids associated with Serotype and group, unique combinations only
-    serorecords = session.query(Serotype.predicted_pheno,SerotypeVariants.variant_id).\
+    serorecords = session.query(Serotype.predicted_pheno, SerotypeVariants.variant_id).\
     outerjoin(SerotypeVariants).filter(Serotype.group_id == analysis.grp_id).distinct().all()
 
     # create dict of expected vars
