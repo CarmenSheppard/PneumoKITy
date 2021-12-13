@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""python 3.6+, tested with Mash version 2.0 to 2.3
+"""python 3.7+, tested with Mash version 2.0 to 2.3
 Main PneumoCaT2 script run serotyping from WGS data (Fastq or assembly)
 1. Run MASH screen tsv output -> tmp folder
 2. Parse mash screen output to apply filters, create csv output files
-3. T.B.C ;-)
-Carmen Sheppard 2019-2020
+Carmen Sheppard 2019-2021
 """
 import os
 import sys
@@ -13,7 +12,7 @@ from run_scripts.tools import run_mash_screen, handle_results
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
 
-version = "PneumoKITy V1.0a"
+version = "PneumoKITy V1.0b"
 
 
 def main(input_args, workflow_version):

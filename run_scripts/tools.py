@@ -152,6 +152,7 @@ def filter_kmerhits(df, minpercent):
     df["hit_hashes"] = pd.to_numeric(hashes[0])
     df["total_hashes"] = pd.to_numeric(hashes[1])
     df["percent"] = df["hit_hashes"] / df["total_hashes"] * 100
+
     filtered_kmerhits = df[df["percent"] >= minpercent]
 
     return filtered_kmerhits, df

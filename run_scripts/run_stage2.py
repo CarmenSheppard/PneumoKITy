@@ -56,6 +56,9 @@ def start_analysis(analysis):
     find_phenotype(analysis, session)
 
     session.close()
+
+    # TODO update code for mixture detection to provide % mix estimation for easier mix interpretation
+
     analysis.stage2_output = f"""
 Stage 2 variants: {analysis.stage2_result}
 Stage 2 hits: {analysis.stage2_hits}
