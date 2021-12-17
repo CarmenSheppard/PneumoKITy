@@ -21,6 +21,9 @@ even though it is not capable of fully serotyping all serotypes.
 PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some useful
 information regarding subtypes and genetic types. 
 
+PneumoKITy is particularly sensitive to mixed serotypes - which could be useful for determination of types in multiple carriage.
+To use this functionality we recommend reducing teh median multiplicity cut off from the default 10 (for pure cultures) to 4. 
+
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
 *S.pneumoniae* genomic data  using a using a two step approach, however PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
 
@@ -307,8 +310,7 @@ if the sample has failed to hit a serotype a description of the result is output
 
 **`stage 1 result`** - the outcome of stage 1 analysis.
 
-**`mix_mm`** - the median multiplicity value for the individual hits (with percent >cut off) in a 
-serotype mix. This value reflects an estimation of the relative abundance of the kmers in the mix. 
+**`mix_mm`** - the estimated % abundance of each serotype in a mixture (calculated from the median multiplicity values >cut off)  
 - Only applicable if input is fastq and mixed serotypes are found
 
 **`stage 2 varids`** - the variant ID (keys) in the ctvdb sql database of the variants used for determination in stage2.
