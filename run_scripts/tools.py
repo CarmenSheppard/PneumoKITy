@@ -112,7 +112,7 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
         sys.exit(1)
 
     elif run_type != "stage1":
-        sys.stdout.write(f" Running stage 2 screen reference:  {ref_sketch}\n")
+        sys.stdout.write(f"Running stage 2 screen reference: {ref_sketch}\n")
 
     else:
         pass
