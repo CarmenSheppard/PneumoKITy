@@ -278,9 +278,7 @@ def find_phenotype(analysis, session):
             analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unexpected variant pattern"
 
         else:
-            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unable to determine" \
-                                           f" serotype using PneumoKITy due " \
-                                           f"to requirement for sensitive sequence analysis."
+            analysis.predicted_serotype = analysis.stage1_result
             sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
