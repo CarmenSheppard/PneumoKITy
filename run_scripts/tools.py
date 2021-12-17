@@ -1,5 +1,5 @@
 """ Python 3.7+
-Utility functions for PneumoCaT 2 - used in more than one of the other run scripts
+Tools for PneumoKITy - used in more than one of the other run scripts
 Carmen Sheppard 2019-2021
 """
 import pandas as pd
