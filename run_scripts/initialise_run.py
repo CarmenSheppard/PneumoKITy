@@ -127,6 +127,7 @@ class Analysis:
         self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
         self.rag_status = "RED"
         self.top_hits = "" # top five hits from stage 1 analysis
+        self.max_mm = ""  # max median multiplicity in stage 1 analysis
         self.stage2_hits = {} # metrics for stage 2 hits
         self.max_percent = "" # percentage of max top hit
         self.gene_list = [] # genelist for stage 2 analysis
@@ -173,6 +174,7 @@ class Analysis:
         # option 3 input assembly path/ file existence check
         elif inputs.assembly:
             # change minmulti filter cut off for assembly
+            self.max_mm = 1
             self.minmulti = 1
             if os.path.isfile(inputs.assembly):
                 self.assembly = inputs.assembly
@@ -289,6 +291,7 @@ Stage 1 screen results:\t{self.stage1_result}
 Stage 1 category:\t{self.category.name}
 Stage 1 top hits: \t{self.top_hits}
 Stage 1 max kmer percentage:\t{self.max_percent}
+Stage 1 median multiplicity for top hit % (fastq only):\t{self.max_mm}
 Stage 1 mixture multiplicities (if mixed and fastq only):\t{self.mix_mm}
 {self.stage2_output}
 
@@ -300,7 +303,7 @@ Result RAG status:\t {self.rag_status}
 RAG explanation
 -----------------------------------------
 GREEN: Analysis passed
-AMBER: Result obtained but caution advised, check top hit percentages.
+AMBER: Result obtained but caution advised, check top hit percentages and median multiplicity.
 RED: Analysis failed
 """)
 
@@ -317,7 +320,7 @@ RED: Analysis failed
         # create separate dataframes of quality and result data
         quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
                              "mash", "database", "output_dir","csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits",	"max_percent", "folder", "stage1_result", "mix_mm",
+        results = frame.filter(["sampleid", "top_hits","max_mm",	"max_percent", "folder", "stage1_result", "mix_mm",
                                 "stage2_varids","stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"],
                                axis=1)
 

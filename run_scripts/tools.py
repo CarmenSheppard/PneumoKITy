@@ -112,7 +112,7 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
         sys.exit(1)
 
     elif run_type != "stage1":
-        sys.stdout.write(f" Running stage 2 screen reference:  {ref_sketch}\n")
+        sys.stdout.write(f"Running stage 2 screen reference: {ref_sketch}\n")
 
     else:
         pass
@@ -152,6 +152,7 @@ def filter_kmerhits(df, minpercent):
     df["hit_hashes"] = pd.to_numeric(hashes[0])
     df["total_hashes"] = pd.to_numeric(hashes[1])
     df["percent"] = df["hit_hashes"] / df["total_hashes"] * 100
+
     filtered_kmerhits = df[df["percent"] >= minpercent]
 
     return filtered_kmerhits, df
@@ -277,9 +278,7 @@ def find_phenotype(analysis, session):
             analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unexpected variant pattern"
 
         else:
-            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unable to determine" \
-                                           f" serotype using PneumoKITy due " \
-                                           f"to requirement for sensitive sequence analysis."
+            analysis.predicted_serotype = analysis.stage1_result
             sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 

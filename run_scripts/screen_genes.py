@@ -51,6 +51,7 @@ def run_alleles(analysis, genename):
     :return: list of alleles
     """
     hit_alleles = {}
+    allele_cut = 90
 
     try:
         # get ref sketch for genename from database folder
@@ -68,7 +69,7 @@ def run_alleles(analysis, genename):
             df = create_dataframe(outfile, "Allele")
             #TODO these are using the universally input mash cut offs  may need to change
             #Filter dataframe for cutoffs using the filtering function
-            filtered_df, original = apply_filters(df, 90,
+            filtered_df, original = apply_filters(df, allele_cut,
                                                   analysis.minmulti, False)
 
             original = original.sort_values(by=["percent", "identity"],
@@ -91,17 +92,23 @@ def run_alleles(analysis, genename):
                     sys.stdout.write(f"Completed {genename} allele analysis.\n")
 
             else:  # for samples with no hits
+                hit_alleles[genename] = 0
+                analysis.stage2_hits[genename] = [f"{max_hit_var}: {max_percent}"]
+                analysis.rag_status = "RED"
+
                 if max_percent < 20:
-                    hit_alleles[genename] = 0
+                    sys.stdout.write(f"Allele {genename} did not match references, hit <20% \n")
+
+                # for samples failing on low median multiplicity only add result but flag amber
+                elif max_percent > allele_cut:
                     analysis.stage2_hits[genename] = [f"{max_hit_var}: {max_percent}"]
-                    analysis.rag_status = "RED"
-                    sys.stdout.write(f"Allele {genename} did not match references, hit <20% t\n")
+                    analysis.rag_status = "AMBER"
+                    sys.stdout.write(f"Allele {genename}- median multiplicity below {analysis.minmulti} "
+                                     f"check seq quality\n")
+
                 # for samples with intermediate %match - unusual alleles
                 else:
-                    hit_alleles[genename] = 0
-                    analysis.stage2_hits[genename] = [f"{max_hit_var}: {max_percent}"]
-                    analysis.rag_status = "RED"
-                    sys.stdout.write(f"Allele {genename}- hit <90%  to possible variant or seq quality issue\n")
+                    sys.stdout.write(f"Allele {genename}- hit <90%, possible variant or seq quality issue\n")
 
         return hit_alleles
 
