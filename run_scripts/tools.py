@@ -279,7 +279,8 @@ def find_phenotype(analysis, session):
 
         else:
             analysis.predicted_serotype = analysis.stage1_result
-            sys.stdout.write(f"{analysis.predicted_serotype}\n")
+
+    sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
 def collate_results(collate_dir, results):
