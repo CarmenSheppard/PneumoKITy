@@ -319,3 +319,21 @@ def handle_results(analysis):
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
     sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")
     sys.stdout.write(f"{analysis.workflow} run complete.\n")
+
+
+def cleanup(analysis):
+    """
+    Removes tmp folder and files within it
+    """
+
+    save_path = os.path.join(analysis.output_dir, "tmp")
+    files = [name for name in os.listdir(save_path)]
+    try:
+        # remove files
+        for file in files:
+            os.remove(os.path.join(save_path, file))
+        # remove directory
+        os.rmdir(save_path)
+        sys.stdout.write("tmp directory removed")
+    except OSError as e:
+        sys.stdout.write(f"Error: {save_path}: {e.strerror}")

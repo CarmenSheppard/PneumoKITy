@@ -8,7 +8,7 @@ Carmen Sheppard 2019-2021
 import os
 import sys
 from run_scripts.initialise_run import Analysis, parse_args, Category
-from run_scripts.tools import run_mash_screen, handle_results
+from run_scripts.tools import run_mash_screen, handle_results, cleanup
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
 
@@ -56,7 +56,7 @@ def main(input_args, workflow_version):
             analysis.stage1_result = "No CTV folder available"
 
         handle_results(analysis)
-        sys.exit(0)
+
 
     elif analysis.category == Category.subtype:
         #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
@@ -65,15 +65,14 @@ def main(input_args, workflow_version):
         # write text report and create csv of analysis object attributes
         handle_results(analysis)
 
-        sys.exit(0)
-
     else:
         analysis.predicted_serotype = analysis.stage1_result
         # write text report and create csv of analysis object attributes
         handle_results(analysis)
 
-        sys.exit(0)
-
+    # cleanup temp dir
+    cleanup(analysis)
+    sys.exit(0)
 
 if __name__ == "__main__":
     args = parse_args(version)
