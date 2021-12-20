@@ -251,7 +251,7 @@ class Analysis:
                                  " will be overwritten\n")
 
             # create output and /tmp directory if it doesn't exist
-            if not os.path.isdir(os.path.join(self.output_dir, f"{self.sampleid}_mp")):
+            if not os.path.isdir(os.path.join(self.output_dir, f"{self.sampleid}_tmp")):
                 os.makedirs(os.path.join(self.output_dir, f"{self.sampleid}_tmp"))
 
         except IOError:
