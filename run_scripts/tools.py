@@ -323,7 +323,8 @@ def handle_results(analysis):
 
 def cleanup(analysis):
     """
-    Removes tmp folder and files within it
+    Removes files in tmp folder and tmp folder if empty (to avoid clashes with other processes
+    if run in parallel and same output folder specified.
     """
 
     save_path = os.path.join(analysis.output_dir, "tmp")
@@ -331,9 +332,11 @@ def cleanup(analysis):
     try:
         # remove files
         for file in files:
-            os.remove(os.path.join(save_path, file))
-        # remove directory
-        os.rmdir(save_path)
-        sys.stdout.write("tmp directory removed")
+            if analysis.sampleid in file:
+                os.remove(os.path.join(save_path, file))
+        # remove directory if empty
+        if not os.listdir(save_path):
+            os.rmdir(save_path)
+            sys.stdout.write("tmp directory removed")
     except OSError as e:
         sys.stdout.write(f"Error: {save_path}: {e.strerror}")
