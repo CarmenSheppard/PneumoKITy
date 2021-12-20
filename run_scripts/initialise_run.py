@@ -217,20 +217,7 @@ class Analysis:
             self.output_dir = os.path.join(inputs.output_dir,
                                            'pneumo_capsular_typing')
 
-        # Set up file directories and add overwrite warning for
-        # pneumo_capsular_typing if pre-existing
-        try:
-            if os.path.isdir(self.output_dir):
-                sys.stdout.write("WARNING: Existing files in output dir"
-                                 " will be overwritten\n")
 
-            # create output and /tmp directory if it doesn't exist
-            if not os.path.isdir(os.path.join(self.output_dir, "tmp")):
-                os.makedirs(os.path.join(self.output_dir, "tmp"))
-
-        except IOError:
-            sys.stderr.write("ERROR: cannot access/write to output paths\n")
-            sys.exit(1)
 
         # get sample id from files
         if not inputs.sampleid:
@@ -256,6 +243,20 @@ class Analysis:
                 sys.stderr.write("ERROR: Check copy csv directory path\n")
                 sys.exit(1)
 
+        # Set up file directories and add overwrite warning for
+        # pneumo_capsular_typing if pre-existing
+        try:
+            if os.path.isdir(self.output_dir):
+                sys.stdout.write("WARNING: Existing files in output dir"
+                                 " will be overwritten\n")
+
+            # create output and /tmp directory if it doesn't exist
+            if not os.path.isdir(os.path.join(self.output_dir, f"{self.sampleid}_mp")):
+                os.makedirs(os.path.join(self.output_dir, f"{self.sampleid}_tmp"))
+
+        except IOError:
+            sys.stderr.write("ERROR: cannot access/write to output paths\n")
+            sys.exit(1)
 
     def write_report(self):
         # Class function to write report output from completed Analysis object

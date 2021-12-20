@@ -130,7 +130,7 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     result = data.stdout.decode('utf-8')
     # TODO write mash output to log file once logging implemented in PneumoKITy
     #sys.stderr.write(data.stderr.decode('utf-8'))
-    outfile = os.path.join(analysis.output_dir, "tmp",
+    outfile = os.path.join(analysis.output_dir, f"{analysis.sampleid}_tmp",
                            f"{analysis.sampleid}_{run_type}_screen.tsv")
 
     with open(outfile, "w") as f:
@@ -298,7 +298,7 @@ def collate_results(collate_dir, results):
             results.to_csv(f, header=f.tell() == 0, index=False)
 
     except IOError:
-        sys.stderr.write(" Error: Could not save  data to collated csv. Please check output "
+        sys.stderr.write(" Error: Could not save data to collated csv. Please check output "
                          "path\n")
         sys.exit(1)
 
@@ -324,10 +324,10 @@ def handle_results(analysis):
 def cleanup(analysis):
     """
     Removes files in tmp folder and tmp folder if empty (to avoid clashes with other processes
-    if run in parallel and same output folder specified.
+    if run in parallel and same output folder specified.)
     """
 
-    save_path = os.path.join(analysis.output_dir, "tmp")
+    save_path = os.path.join(analysis.output_dir, f"{analysis.sampleid}_tmp")
     files = [name for name in os.listdir(save_path)]
     try:
         # remove files
