@@ -337,6 +337,6 @@ def cleanup(analysis):
         # remove directory if empty
         if not os.listdir(save_path):
             os.rmdir(save_path)
-            sys.stdout.write("tmp directory removed")
+            sys.stdout.write("tmp directory removed\n")
     except OSError as e:
         sys.stdout.write(f"Error: {save_path}: {e.strerror}")
