@@ -67,10 +67,11 @@ def parse_args(workflow_version):
                              "Default = 90")
 
     parser.add_argument("-n", "--minmulti", type=int,
-                        default=10,
+                        default=4,
                         help="minimum kmer multiplicity (read input only).["
                              "OPTIONAL];"
-                             " Default = 10 for reads, uses 1 for assembly")
+                             " Default = 4 for reads, uses 1 for assembly - recommend 10 if input is expected pure "
+                             "culture.")
 
     parser.add_argument('--database', '-d',
                         help='path to alternative ctvdb folder'
@@ -133,8 +134,7 @@ class Analysis:
         self.gene_list = [] # genelist for stage 2 analysis
         self.grp_id = None # database id of group for stage 3
         self.csv_collate = None # folder for collating of results
-        self.mix_mm = None # initialise multiplicity for if sample Mixed (for extimating ratios)
-        #self.stringent = inputs.stringent # next version!!
+        self.mix_mm = None # initialise mixture estimation (multiplicity) for if sample Mixed (for extimating ratios)
 
         # Determine input option
         # Option 1: specify an input directory path with -i option.
@@ -218,20 +218,7 @@ class Analysis:
             self.output_dir = os.path.join(inputs.output_dir,
                                            'pneumo_capsular_typing')
 
-        # Set up file directories and add overwrite warning for
-        # pneumo_capsular_typing if pre-existing
-        try:
-            if os.path.isdir(self.output_dir):
-                sys.stdout.write("WARNING: Existing files in output dir"
-                                 " will be overwritten\n")
 
-            # create output and /tmp directory if it doesn't exist
-            if not os.path.isdir(os.path.join(self.output_dir, "tmp")):
-                os.makedirs(os.path.join(self.output_dir, "tmp"))
-
-        except IOError:
-            sys.stderr.write("ERROR: cannot access/write to output paths\n")
-            sys.exit(1)
 
         # get sample id from files
         if not inputs.sampleid:
@@ -257,6 +244,20 @@ class Analysis:
                 sys.stderr.write("ERROR: Check copy csv directory path\n")
                 sys.exit(1)
 
+        # Set up file directories and add overwrite warning for
+        # pneumo_capsular_typing if pre-existing
+        try:
+            if os.path.isdir(self.output_dir):
+                sys.stdout.write("WARNING: Existing files in output dir"
+                                 " will be overwritten\n")
+
+            # create output and /tmp directory if it doesn't exist
+            if not os.path.isdir(os.path.join(self.output_dir, f"{self.sampleid}_tmp")):
+                os.makedirs(os.path.join(self.output_dir, f"{self.sampleid}_tmp"))
+
+        except IOError:
+            sys.stderr.write("ERROR: cannot access/write to output paths\n")
+            sys.exit(1)
 
     def write_report(self):
         # Class function to write report output from completed Analysis object
@@ -292,7 +293,7 @@ Stage 1 category:\t{self.category.name}
 Stage 1 top hits: \t{self.top_hits}
 Stage 1 max kmer percentage:\t{self.max_percent}
 Stage 1 median multiplicity for top hit % (fastq only):\t{self.max_mm}
-Stage 1 mixture multiplicities (if mixed and fastq only):\t{self.mix_mm}
+Stage 1 Estimated abundance of mix (%) (if mixed and fastq only):\t{self.mix_mm}
 {self.stage2_output}
 
 Predicted serotype result:\t {self.predicted_serotype}
@@ -320,7 +321,7 @@ RED: Analysis failed
         # create separate dataframes of quality and result data
         quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
                              "mash", "database", "output_dir","csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits","max_mm",	"max_percent", "folder", "stage1_result", "mix_mm",
+        results = frame.filter(["sampleid", "top_hits","max_mm","max_percent", "folder", "stage1_result", "mix_mm",
                                 "stage2_varids","stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"],
                                axis=1)
 

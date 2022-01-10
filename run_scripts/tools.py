@@ -1,5 +1,5 @@
 """ Python 3.7+
-Utility functions for PneumoCaT 2 - used in more than one of the other run scripts
+Tools for PneumoKITy - used in more than one of the other run scripts
 Carmen Sheppard 2019-2021
 """
 import pandas as pd
@@ -130,7 +130,7 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     result = data.stdout.decode('utf-8')
     # TODO write mash output to log file once logging implemented in PneumoKITy
     #sys.stderr.write(data.stderr.decode('utf-8'))
-    outfile = os.path.join(analysis.output_dir, "tmp",
+    outfile = os.path.join(analysis.output_dir, f"{analysis.sampleid}_tmp",
                            f"{analysis.sampleid}_{run_type}_screen.tsv")
 
     with open(outfile, "w") as f:
@@ -279,7 +279,8 @@ def find_phenotype(analysis, session):
 
         else:
             analysis.predicted_serotype = analysis.stage1_result
-            sys.stdout.write(f"{analysis.predicted_serotype}\n")
+
+    sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
 def collate_results(collate_dir, results):
@@ -297,7 +298,7 @@ def collate_results(collate_dir, results):
             results.to_csv(f, header=f.tell() == 0, index=False)
 
     except IOError:
-        sys.stderr.write(" Error: Could not save  data to collated csv. Please check output "
+        sys.stderr.write(" Error: Could not save data to collated csv. Please check output "
                          "path\n")
         sys.exit(1)
 
@@ -318,3 +319,24 @@ def handle_results(analysis):
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
     sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")
     sys.stdout.write(f"{analysis.workflow} run complete.\n")
+
+
+def cleanup(analysis):
+    """
+    Removes files in tmp folder and tmp folder if empty (to avoid clashes with other processes
+    if run in parallel and same output folder specified.)
+    """
+
+    save_path = os.path.join(analysis.output_dir, f"{analysis.sampleid}_tmp")
+    files = [name for name in os.listdir(save_path)]
+    try:
+        # remove files
+        for file in files:
+            if analysis.sampleid in file:
+                os.remove(os.path.join(save_path, file))
+        # remove directory if empty
+        if not os.listdir(save_path):
+            os.rmdir(save_path)
+            sys.stdout.write("tmp directory removed\n")
+    except OSError as e:
+        sys.stdout.write(f"Error: {save_path}: {e.strerror}")
