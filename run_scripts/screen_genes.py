@@ -35,7 +35,8 @@ def sort_genes(gene, analysis, allele_or_gene, session):
         sys.exit(1)
 
     # append hit genes output to analysis object
-    analysis.stage2_result.update(hit_genes)
+    if type(analysis.stage2_result) != str:
+        analysis.stage2_result.update(hit_genes)
 
     # use variant query to get Variant records for hit
     stage2_var = get_variant_ids(hit_genes, allele_or_gene, analysis.grp_id, session)
@@ -63,6 +64,7 @@ def run_alleles(analysis, genename):
         outfile = run_mash_screen(analysis, ref_sketch, genename)
         #create dataframe from the TSV
         if os.path.getsize(outfile) == 0:
+            analysis.stage2_result = f" {genename} not found in isolate, possible variant"
             sys.stderr.write(f"ERROR: {genename} not found in isolate, possible variant. \n")
 
         else:

@@ -262,24 +262,27 @@ def find_phenotype(analysis, session):
     detected_vars = []
 
     # create list of var ids from analysis
-    for i in analysis.stage2_varids:
-        if i[0] != 0: # ignore undetected (0)
-            detected_vars.append(i[0])
+    # catch variants not found.
+    try:
+        for i in analysis.stage2_varids:
+            if i[0] != 0: # ignore undetected (0)
+                detected_vars.append(i[0])
 
-   #interpret results
-    for serotype in expected_vars:
-        a = set(expected_vars[serotype])
-        b = set(detected_vars)
+       #interpret results
+        for serotype in expected_vars:
+            a = set(expected_vars[serotype])
+            b = set(detected_vars)
 
-        if a == b:
-            analysis.predicted_serotype = serotype
-            break
-        if  a != b and not analysis.predicted_serotype:
-            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unexpected variant pattern"
+            if a == b:
+                analysis.predicted_serotype = serotype
+                break
+            if  a != b and not analysis.predicted_serotype:
+                analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unexpected variant pattern"
 
-        else:
-            analysis.predicted_serotype = analysis.stage1_result
-
+            else:
+                analysis.predicted_serotype = analysis.stage1_result
+    except IndexError:
+        analysis.predicted_serotype = f"{analysis.stage1_result}: {analysis.stage2_result}"
     sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
