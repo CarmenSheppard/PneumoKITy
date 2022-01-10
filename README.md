@@ -18,8 +18,7 @@ capsular typing tool, written for **Python 3.7+**, using different methods. Pneu
 kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) basis,
 as this lite version could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data 
 even though it is not capable of fully serotyping all serotypes. Further determinations in PneumoCaT2 will remove the speed and sensitivity that PneumoKITy posesses.
-PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some useful
-information regarding subtypes and genetic types. 
+PneumoKITy can fully  serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and can get to serogroup, subgroup or genogroup level for the remianing types. PneumoKITy and provides some useful information regarding  some described genetic subtypes and genetic types. 
 
 
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
@@ -72,7 +71,7 @@ Download Mash 2.3 as a tar file from [here](https://github.com/marbl/Mash/releas
 
 Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
 
-Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.2/mash` unless you have fully installed the software or added it to your PATH variable.
+Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.3/mash` unless you have fully installed the software or added it to your PATH variable.
 If successful you will see the Mash software command line help options. 
 
 For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
@@ -266,7 +265,7 @@ RED rag status alerts the user to failure of the serotyping. This could be
 due to an unexpected pattern of results, mixed serotypes or no-hits in the 
 analysis.
 
-**IMPORTANT:** Once software is released publically - each time an update is added to the included ctvdb we increment the 
+**IMPORTANT:** Once software is released publicly - each time an update is added to the included ctvdb we increment the 
 version of the overall PneumoKITy software (eg. from version 2.0 to 2.0.1). 
 However if an alternative version of the ctvdb is used it is up to the user to record 
 which version is used for their analysis.
