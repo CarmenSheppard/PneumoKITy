@@ -119,9 +119,11 @@ incrementally drop the kmer percentage if no hits are initially obtained - and r
 RAG status if determined with the dropped back cut off (auto drop min= 70%). 
 
 **-n** (minmulti): minimum, median-multiplicity value cut off (relevant for fastq 
-read input only). eg: `-n 4` (default = 10) Used to minimise the kmers present due to 
-sequencing errors only.  Default set quite stringently to avoid over sensitive detection
- of mixed samples. Reduce to increase serotype mixture sensitivity. Recommended min 4. 
+read input only). eg: `-n 10` (default = 4) Used to minimise the kmers present due to 
+sequencing errors only.  We have set the default to 4 to allow sensitivity for mixed serotype detection, while
+retaining some specficity to ignore novel reads caused by sequencing errors. However if you are running expected pure
+cultures we recommend setting this value to 10 to avoid over sensitivity of detection of reads caused by contamination for eg.
+during pure culture DNA extraction. Recommended minimum 4. 
 
 **-s** (sampleid): Specify a sample ID for output files. If not specified 
 PneumoKITy will default to the assembly file name or the fastq file name 
@@ -220,8 +222,8 @@ determine in stage 2. However some genogroups contain types that can be separate
 eg 12F from 12A_12B_44_46 and 38 from 25F_25A. So depending on the serotype with in a genogroup you
 may get either a type specific or genogroup specific result.
 
-Additional reference files have been added to the CTVdb for serotypes 24F and 33F due to the extra specificity of the 
-kmer screening method causing many test samples to give low top hits and AMBER calls, due to divergence between the old reference strains
+Additional reference files have been added to the CTVdb for serotypes 24F and 33F and referecen sequence for 18F has been replaced 
+due to the extra specificity of the kmer screening method causing many test samples to give low top hits and AMBER calls, due to divergence between the old reference strains
 used for the original PneumoCaT reference.fasta and isolates now circulating (in the UK). Once more data has been collected, potentially 
 it may be possible to call other serotypes from groups to serotype level due to the greater specificity of the kmer method and increased
 match with the new references (eg 24F from B), however additional testing is needed to validate this.
