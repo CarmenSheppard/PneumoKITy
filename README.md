@@ -13,23 +13,38 @@
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
-lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT)
-capsular typing tool, written for **Python 3.7+**, using different methods. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
-kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) basis,
-as this lite version could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data 
-even though it is not capable of fully serotyping all serotypes. Further determinations in PneumoCaT2 will remove the speed and sensitivity that PneumoKITy posesses.
-PneumoKITy can fully  serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and can get to serogroup, subgroup or genogroup level for the remianing types. PneumoKITy and provides some useful information regarding  some described genetic subtypes and genetic types. 
+lite version of the in-development PneumoCaT2. It is written for **Python 3.7+**. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+kmer based analysis. We decided to create a lite version (PneumoKITy) as this his tool has significant value 
+for both sensitive detection of mixed serotypes in fastQ data and is also significantly faster for serotype screening than existing methods which may mean
+it has utility  either as a quick assessment method which has input type flexibility for running PURE cultures, and when using fastq data it can be run on
+expected mixed serotype samples (eg. Carriage study culture -enriched samples or even deep sequenced primary swabs) in order to attempt to assess serotype composition in 
+these more complex situations.
 
 
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
-*S.pneumoniae* genomic data  using a using a two step approach, however PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
-
+*S.pneumoniae* genomic data  using a using a two step approach, But PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
+However due to the extra specificity of the MASH method, PneumoKITy fully  serotype about 58% of the serotypes defined 
+by the SSI Diagnostica typing sera, and can get to serogroup, or subgroup level for the remaining types. In addition 
+PneumoKITy and provides some useful information regarding  some described genetic subtypes and genetic types. 
 Serotypes that require determination using alternative variants such as SNPs cannot be distinquished using PneumoKITy.
 PneumoKITy has the advantage that it can be used on assembly files OR illumina fastq read files and it is incredibly fast.
 
-PneumoKITy is particularly sensitive to mixed serotypes - which could be useful for determination of types in multiple carriage.
+PneumoKITy has a useful RAG (red - amber- green) status flag which alerts users to the status of the results, with green 
+flagged samples passing within expected metrics, amber flagged metrics indicating that a result was obtained but that the results
+should be checked as some outcomes were not within range, or RED indicating a failure to serotype. 
 
-If used on expected pure cultures we recommend setting the median multiplicity cut off (-n) to 10 to avoid oversensitive detection of unintentional contamination.
+
+**PneumoKITy has two run options:**
+
+`pure`  suitable for analysis of expected pure cultures. This method which will increase specificity and 
+reduce over reporting of mixed serotypes which may be present due to high levels of DNA from pure culture isolates. Although
+it will report genogroups of any mixed samples, PneumoKITy will assign these as an AMBER RAG status due to them being unexpected in a 
+pure culture. 
+
+
+`mix` PneumoKITy is particularly sensitive to mixed serotypes - which could be useful for determination of types in multiple carriage.
+When run in mix mode PneumoKITy uses less stringent cut-offs to increase sensitivity for detection of multiple serotype carriage and reports
+the results
 
    
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.
@@ -40,8 +55,10 @@ PneumoKITy uses very different methods to previous PneumoCaT versions and requir
  (subtyping etc is planned in a future update). 
 
 For PneumoKITy specifically any snp or gene_function variants have been removed from the CTVdb as it is not possible to perform
-these determinations usign kmer screening alone, so the database is very small. 
-The database is populated from the included excel template in database_tools. 
+these determinations using kmer screening alone, so the database is very small. 
+
+
+The database is populated from the included Excel template in database_tools. 
 
 At present the database import script can only import new data and has not yet been programmed with any functions to update existing records (future update)
 
@@ -85,6 +102,8 @@ Once this is working you should be able to run PneumoKITy as detailed below.
 
 ## Running PneumoKITy
 #### Mandatory commandline inputs
+
+### Running expected mixed samples 
 
 PneumoKITy accepts 3 input options, two for read input and one for assembly
  input. It mandatory to give at least one of these options. 

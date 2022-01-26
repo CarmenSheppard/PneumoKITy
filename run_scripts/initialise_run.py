@@ -3,10 +3,9 @@ PneumoCaT2 run initialisation.
 Set up command line arguments, custom error, Enum categories initialise analysis run object
 and deal with options from command line arguments
 
-Carmen Sheppard 2019-2021
+Carmen Sheppard 2019-2022
 """
 import argparse
-from argparse import ArgumentParser
 import glob
 import sys
 import os
@@ -23,6 +22,7 @@ class Category(Enum):
     mix = 4
     acapsular = 5
     no_hits = 6
+    mixed_variants = 7
 
 def parse_args(workflow_version):
     """
@@ -50,11 +50,6 @@ def parse_args(workflow_version):
                         help='Split-to character for sample name [Default = .]',
                         default=".")
 
-    parent_parser.add_argument("-p", "--minpercent", type=int,
-            default = 90,
-            help = "Initial minimum %% kmer count/total, N.B PneumoKITy auto drops top hit % if no hits fount until "
-                   "a minimum of 70% hit.  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
-                    "Default = 90")
 
     parent_parser.add_argument('--database', '-d',
                         help='path to alternative ctvdb folder'
@@ -106,6 +101,11 @@ def parse_args(workflow_version):
     input_group.add_argument('--assembly', '-a',
                        help='Specify assembly input file path [REQUIRED '
                             'OPTION 3]')
+    pure_parser.add_argument("-p", "--minpercent", type=int,
+            default = 90,
+            help = "Initial minimum %% kmer count/total, N.B PneumoKITy auto drops top hit % if no hits fount until "
+                   "a minimum of 70% hit.  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
+                    "Default = 90")
 
     pure_parser.add_argument("-n", "--minmulti", type=int,
                         default=10,
@@ -130,6 +130,12 @@ def parse_args(workflow_version):
     mix_input_group.add_argument('--fastqs', '-f', nargs=2, help=' paths to fastq '
     'files: read1 read2 '
     '[REQUIRED - OPTION 2]')
+
+    # auto default to 70 for mix.
+    mix_parser.add_argument("-p", "--minpercent", type=int,
+            default = 90,
+            help = "Initial minimum %% kmer count/total,  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
+                    "Default = 70")
 
     # auto default to 4 for mixed input
     mix_parser.add_argument("-n", "--minmulti", type=int,
@@ -209,7 +215,6 @@ class AnalysisMixed:
                 # set input dir to input dir of first fastq
                 self.input_dir = os.path.dirname(inputs.fastqs[0])
                 self.fastq_files = inputs.fastqs
-                self.assembly = None
 
             else:
                 sys.stderr.write("ERROR: Check input fastQ paths\n")

@@ -7,7 +7,7 @@ Carmen Sheppard 2019-2022
 """
 import os
 import sys
-from run_scripts.initialise_run import AnalysisMixed, Analysis, parse_args, Category
+from run_scripts.initialise_run import AnalysisMixed, AnalysisPure, parse_args, Category
 from run_scripts.tools import run_mash_screen, handle_results, cleanup
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
@@ -27,12 +27,13 @@ def main(input_args, workflow_version):
     # determine run type to set up object
     if args.run_type == "pure":
         # set up analysis object using inputs from commandline
-        analysis = Analysis(input_args, workflow_version)
+        analysis = AnalysisPure(input_args, workflow_version)
 
     else:
         analysis = AnalysisMixed(input_args, workflow_version)
 
     sys.stdout.write(f"\nSample: {analysis.sampleid}\n")
+
     # Run Stage 1 Serotype analysis.
     # -------------------------------
     # obtain full path for reference sketch
