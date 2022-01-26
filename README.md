@@ -14,21 +14,23 @@
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT)
-capsular typing tool, written for **Python 3.7+**, using different methods. Stage 1 uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+capsular typing tool, written for **Python 3.7+**, using different methods. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
 kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) basis,
 as this lite version could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data 
-even though it is not capable of fully serotyping all serotypes.
-PneumoKITy can serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and provides some useful
-information regarding subtypes and genetic types. 
+even though it is not capable of fully serotyping all serotypes. Further determinations in PneumoCaT2 will remove the speed and sensitivity that PneumoKITy posesses.
+PneumoKITy can fully  serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and can get to serogroup, subgroup or genogroup level for the remianing types. PneumoKITy and provides some useful information regarding  some described genetic subtypes and genetic types. 
 
-PneumoKITy is particularly sensitive to mixed serotypes - which could be useful for determination of types in multiple carriage.
-To use this functionality we recommend reducing teh median multiplicity cut off from the default 10 (for pure cultures) to 4. 
 
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
 *S.pneumoniae* genomic data  using a using a two step approach, however PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
 
 Serotypes that require determination using alternative variants such as SNPs cannot be distinquished using PneumoKITy.
 PneumoKITy has the advantage that it can be used on assembly files OR illumina fastq read files and it is incredibly fast.
+
+PneumoKITy is particularly sensitive to mixed serotypes - which could be useful for determination of types in multiple carriage.
+
+If used on expected pure cultures we recommend setting the median multiplicity cut off (-n) to 10 to avoid oversensitive detection of unintentional contamination.
+
    
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.
 
@@ -69,7 +71,7 @@ Download Mash 2.3 as a tar file from [here](https://github.com/marbl/Mash/releas
 
 Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
 
-Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.2/mash` unless you have fully installed the software or added it to your PATH variable.
+Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.3/mash` unless you have fully installed the software or added it to your PATH variable.
 If successful you will see the Mash software command line help options. 
 
 For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
@@ -241,7 +243,7 @@ versions of software used (PneumoKITy itself, Mash etc), paths to input
 files,  information about the reference database used and the cut offs 
 specified. 
 
-Outputs from PneumoKITy are automatically assigned a RAG status:
+Outputs from PneumoKITy are automatically assigned a RAG status, please take care to note the status assigned when interpreting the results of the analysis.
 
 ![#4CAF50](https://via.placeholder.com/15/4CAF50/000000?text=+) GREEN: Analysis passed within expected cut-off
 
@@ -263,7 +265,7 @@ RED rag status alerts the user to failure of the serotyping. This could be
 due to an unexpected pattern of results, mixed serotypes or no-hits in the 
 analysis.
 
-**IMPORTANT:** Once software is released publically - each time an update is added to the included ctvdb we increment the 
+**IMPORTANT:** Once software is released publicly - each time an update is added to the included ctvdb we increment the 
 version of the overall PneumoKITy software (eg. from version 2.0 to 2.0.1). 
 However if an alternative version of the ctvdb is used it is up to the user to record 
 which version is used for their analysis.
@@ -319,7 +321,7 @@ if the sample has failed to hit a serotype a description of the result is output
 
 **`stage 2 hits`** - the variant genes and results of stage 2 analysis, eg for those variants determined using MASH screen (gene presence/absence and allele) the result will be a hit % of kmers from sample vs kmers in the gene. 
 
-**`stage 2 result`** - interpreted version f stage 1, eg hit variant determined (eg detected, not detected)
+**`stage 2 result`** - outcome of any stage 2 analysis, eg hit variant determined (eg detected, not detected)
 
 **`rag status`** - the overall quality status (traffic light system) of the run as described above.
 
