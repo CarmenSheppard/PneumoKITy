@@ -78,11 +78,12 @@ def parse_args(workflow_version):
     main_parser = argparse.ArgumentParser()
 
     # create sub parsers
-    subparsers = main_parser.add_subparsers(title="actions", required=True, help="Choose expected Mixed ('mix') or "
-                                                                                 "expected pure ['pure'] input. "
-                                                                                 "This changes PneumoKITy's run and "
-                                                                                 "output behaviour to suit"
-                                                                                 " (see documentation).")
+    subparsers = main_parser.add_subparsers(title="actions", required=True, dest="run_type",
+                                            help="Choose expected Mixed ('mix') or "
+                                             "expected pure ['pure'] input. "
+                                             "This changes PneumoKITy's run and "
+                                              "output behaviour to suit"
+                                               " (see documentation).")
 
     pure_parser = subparsers.add_parser("pure", parents=[parent_parser], description="subparser pure", help=
                                             "Expected pure culture input args")
@@ -120,7 +121,7 @@ def parse_args(workflow_version):
     # input group options for expected mix input.
     mix_input_group = mix_parser.add_mutually_exclusive_group(required=True)
 
-    input_group.add_argument('--input_dir', '-i',
+    mix_input_group.add_argument('--input_dir', '-i',
     help = 'please provide the path to the directory '
     'containing two fastq files (paired fastq for '
     'one sample)'
@@ -131,7 +132,7 @@ def parse_args(workflow_version):
     '[REQUIRED - OPTION 2]')
 
     # auto default to 4 for mixed input
-    pure_parser.add_argument("-n", "--minmulti", type=int,
+    mix_parser.add_argument("-n", "--minmulti", type=int,
             default = 4,
             help = "minimum kmer multiplicity .["
             "OPTIONAL];"
@@ -157,6 +158,7 @@ class AnalysisMixed:
         """
 
         self.workflow = version # version of PneumoKITy workflow
+        self.runtype = "mix"
         self.minmulti = inputs.minmulti #minimum multiplicity cut off value
         self.category = None # category for stage 2 analysis or not
         self.folder = None # folder (genogroup) for stage 2 analysis
@@ -213,19 +215,6 @@ class AnalysisMixed:
                 sys.stderr.write("ERROR: Check input fastQ paths\n")
                 sys.exit(1)
 
-        # option 3 input assembly path/ file existence check
-        elif inputs.assembly:
-            # change minmulti filter cut off for assembly
-            self.max_mm = 1
-            self.minmulti = 1
-            if os.path.isfile(inputs.assembly):
-                self.assembly = inputs.assembly
-                self.input_dir = os.path.dirname(self.assembly)
-                self.fastq_files = None
-            else:
-                sys.stderr.write("ERROR: Check input assembly path\n")
-                sys.exit(1)
-
         # check minpercent input:
         if 20 <= inputs.minpercent <= 100:
             self.minpercent = inputs.minpercent
@@ -264,15 +253,9 @@ class AnalysisMixed:
 
         # get sample id from files
         if not inputs.sampleid:
-            if not inputs.assembly:
-                # get a file name from first seq input file to use for output
-                seq_file_name = os.path.basename(self.fastq_files[0])
-                self.sampleid = seq_file_name.split(self.split, 1)[0]
-            else:
-                # get filename from assembly
-                assembly_name = os.path.basename(self.assembly)
-                self.sampleid = assembly_name.split(self.split, 1)[0]
-
+            # get a file name from first seq input file to use for output
+            seq_file_name = os.path.basename(self.fastq_files[0])
+            self.sampleid = seq_file_name.split(self.split, 1)[0]
 
         else:
             self.sampleid = inputs.sampleid
@@ -303,11 +286,8 @@ class AnalysisMixed:
 
     def write_report(self):
         # Class function to write report output from completed Analysis object
-        if self.assembly:
-            inputfiles = f"Assembly file:\t{self.assembly}"
-        else:  # for fastq
-            inputfiles = f"Fastq1:\t{self.fastq_files[0]}\nFastq2:\t" \
-                f"{self.fastq_files[1]}"
+        inputfiles = f"Fastq1:\t{self.fastq_files[0]}\nFastq2:\t" \
+             f"{self.fastq_files[1]}"
 
         with open(os.path.join(self.output_dir,
                                f"{self.sampleid}_serotyping_results.txt"),
@@ -370,12 +350,7 @@ RED: Analysis failed
         return quality, results
 
 
-
-
-
-
-
-class Analysis:
+class AnalysisPure:
 
     """Create object for Pure cutlure analysis - update class attributes based on inputs,
         includes methods for creation of report and csv from object"""
@@ -384,7 +359,7 @@ class Analysis:
         """set up analysis object according to input options
         :param inputs: input arguments (args)
         """
-
+        self.runtype = "pure"
         self.workflow = version # version of PneumoKITy workflow
         self.minmulti = inputs.minmulti #minimum multiplicity cut off value
         self.category = None # category for stage 2 analysis or not
@@ -598,3 +573,11 @@ RED: Analysis failed
 
         return quality, results
 
+
+class Mix:
+    """Create object for storing results of mixed analysis"""
+
+    def __init__(self, serogroup, mixmm, percent):
+        self.serogroupo = serogroup
+        self.mixmm = mixmm  # version of PneumoKITy workflow
+        self.precent = percent  # minimum multiplicity cut off value

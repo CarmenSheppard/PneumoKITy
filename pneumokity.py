@@ -3,11 +3,11 @@
 Main PneumoKITY script run serotyping from WGS data (Fastq or assembly)
 1. Run MASH screen tsv output -> tmp folder
 2. Parse mash screen output to apply filters, create csv output files
-Carmen Sheppard 2019-2021
+Carmen Sheppard 2019-2022
 """
 import os
 import sys
-from run_scripts.initialise_run import Analysis, parse_args, Category
+from run_scripts.initialise_run import AnalysisMixed, Analysis, parse_args, Category
 from run_scripts.tools import run_mash_screen, handle_results, cleanup
 from run_scripts.run_stage1 import run_parse
 from run_scripts.run_stage2 import start_analysis
@@ -22,12 +22,17 @@ def main(input_args, workflow_version):
     Runs stage2
     """
 
-    sys.stdout.write(f"\nRunning {workflow_version}\n")
+    sys.stdout.write(f"\nRunning {workflow_version} for {args.run_type} serotype determination\n")
 
-    # set up analysis object using inputs from commandline
-    analysis = Analysis(input_args, workflow_version)
+    # determine run type to set up object
+    if args.run_type == "pure":
+        # set up analysis object using inputs from commandline
+        analysis = Analysis(input_args, workflow_version)
+
+    else:
+        analysis = AnalysisMixed(input_args, workflow_version)
+
     sys.stdout.write(f"\nSample: {analysis.sampleid}\n")
-
     # Run Stage 1 Serotype analysis.
     # -------------------------------
     # obtain full path for reference sketch
@@ -37,10 +42,8 @@ def main(input_args, workflow_version):
 
     sys.stdout.write(f"Used {analysis.mash_v}\n")
     run_parse(analysis, tsvfile)
-    # TODO add subtype to stage 2 later as 19F can type in stage 1 but has
-    #  subtypes
 
-    # if typed in stage 1 only and not going through stringent analysis
+    # if typed in stage 1 only
     if analysis.category == Category.variants:
         # Run Stage 2 Serotype analysis.
         # -------------------------------
