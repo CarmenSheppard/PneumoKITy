@@ -45,38 +45,38 @@ def main(input_args, workflow_version):
     if analysis.runtype == "pure":
         run_parse_pure(analysis, tsvfile)
 
+        # if typed in stage 1 only
+        if analysis.category == Category.variants:
+            # Run Stage 2 Serotype analysis.
+            # -------------------------------
+            # check for found folder from CTVdb
+            if analysis.folder:
+                start_analysis(analysis)
+
+            # Write report file for stage 2
+            else:
+                sys.stderr.write("ERROR: unexpected output from stage 1 for "
+                                 f"{analysis.stage1_result}, no appropriate "
+                                 "CTVdb folder specified\n")
+                analysis.stage1_result = "No CTV folder available"
+
+            handle_results(analysis)
+
+
+        elif analysis.category == Category.subtype:
+            #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
+
+            analysis.predicted_serotype = analysis.stage1_result
+            # write text report and create csv of analysis object attributes
+            handle_results(analysis)
+
+        else:
+            analysis.predicted_serotype = analysis.stage1_result
+            # write text report and create csv of analysis object attributes
+            handle_results(analysis)
+
     elif analysis.runtype == "mix":
         run_parse_mix(analysis, tsvfile)
-
-    # if typed in stage 1 only
-    if analysis.category == Category.variants:
-        # Run Stage 2 Serotype analysis.
-        # -------------------------------
-        # check for found folder from CTVdb
-        if analysis.folder:
-            start_analysis(analysis)
-
-        # Write report file for stage 2
-        else:
-            sys.stderr.write("ERROR: unexpected output from stage 1 for "
-                             f"{analysis.stage1_result}, no appropriate "
-                             "CTVdb folder specified\n")
-            analysis.stage1_result = "No CTV folder available"
-
-        handle_results(analysis)
-
-
-    elif analysis.category == Category.subtype:
-        #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
-
-        analysis.predicted_serotype = analysis.stage1_result
-        # write text report and create csv of analysis object attributes
-        handle_results(analysis)
-
-    else:
-        analysis.predicted_serotype = analysis.stage1_result
-        # write text report and create csv of analysis object attributes
-        handle_results(analysis)
 
     # cleanup temp dir
     cleanup(analysis)

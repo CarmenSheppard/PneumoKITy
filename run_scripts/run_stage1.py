@@ -72,7 +72,6 @@ def open_tsv_filter(tsvfile, minpercent, minmulti):
 
     df = create_dataframe(tsvfile)
     filename = os.path.basename(tsvfile)[:-4]
-    alldata = f'{filename}.csv'
 
     # Apply filters
     filtered_df, original, top_hits = \
@@ -90,10 +89,8 @@ def group_check_mix(df, analysis):
     :param analysis: analysis object
     :return:strings of group and results
     """
-    folder = None
-    grp_id = None
+
     results = []
-    mix_mm = None
 
     # collate the data results together on one line and create result list
     for index, rows in df.iterrows():
@@ -103,38 +100,31 @@ def group_check_mix(df, analysis):
     # create db session
     session = session_maker(analysis.database)
 
-    # initialise empty list for group ids and group info
+    # initialise empty list for group ids and group info, types and any mixture objects
     groups = []
     grp_info = []
-
-    # add a list to collect objects if runtype expects mixed.
-    if analysis.runtype == "mix":
-        mix_objects = []
-
-    #initialise empty list for types
+    mix_objects = []
     types = []
-    # go through query results and append to groups list if not "no results".
+    # go through query results and append to groups list.
     for i in results:
-
+        #create mix sero object
+        sero_obj = MixSero(i, df.loc[df["Serotype"] == i]["percent"].values[0], analysis.database)
         genogroup = session.query(Serotype).join(Group).filter(Serotype.serotype_hit == i).all()
         if genogroup:
             groups.append(genogroup[0].group_id)
             grp_info.append(genogroup[0])
-
+            sero_obj.folder = genogroup[0].genogroup.group_name
 
         else: # if not in a group add the type that was found
             types.append(i)
 
-        # Create mixobject if analysis type = expected mix
-        if analysis.runtype == "mix":
-            if genogroup:
-                group = genogroup[0].group_id
-            else:
-                group = None
-            # create mixsero object with hit and %
-            sero_obj = MixSero(i, df.loc[df["Serotype"] == i]["percent"].values[0])
-            sero_obj.serogroup = group
-            mix_objects.append(sero_obj)
+        # if genogroup:
+        #     group = genogroup[0].group_id
+        # else:
+        #     group = None
+
+        # Append mixsero object to list
+        mix_objects.append(sero_obj)
 
 
     # check length of set group is > 1 then not all group's were identical, hence Mixed. Or there are
@@ -146,18 +136,12 @@ def group_check_mix(df, analysis):
 
         if len(pheno) > 1:
             analysis.category = Category.mix
-            #For expected pure write outputs and add results
-            if analysis.runtype == "pure":
-                analysis.stage1_result = f"Mixed serotypes- {pheno}"
-                sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
-                if max(df["median-multiplicity"]) > 1:
-                   mix_mm = pd.Series(df["median-multiplicity"].values, index=df.Serotype).to_dict()
-                   analysis.mix_mm = translate_mixmm(mix_mm, session)
-
-            # for expected  mixed add MixSero object to gather mix data
-            else:
-
-                pass
+            analysis.stage1_result = f"Mixed serotypes- {pheno}"
+            sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
+            if max(df["median-multiplicity"]) > 1:
+                mix_mm = pd.Series(df["median-multiplicity"].values, index=df.Serotype).to_dict()
+                analysis.mix_mm = translate_mixmm(mix_mm, session)
+                sys.stdout.write(f"Estimated abundance of mixed types (%) {analysis.mix_mm}\n")
         # deal with subtypes in stage 1
         else:
             analysis.category = Category.subtype
@@ -169,6 +153,8 @@ def group_check_mix(df, analysis):
         stage1_result = list(get_pheno_list(results, session))
         # get element for display
         analysis.stage1_result = stage1_result[0]
+        sys.stdout.write(f"Found - {stage1_result[0]}\n")
+
         # if stage 1 hit not found raise error
         if not stage1_result:
             sys.stderr.write(f"Stage 1 hit unexpected - please check "
@@ -183,8 +169,8 @@ def group_check_mix(df, analysis):
         # get phenotypes for output
         pheno = set(get_pheno_list(results, session))
         if len(pheno) > 1:
-            category = Category.mix
-            stage1_result = f"Mixed serotypes- {pheno}"
+            analysis.category = Category.mix
+            analysis.stage1_result = f"Mixed serotypes- {pheno}"
             sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
             # if not assembly (mm >1) look for median multiplicity of hits and create dict
             if max(df["median-multiplicity"]) > 1:
@@ -204,7 +190,7 @@ def group_check_mix(df, analysis):
                 analysis.folder = record.genogroup.group_name
                 analysis.grp_id = record.group_id
             analysis.category = Category.variants
-            analysis.stage1_result = folder
+            analysis.stage1_result = analysis.folder
             session.close()
 
         else:
@@ -214,9 +200,6 @@ def group_check_mix(df, analysis):
             sys.exit(1)
 
     return analysis
-
-
-
 
 
 def group_check_pure(df, analysis):
@@ -331,6 +314,59 @@ def group_check_pure(df, analysis):
     return analysis
 
 
+
+def run_parse_mix(analysis, tsvfile):
+    # Run stage 1 MASH screen file parsing for expected Mix culture
+    # check tsv file not empty
+
+    try:
+
+        if os.path.isfile(tsvfile) and os.path.getsize(tsvfile) > 0:
+            # check file is not empty then open and create df
+            filtered_df, original, analysis.max_percent, analysis.top_hits, analysis.max_MM = \
+                open_tsv_filter(tsvfile, analysis.minpercent, analysis.minmulti)
+
+            if not filtered_df.empty:
+                # sort dataframes by percent then identity descending.
+                filtered_df = filtered_df.sort_values(by=["percent",
+                                                          "identity"],
+                                                      ascending=False)
+                analysis = group_check_mix(filtered_df, analysis)
+                analysis.rag_status = "GREEN"
+
+            else:  # for samples with no hits
+                # catch samples with very low median multiplicity values for interpretation
+                if analysis.max_percent >= 70 and analysis.max_mm < analysis.minmulti:
+                    analysis.rag_status = "RED"
+                    analysis.stage1_result = "Median multiplicity low, check sequence quality."
+
+                if analysis.max_percent < 20:
+                    analysis.category = Category.acapsular
+                    analysis.stage1_result = "Below 20% hit - inadequate DNA or acapsular organism"                                            "organism, check species identity and sequence quality."
+
+                else:
+                    analysis.category = Category.no_hits
+                    analysis.stage1_result = "Below 70% hit - Poor Sequence " \
+                                             "quality, variant or non-typeable"\
+                                             " organisms."
+
+                sys.stdout.write(analysis.stage1_result + "\n")
+
+            original = original.sort_values(by=["percent", "identity"],
+                                            ascending=False)
+
+            create_csv(original, analysis.output_dir, f"{analysis.sampleid}_alldata.csv")
+
+
+        else:
+            sys.stderr.write("ERROR: No Mash data - empty file\n")
+            sys.exit(1)
+
+    except IOError:
+        # warning about weird file path
+        sys.stderr.write("ERROR: Mash output path not available.\n")
+        sys.exit(1)
+
 def run_parse_pure(analysis, tsvfile):
     # Run stage 1 MASH screen file parsing for expected Pure culture
     # check tsv file not empty
@@ -353,74 +389,6 @@ def run_parse_pure(analysis, tsvfile):
                     analysis.rag_status = "AMBER"
 
 
-                else:
-                    analysis.rag_status = "GREEN"
-
-            else:  # for samples with no hits
-                # catch samples with very low median multiplicity values for interpretation
-                if analysis.max_percent >= 70 and analysis.max_mm < analysis.minmulti:
-                    analysis.rag_status = "RED"
-                    analysis.stage1_result = "Median multiplicity low, check sequence quality."
-
-                # second chance, amber rag status for low top hits
-                if analysis.max_percent >= 70 and analysis.minpercent >= 70:
-                    analysis.rag_status = "AMBER"
-                    # reduce minpercent cut off to: max percentage - 10%
-                    minpercent = analysis.max_percent - (analysis.max_percent*0.1)
-                    # rerun filter
-                    filtered_df, original, analysis.top_hits = apply_filters(original,
-                                                minpercent, analysis.minmulti)
-                    analysis.category, analysis.stage1_result, analysis.folder, analysis.grp_id, analysis.mix_mm\
-                        = group_check_pure(filtered_df, analysis.database)
-
-                if analysis.max_percent < 20:
-                    analysis.category = Category.acapsular
-                    analysis.stage1_result = "Below 20% hit - possible acapsular"\
-                                             " organism, check species identity and sequence quality."
-
-                else:
-                    analysis.category = Category.no_hits
-                    analysis.stage1_result = "Below 70% hit - Poor Sequence " \
-                                             "quality, variant or non-typeable"\
-                                             " organism."
-
-                sys.stdout.write(analysis.stage1_result + "\n")
-
-            original = original.sort_values(by=["percent", "identity"],
-                                            ascending=False)
-
-            create_csv(original, analysis.output_dir, f"{analysis.sampleid}_alldata.csv")
-
-
-        else:
-            sys.stderr.write("ERROR: No Mash data - empty file\n")
-            sys.exit(1)
-
-    except IOError:
-        # warning about weird file path
-        sys.stderr.write("ERROR: Mash output path not available.\n")
-        sys.exit(1)
-
-def run_parse_mix(analysis, tsvfile):
-    # Run stage 1 MASH screen file parsing for expected Pure culture
-    # check tsv file not empty
-
-    try:
-
-        if os.path.isfile(tsvfile) and os.path.getsize(tsvfile) > 0:
-            # check file is not empty then open and create df
-            filtered_df, original, analysis.max_percent, analysis.top_hits, analysis.max_MM = \
-                open_tsv_filter(tsvfile, analysis.minpercent, analysis.minmulti)
-
-            if not filtered_df.empty:
-                # sort dataframes by percent then identity descending.
-                filtered_df = filtered_df.sort_values(by=["percent",
-                                                          "identity"],
-                                                      ascending=False)
-                analysis = group_check_pure(filtered_df, analysis)
-
-                if analysis.category == Category.mix:
-                    analysis.rag_status = "AMBER"
                 else:
                     analysis.rag_status = "GREEN"
 

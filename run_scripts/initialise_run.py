@@ -13,6 +13,8 @@ import ctvdb
 import pandas as pd
 from enum import Enum
 from run_scripts.tools import check_db_path, check_version
+from Database_tools.sqlalchemydeclarative import Serotype
+from Database_tools.db_functions import session_maker
 
 class Category(Enum):
     # deal with categories from stage 1
@@ -234,6 +236,15 @@ class Analysis:
                 sys.stderr.write("ERROR: Check input fastQ paths\n")
                 sys.exit(1)
 
+            # check minpercent input:
+            if 20 <= inputs.minpercent <= 100:
+                self.minpercent = inputs.minpercent
+
+            else:
+                sys.stderr.write("ERROR: Input min kmer percentage must be "
+                                 "between 20 and 100.\n")
+                sys.exit(1)
+
 
 class AnalysisPure(Analysis):
 
@@ -261,15 +272,6 @@ class AnalysisPure(Analysis):
             else:
                 sys.stderr.write("ERROR: Check input assembly path\n")
                 sys.exit(1)
-
-        # check minpercent input:
-        if 20 <= inputs.minpercent <= 100:
-            self.minpercent = inputs.minpercent
-
-        else:
-            sys.stderr.write("ERROR: Input min kmer percentage must be "
-                             "between 20 and 100.\n")
-            sys.exit(1)
 
 
         # deal with output directory options
@@ -437,14 +439,7 @@ class AnalysisMixed(Analysis):
                 sys.stderr.write("ERROR: Check input fastQ paths\n")
                 sys.exit(1)
 
-        # check minpercent input:
-        if 20 <= inputs.minpercent <= 100:
-            self.minpercent = inputs.minpercent
 
-        else:
-            sys.stderr.write("ERROR: Input min kmer percentage must be "
-                             "between 20 and 100.\n")
-            sys.exit(1)
 
 
         # deal with output directory options
@@ -558,9 +553,12 @@ RED: Analysis failed
 class MixSero:
     """Create object for storing results of mixed analysis"""
 
-    def __init__(self, serotype_hit, percent):
+    def __init__(self, serotype_hit, percent, dbpath):
         self.serotype_hit = serotype_hit
-        self.serogroup = None
+        self.folder = None
         self.mixmm = None
         self.percent = percent  # individual top hits and percent (dict)
-        self.pheno = None
+
+        session = session_maker(dbpath)
+        self.pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == serotype_hit).first()[0]
+        session.close()
