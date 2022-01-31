@@ -9,7 +9,7 @@ import os
 import sys
 from run_scripts.initialise_run import AnalysisMixed, AnalysisPure, parse_args, Category
 from run_scripts.tools import run_mash_screen, handle_results, cleanup
-from run_scripts.run_stage1 import run_parse
+from run_scripts.run_stage1 import run_parse_pure, run_parse_mix
 from run_scripts.run_stage2 import start_analysis
 
 version = "PneumoKITy V1.0b"
@@ -42,7 +42,11 @@ def main(input_args, workflow_version):
     tsvfile = run_mash_screen(analysis, reference)
 
     sys.stdout.write(f"Used {analysis.mash_v}\n")
-    run_parse(analysis, tsvfile)
+    if analysis.runtype == "pure":
+        run_parse_pure(analysis, tsvfile)
+
+    elif analysis.runtype == "mix":
+        run_parse_mix(analysis, tsvfile)
 
     # if typed in stage 1 only
     if analysis.category == Category.variants:

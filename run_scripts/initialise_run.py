@@ -153,18 +153,17 @@ def parse_args(workflow_version):
 
     return args
 
-class AnalysisMixed:
 
-    """Create object for mixed cutlure analysis - update class attributes based on inputs,
-        includes methods for creation of report and csv from object"""
+class Analysis:
 
+    """Parent Class object for analysis objects- update class attributes based on inputs,
+        """
     def __init__(self, inputs, version):
         """set up analysis object according to input options
         :param inputs: input arguments (args)
         """
 
         self.workflow = version # version of PneumoKITy workflow
-        self.runtype = "mix"
         self.minmulti = inputs.minmulti #minimum multiplicity cut off value
         self.category = None # category for stage 2 analysis or not
         self.folder = None # folder (genogroup) for stage 2 analysis
@@ -185,50 +184,6 @@ class AnalysisMixed:
         self.grp_id = None # database id of group for stage 3
         self.csv_collate = None # folder for collating of results
         self.mix_mm = None # initialise mixture estimation (multiplicity) for if sample Mixed (for extimating ratios)
-
-        # Determine input option
-        # Option 1: specify an input directory path with -i option.
-        if inputs.input_dir:
-            glob_pattern = "*fastq*"
-            if os.path.isdir(inputs.input_dir):
-                self.fastq_files = sorted(glob.glob(os.path.join(inputs.input_dir,
-                                                          glob_pattern)))
-                self.input_dir = inputs.input_dir
-                self.assembly = None
-
-            else:
-                sys.stderr.write(" ERROR: Check input directory path\n")
-                sys.exit(1)
-
-            # check for correct number of fastq
-            if len(self.fastq_files) != 2:
-                sys.stderr.write("Unexpected number (" +
-                                 str(len(self.fastq_files))
-                                 + ") of fastq files. Please use option -f to"
-                                   " specify the paths to the fastq files\n")
-                sys.exit(1)
-
-        # option 2 input separate fastq paths -f option + existence check
-        elif inputs.fastqs:
-            if os.path.isfile(inputs.fastqs[0]) and \
-                    os.path.isfile(inputs.fastqs[1]):
-                # set input dir to input dir of first fastq
-                self.input_dir = os.path.dirname(inputs.fastqs[0])
-                self.fastq_files = inputs.fastqs
-
-            else:
-                sys.stderr.write("ERROR: Check input fastQ paths\n")
-                sys.exit(1)
-
-        # check minpercent input:
-        if 20 <= inputs.minpercent <= 100:
-            self.minpercent = inputs.minpercent
-
-        else:
-            sys.stderr.write("ERROR: Input min kmer percentage must be "
-                             "between 20 and 100.\n")
-            sys.exit(1)
-
         # Add and check given mash path
         self.mash = inputs.mash
         self.mash_v = check_version(self.mash)
@@ -242,158 +197,15 @@ class AnalysisMixed:
             self.database = inputs.database
 
         # check ctvdb folder for presence of correct files:
-
         check_db_path(self.database)
 
-
-        # deal with output directory options
-        if not inputs.output_dir:
-            self.output_dir = os.path.join(self.input_dir,
-                                           'pneumo_capsular_typing')
-        else:
-            self.output_dir = os.path.join(inputs.output_dir,
-                                           'pneumo_capsular_typing')
-
-
-
-        # get sample id from files
-        if not inputs.sampleid:
-            # get a file name from first seq input file to use for output
-            seq_file_name = os.path.basename(self.fastq_files[0])
-            self.sampleid = seq_file_name.split(self.split, 1)[0]
-
-        else:
-            self.sampleid = inputs.sampleid
-
-        if inputs.collate:
-            # get collate dir location
-            if os.path.isdir(inputs.collate):
-                # set collate dir
-                self.csv_collate = inputs.collate
-            else:
-                sys.stderr.write("ERROR: Check copy csv directory path\n")
-                sys.exit(1)
-
-        # Set up file directories and add overwrite warning for
-        # pneumo_capsular_typing if pre-existing
-        try:
-            if os.path.isdir(self.output_dir):
-                sys.stdout.write("WARNING: Existing files in output dir"
-                                 " will be overwritten\n")
-
-            # create output and /tmp directory if it doesn't exist
-            if not os.path.isdir(os.path.join(self.output_dir, f"{self.sampleid}_tmp")):
-                os.makedirs(os.path.join(self.output_dir, f"{self.sampleid}_tmp"))
-
-        except IOError:
-            sys.stderr.write("ERROR: cannot access/write to output paths\n")
-            sys.exit(1)
-
-    def write_report(self):
-        # Class function to write report output from completed Analysis object
-        inputfiles = f"Fastq1:\t{self.fastq_files[0]}\nFastq2:\t" \
-             f"{self.fastq_files[1]}"
-
-        with open(os.path.join(self.output_dir,
-                               f"{self.sampleid}_serotyping_results.txt"),
-                  "w+") as f:
-            f.write(f"""----------------------------------------
-PneumoKITy serotyping result report
-----------------------------------------
-
-Run Metrics
-----------------------------------------
-Workflow version\t{self.workflow}
-
-{inputfiles}
-Input kmer percent cut-off:\t{self.minpercent}
-Median multiplicity cut-off:\t{self.minmulti}
-CTV.db path:\t{self.database}
-Mash Version:\t{self.mash_v}
-
-Please note median multiplicity cut-off only relevant for fastq input.
-
-SEROTYPING RESULTS
------------------------------------------
-Stage 1 screen results:\t{self.stage1_result}
-Stage 1 category:\t{self.category.name}
-Stage 1 top hits: \t{self.top_hits}
-Stage 1 max kmer percentage:\t{self.max_percent}
-Stage 1 median multiplicity for top hit % (fastq only):\t{self.max_mm}
-Stage 1 Estimated abundance of mix (%) (if mixed and fastq only):\t{self.mix_mm}
-{self.stage2_output}
-
-Predicted serotype result:\t {self.predicted_serotype}
-Result RAG status:\t {self.rag_status}
-
-
-
-RAG explanation
------------------------------------------
-GREEN: Analysis passed
-AMBER: Result obtained but caution advised, check top hit percentages and median multiplicity.
-RED: Analysis failed
-""")
-
-        sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
-                         f"Output directory: {self.output_dir}\n")
-
-
-    def create_objdf(self):
-        """Creates result and quality dataframes from Analysis object"""
-
-        attribs = vars(self)
-        frame = pd.DataFrame.from_dict(attribs, orient="index")
-        frame = frame.transpose()
-        # create separate dataframes of quality and result data
-        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
-                             "mash", "database", "output_dir","csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits","max_mm","max_percent", "folder", "stage1_result", "mix_mm",
-                                "stage2_varids","stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"],
-                               axis=1)
-
-        return quality, results
-
-
-class AnalysisPure:
-
-    """Create object for Pure cutlure analysis - update class attributes based on inputs,
-        includes methods for creation of report and csv from object"""
-
-    def __init__(self, inputs, version):
-        """set up analysis object according to input options
-        :param inputs: input arguments (args)
-        """
-        self.runtype = "pure"
-        self.workflow = version # version of PneumoKITy workflow
-        self.minmulti = inputs.minmulti #minimum multiplicity cut off value
-        self.category = None # category for stage 2 analysis or not
-        self.folder = None # folder (genogroup) for stage 2 analysis
-        self.stage1_result = ""
-        self.stage2_result = {}
-        self.stage2_varids = None
-        self.split = str(inputs.split) #input split value
-        self.mash_v = "" # version of Mash used
-        self.threads = str(inputs.threads) # number of threads used for subprocesses
-        self.predicted_serotype = "" # final serotype predicted phenotype result
-        self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
-        self.rag_status = "RED"
-        self.top_hits = "" # top five hits from stage 1 analysis
-        self.max_mm = ""  # max median multiplicity in stage 1 analysis
-        self.stage2_hits = {} # metrics for stage 2 hits
-        self.max_percent = "" # percentage of max top hit
-        self.gene_list = [] # genelist for stage 2 analysis
-        self.grp_id = None # database id of group for stage 3
-        self.csv_collate = None # folder for collating of results
-        self.mix_mm = None # initialise mixture estimation (multiplicity) for if sample Mixed (for extimating ratios)
-
-        # Determine input option
+        # Determine input option - both methods Mix and Pure have fastq input
         # Option 1: specify an input directory path with -i option.
         if inputs.input_dir:
             glob_pattern = "*fastq*"
             if os.path.isdir(inputs.input_dir):
                 self.fastq_files = sorted(glob.glob(os.path.join(inputs.input_dir,
-                                                          glob_pattern)))
+                                                                 glob_pattern)))
                 self.input_dir = inputs.input_dir
                 self.assembly = None
 
@@ -422,8 +234,23 @@ class AnalysisPure:
                 sys.stderr.write("ERROR: Check input fastQ paths\n")
                 sys.exit(1)
 
+
+class AnalysisPure(Analysis):
+
+    """Create child object for pure culture analysis - update class attributes based on inputs,
+        includes methods for creation of report and csv from object"""
+
+    def __init__(self, inputs, version):
+        """set up analysis object according to input options
+        :param inputs: input arguments (args)
+        """
+        # inherit everything from parent class
+        super().__init__(inputs,version)
+        self.runtype = "pure"
+
+
         # option 3 input assembly path/ file existence check
-        elif inputs.assembly:
+        if inputs.assembly:
             # change minmulti filter cut off for assembly
             self.max_mm = 1
             self.minmulti = 1
@@ -444,22 +271,6 @@ class AnalysisPure:
                              "between 20 and 100.\n")
             sys.exit(1)
 
-        # Add and check given mash path
-        self.mash = inputs.mash
-        self.mash_v = check_version(self.mash)
-
-        # set up path  to ctvdb if using default
-        if not inputs.database:
-            self.database = os.path.dirname(ctvdb.__file__)
-
-        else:
-            # use given database folder
-            self.database = inputs.database
-
-        # check ctvdb folder for presence of correct files:
-
-        check_db_path(self.database)
-
 
         # deal with output directory options
         if not inputs.output_dir:
@@ -468,7 +279,6 @@ class AnalysisPure:
         else:
             self.output_dir = os.path.join(inputs.output_dir,
                                            'pneumo_capsular_typing')
-
 
 
         # get sample id from files
@@ -528,7 +338,7 @@ PneumoKITy serotyping result report
 Run Metrics
 ----------------------------------------
 Workflow version\t{self.workflow}
-
+Analysis type = Expected pure culture
 {inputfiles}
 Input kmer percent cut-off:\t{self.minpercent}
 Median multiplicity cut-off:\t{self.minmulti}
@@ -579,10 +389,178 @@ RED: Analysis failed
         return quality, results
 
 
-class Mix:
+class AnalysisMixed(Analysis):
+
+    """Create child object for expected mixed culture analysis - update class attributes based on inputs,
+        includes methods for creation of report and csv from object"""
+
+    def __init__(self, inputs, version):
+        """set up analysis object according to input options
+        :param inputs: input arguments (args)
+        """
+        # inherit everything from parent class
+        super().__init__(inputs,version)
+        self.runtype = "mix"
+
+        # Determine input option
+        # Option 1: specify an input directory path with -i option.
+        if inputs.input_dir:
+            glob_pattern = "*fastq*"
+            if os.path.isdir(inputs.input_dir):
+                self.fastq_files = sorted(glob.glob(os.path.join(inputs.input_dir,
+                                                          glob_pattern)))
+                self.input_dir = inputs.input_dir
+                self.assembly = None
+
+            else:
+                sys.stderr.write(" ERROR: Check input directory path\n")
+                sys.exit(1)
+
+            # check for correct number of fastq
+            if len(self.fastq_files) != 2:
+                sys.stderr.write("Unexpected number (" +
+                                 str(len(self.fastq_files))
+                                 + ") of fastq files. Please use option -f to"
+                                   " specify the paths to the fastq files\n")
+                sys.exit(1)
+
+        # option 2 input separate fastq paths -f option + existence check
+        elif inputs.fastqs:
+            if os.path.isfile(inputs.fastqs[0]) and \
+                    os.path.isfile(inputs.fastqs[1]):
+                # set input dir to input dir of first fastq
+                self.input_dir = os.path.dirname(inputs.fastqs[0])
+                self.fastq_files = inputs.fastqs
+                self.assembly = None
+
+            else:
+                sys.stderr.write("ERROR: Check input fastQ paths\n")
+                sys.exit(1)
+
+        # check minpercent input:
+        if 20 <= inputs.minpercent <= 100:
+            self.minpercent = inputs.minpercent
+
+        else:
+            sys.stderr.write("ERROR: Input min kmer percentage must be "
+                             "between 20 and 100.\n")
+            sys.exit(1)
+
+
+        # deal with output directory options
+        if not inputs.output_dir:
+            self.output_dir = os.path.join(self.input_dir,
+                                           'pneumo_capsular_typing')
+        else:
+            self.output_dir = os.path.join(inputs.output_dir,
+                                           'pneumo_capsular_typing')
+
+        # get sample id from files
+        if not inputs.sampleid:
+            # get a file name from first seq input file to use for output
+            seq_file_name = os.path.basename(self.fastq_files[0])
+            self.sampleid = seq_file_name.split(self.split, 1)[0]
+
+        else:
+            self.sampleid = inputs.sampleid
+
+        if inputs.collate:
+            # get collate dir location
+            if os.path.isdir(inputs.collate):
+                # set collate dir
+                self.csv_collate = inputs.collate
+            else:
+                sys.stderr.write("ERROR: Check copy csv directory path\n")
+                sys.exit(1)
+
+        # Set up file directories and add overwrite warning for
+        # pneumo_capsular_typing if pre-existing
+        try:
+            if os.path.isdir(self.output_dir):
+                sys.stdout.write("WARNING: Existing files in output dir"
+                                 " will be overwritten\n")
+
+            # create output and /tmp directory if it doesn't exist
+            if not os.path.isdir(os.path.join(self.output_dir, f"{self.sampleid}_tmp")):
+                os.makedirs(os.path.join(self.output_dir, f"{self.sampleid}_tmp"))
+
+        except IOError:
+            sys.stderr.write("ERROR: cannot access/write to output paths\n")
+            sys.exit(1)
+
+    def write_report(self):
+        # Class function to write report output from completed mixed object
+
+        inputfiles = f"Fastq1:\t{self.fastq_files[0]}\nFastq2:\t" \
+                f"{self.fastq_files[1]}"
+
+        with open(os.path.join(self.output_dir,
+                               f"{self.sampleid}_serotyping_results.txt"),
+                  "w+") as f:
+            f.write(f"""----------------------------------------
+PneumoKITy serotyping result report
+----------------------------------------
+
+Run Metrics
+----------------------------------------
+Workflow version\t{self.workflow}
+Analysis type = Expected mixed culture
+{inputfiles}
+Input kmer percent cut-off:\t{self.minpercent}
+Median multiplicity cut-off:\t{self.minmulti}
+CTV.db path:\t{self.database}
+Mash Version:\t{self.mash_v}
+
+Please note median multiplicity cut-off only relevant for fastq input.
+
+SEROTYPING RESULTS
+-----------------------------------------
+Stage 1 screen results:\t{self.stage1_result}
+Stage 1 category:\t{self.category.name}
+Stage 1 top hits: \t{self.top_hits}
+Stage 1 max kmer percentage:\t{self.max_percent}
+Stage 1 median multiplicity for top hit % (fastq only):\t{self.max_mm}
+Stage 1 Estimated abundance of mix (%) (if mixed and fastq only):\t{self.mix_mm}
+{self.stage2_output}
+
+Predicted serotype result:\t {self.predicted_serotype}
+Result RAG status:\t {self.rag_status}
+
+
+
+RAG explanation
+-----------------------------------------
+GREEN: Analysis passed
+AMBER: Result obtained but caution advised, check top hit percentages and median multiplicity.
+RED: Analysis failed
+""")
+
+        sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
+                         f"Output directory: {self.output_dir}\n")
+
+
+    def create_objdf(self):
+        """Creates result and quality dataframes from Analysis object"""
+
+        attribs = vars(self)
+        frame = pd.DataFrame.from_dict(attribs, orient="index")
+        frame = frame.transpose()
+        # create separate dataframes of quality and result data
+        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
+                             "mash", "database", "output_dir","csv_collate"], axis=1)
+        results = frame.filter(["sampleid", "top_hits","max_mm","max_percent", "folder", "stage1_result", "mix_mm",
+                                "stage2_varids","stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"],
+                               axis=1)
+
+        return quality, results
+
+
+class MixSero:
     """Create object for storing results of mixed analysis"""
 
-    def __init__(self, serogroup, mixmm, percent):
-        self.serogroupo = serogroup
-        self.mixmm = mixmm  # version of PneumoKITy workflow
-        self.precent = percent  # minimum multiplicity cut off value
+    def __init__(self, serotype_hit, percent):
+        self.serotype_hit = serotype_hit
+        self.serogroup = None
+        self.mixmm = None
+        self.percent = percent  # individual top hits and percent (dict)
+        self.pheno = None
