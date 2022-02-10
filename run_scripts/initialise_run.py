@@ -13,8 +13,9 @@ import ctvdb
 import pandas as pd
 from enum import Enum
 from run_scripts.tools import check_db_path, check_version
-from Database_tools.sqlalchemydeclarative import Serotype
+from Database_tools.sqlalchemydeclarative import Serotype, Group
 from Database_tools.db_functions import session_maker
+from exceptions import CtvdbFileError
 
 class Category(Enum):
     # deal with categories from stage 1
@@ -103,6 +104,7 @@ def parse_args(workflow_version):
     input_group.add_argument('--assembly', '-a',
                        help='Specify assembly input file path [REQUIRED '
                             'OPTION 3]')
+
     pure_parser.add_argument("-p", "--minpercent", type=int,
             default = 90,
             help = "Initial minimum %% kmer count/total, N.B PneumoKITy auto drops top hit % if no hits fount until "
@@ -236,14 +238,14 @@ class Analysis:
                 sys.stderr.write("ERROR: Check input fastQ paths\n")
                 sys.exit(1)
 
-            # check minpercent input:
-            if 20 <= inputs.minpercent <= 100:
-                self.minpercent = inputs.minpercent
+        # check minpercent input:
+        if 20 <= inputs.minpercent <= 100:
+            self.minpercent = inputs.minpercent
 
-            else:
-                sys.stderr.write("ERROR: Input min kmer percentage must be "
-                                 "between 20 and 100.\n")
-                sys.exit(1)
+        else:
+            sys.stderr.write("ERROR: Input min kmer percentage must be "
+                             "between 20 and 100.\n")
+            sys.exit(1)
 
 
 class AnalysisPure(Analysis):
@@ -293,7 +295,6 @@ class AnalysisPure(Analysis):
                 # get filename from assembly
                 assembly_name = os.path.basename(self.assembly)
                 self.sampleid = assembly_name.split(self.split, 1)[0]
-
 
         else:
             self.sampleid = inputs.sampleid
@@ -403,6 +404,7 @@ class AnalysisMixed(Analysis):
         # inherit everything from parent class
         super().__init__(inputs,version)
         self.runtype = "mix"
+        self.mixobjects = []
 
         # Determine input option
         # Option 1: specify an input directory path with -i option.
@@ -438,9 +440,6 @@ class AnalysisMixed(Analysis):
             else:
                 sys.stderr.write("ERROR: Check input fastQ paths\n")
                 sys.exit(1)
-
-
-
 
         # deal with output directory options
         if not inputs.output_dir:
@@ -506,7 +505,6 @@ Median multiplicity cut-off:\t{self.minmulti}
 CTV.db path:\t{self.database}
 Mash Version:\t{self.mash_v}
 
-Please note median multiplicity cut-off only relevant for fastq input.
 
 SEROTYPING RESULTS
 -----------------------------------------
@@ -514,8 +512,8 @@ Stage 1 screen results:\t{self.stage1_result}
 Stage 1 category:\t{self.category.name}
 Stage 1 top hits: \t{self.top_hits}
 Stage 1 max kmer percentage:\t{self.max_percent}
-Stage 1 median multiplicity for top hit % (fastq only):\t{self.max_mm}
-Stage 1 Estimated abundance of mix (%) (if mixed and fastq only):\t{self.mix_mm}
+Stage 1 maximum median multiplicity for top hits:\t{self.max_mm}
+Stage 1 Estimated abundance of mix (%) (if mixed only):\t{self.mix_mm}
 {self.stage2_output}
 
 Predicted serotype result:\t {self.predicted_serotype}
@@ -551,14 +549,34 @@ RED: Analysis failed
 
 
 class MixSero:
-    """Create object for storing results of mixed analysis"""
+    """Create object for storing results of mixed analysis, runs queries to get variour """
 
-    def __init__(self, serotype_hit, percent, dbpath):
-        self.serotype_hit = serotype_hit
-        self.folder = None
-        self.mixmm = None
-        self.percent = percent  # individual top hits and percent (dict)
-
+    def __init__(self, serotype_hit, percent, mm, dbpath):
         session = session_maker(dbpath)
+        self.serotype_hit = serotype_hit
+        # query for group  and group id if serotype is in group
+        self.folder = session.query(Group.group_name).join(Serotype).filter(Serotype.serotype_hit == serotype_hit).first()
+        # format query object
+        if self.folder:
+            self.folder = self.folder[0]
+        self.grp_id = session.query(Group.id).join(Serotype).filter(Serotype.serotype_hit == serotype_hit).first()
+        # format query object
+        if self.grp_id:
+            self.grp_id = self.grp_id[0]
+        self.mm = mm
+        self.percent = percent  # individual top hits and percent (dict)
         self.pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == serotype_hit).first()[0]
         session.close()
+        self.stage2_type = None
+        self.predicted_serotype = None
+        self.stage1_result = None
+        self.stage2_result = None
+        self.stage2_hits = None
+        self.rag_status = 'RED'
+        # catch unexpected phenotype hit - CTVdb error
+        if not self.pheno:
+            sys.stderr.write(f"Stage 1 hit {serotype_hit} unexpected - please check "
+                         f"integrity of CTVdb, all reference sequences MUST"
+                         f" be accounted for in CTVdb.\n")
+            raise CtvdbFileError
+

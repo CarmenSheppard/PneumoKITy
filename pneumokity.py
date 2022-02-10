@@ -3,16 +3,17 @@
 Main PneumoKITY script run serotyping from WGS data (Fastq or assembly)
 1. Run MASH screen tsv output -> tmp folder
 2. Parse mash screen output to apply filters, create csv output files
-Carmen Sheppard 2019-2022
+Carmen Sheppard 2022
 """
 import os
 import sys
 from run_scripts.initialise_run import AnalysisMixed, AnalysisPure, parse_args, Category
 from run_scripts.tools import run_mash_screen, handle_results, cleanup
 from run_scripts.run_stage1 import run_parse_pure, run_parse_mix
-from run_scripts.run_stage2 import start_analysis
+from run_scripts.run_stage2 import start_stage2
+from exceptions import CtvdbError
 
-version = "PneumoKITy V1.0b"
+version = "PneumoKITy V1.0b2"
 
 
 def main(input_args, workflow_version):
@@ -45,38 +46,40 @@ def main(input_args, workflow_version):
     if analysis.runtype == "pure":
         run_parse_pure(analysis, tsvfile)
 
-        # if typed in stage 1 only
-        if analysis.category == Category.variants:
-            # Run Stage 2 Serotype analysis.
-            # -------------------------------
-            # check for found folder from CTVdb
-            if analysis.folder:
-                start_analysis(analysis)
+    else:
+        run_parse_mix(analysis, tsvfile)
 
-            # Write report file for stage 2
-            else:
-                sys.stderr.write("ERROR: unexpected output from stage 1 for "
-                                 f"{analysis.stage1_result}, no appropriate "
-                                 "CTVdb folder specified\n")
-                analysis.stage1_result = "No CTV folder available"
+    # sort out results
 
-            handle_results(analysis)
+    if analysis.category == Category.variants or analysis.category == Category.mixed_variants:
+    # Run Stage 2 Serotype analysis.
+    # -------------------------------
+    # check for found folder from CTVdb
+        if analysis.folder:
+            # if folder then this is not a mixed variant analysis - proceed with standard variant search
+            start_stage2(analysis, analysis.database)
 
-
-        elif analysis.category == Category.subtype:
-            #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
-
-            analysis.predicted_serotype = analysis.stage1_result
-            # write text report and create csv of analysis object attributes
-            handle_results(analysis)
+        elif analysis.category == Category.mixed_variants:
+            for serovar in analysis.mixobjects:
+                if serovar.folder:
+                    start_stage2(serovar, analysis.database)
 
         else:
-            analysis.predicted_serotype = analysis.stage1_result
-            # write text report and create csv of analysis object attributes
-            handle_results(analysis)
 
-    elif analysis.runtype == "mix":
-        run_parse_mix(analysis, tsvfile)
+            sys.stderr.write("ERROR: unexpected output from stage 1 for "
+                             f"{analysis.stage1_result}, no appropriate "
+                             "CTVdb folder specified\n")
+            analysis.stage1_result = "No CTV folder available"
+            raise CtvdbError('No CTV folder available')
+
+        handle_results(analysis)
+
+    else:
+        analysis.predicted_serotype = analysis.stage1_result
+        # write text report and create csv of analysis object attributes
+        handle_results(analysis)
+
+
 
     # cleanup temp dir
     cleanup(analysis)

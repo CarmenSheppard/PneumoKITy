@@ -277,7 +277,7 @@ def find_phenotype(analysis, session):
                 analysis.predicted_serotype = serotype
                 break
             if  a != b and not analysis.predicted_serotype:
-                analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unexpected variant pattern"
+                analysis.predicted_serotype = f"Serotype within {analysis.folder} unexpected variant pattern"
 
             else:
                 analysis.predicted_serotype = analysis.stage1_result

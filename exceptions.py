@@ -33,3 +33,4 @@ class CtvdbFileError(Exception):
         else:
             return "CtvdbFileError: check folder integrity for missing or misnamed " \
                    " reference files.\n"
+
