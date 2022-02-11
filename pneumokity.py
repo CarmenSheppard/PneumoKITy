@@ -57,22 +57,37 @@ def main(input_args, workflow_version):
     # check for found folder from CTVdb
         if analysis.folder:
             # if folder then this is not a mixed variant analysis - proceed with standard variant search
-             analysis = start_stage2(analysis, analysis.database)
+            start_stage2(analysis)
 
         elif analysis.category == Category.mixed_variants:
-            mix_results = []
+            check = []
+            new_objs =[]
+              # get unique types to run (or it will continually run subtypes).
+            for serovar in analysis.mixobjects:
+                if serovar.folder:
+                    if serovar.folder not in check:
+                        check.append(serovar.folder)
+                        new_objs.append(serovar)
+                else:
+                    if serovar.pheno not in check:
+                        check.append(serovar.pheno)
+                        new_objs.append(serovar)
+            #update mixobjects with cut down list
+            analysis.mixobjects = new_objs
+
+            typed = []
             for serovar in analysis.mixobjects:
 
                 #TODO SORT OUT PREDICTED SEROTYPE OUTPUT AND COLLATE DATA METHODS
                 if serovar.folder:
-                    start_stage2(serovar, analysis.database)
+                    start_stage2(serovar)
                     serovar.predicted_serotype = serovar.stage2_result
-                    mix_results.append(serovar)
+                    typed.append(serovar)
                 else:
                     serovar.predicted_serotype = serovar.stage2_result
-                    mix_results.append(serovar)
+                    typed.append(serovar)
 
-            analysis.mixobjects = mix_results
+                analysis.mixobjects = typed
         else:
 
             sys.stderr.write("ERROR: unexpected output from stage 1 for "

@@ -551,8 +551,15 @@ RED: Analysis failed
 class MixSero:
     """Create object for storing results of mixed analysis, runs queries to get variour """
 
-    def __init__(self, serotype_hit, percent, mm, dbpath):
-        session = session_maker(dbpath)
+    def __init__(self, serotype_hit, percent, mm, analysis):
+        session = session_maker(analysis.database)
+        self.database = analysis.database
+        self.sampleid = analysis.sampleid
+        self.minmulti = analysis.minmulti
+        self.output_dir = analysis.output_dir
+        self.threads = analysis.threads
+        self.fastq_files = analysis.fastq_files
+        self.mash = analysis.mash
         self.serotype_hit = serotype_hit
         # query for group  and group id if serotype is in group
         self.folder = session.query(Group.group_name).join(Serotype).filter(Serotype.serotype_hit == serotype_hit).first()
@@ -567,11 +574,12 @@ class MixSero:
         self.percent = percent  # individual top hits and percent (dict)
         self.pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == serotype_hit).first()[0]
         session.close()
-        self.stage2_type = None
-        self.predicted_serotype = None
-        self.stage1_result = None
-        self.stage2_result = None
-        self.stage2_hits = None
+        self.maxpercent = 0
+        #self.stage2_type = None
+        self.predicted_serotype = ""
+        self.stage1_result = ""
+        self.stage2_result = {}
+        self.stage2_hits = {}
         self.rag_status = 'GREEN'
         # catch unexpected phenotype hit - CTVdb error
         if not self.pheno:

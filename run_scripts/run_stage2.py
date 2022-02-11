@@ -11,12 +11,12 @@ from run_scripts.tools import find_phenotype
 import exceptions
 
 
-def start_stage2(stage2_var_obj, database):
+def start_stage2(stage2_var_obj):
     """ Function to start processing for stage 2 using variant object (either analysis object for non-mix run ,
      or seromix object for mix run"""
 
     # find variants for serogroup (variant group table)
-    session = session_maker(database)
+    session = session_maker(stage2_var_obj.database)
     # retrieve genes from relevant variants from group id using join query grouped by genename (avoid dups)
     # Analysis in stage 2 is done by gene.
     # Pass query objects into analysis object
@@ -37,11 +37,11 @@ def start_stage2(stage2_var_obj, database):
         if gene.var_type == "allele":
             #append gene-variant object to list
             alleles.append(gene)
-            sort_genes(gene, stage2_var_obj, gene.var_type, session, database)
+            sort_genes(gene, stage2_var_obj, gene.var_type, session)
 
         elif gene.var_type == "gene_presence":
             genes.append(gene)
-            sort_genes(gene, stage2_var_obj, gene.var_type, session, database)
+            sort_genes(gene, stage2_var_obj, gene.var_type, session)
 
         elif gene.var_type == "snp":
             stage2_var_obj.predicted_serotype = "Group"

@@ -110,7 +110,7 @@ def group_check_mix(df, analysis):
     for i in results:
         # create mix sero object
         sero_obj = MixSero(i, df.loc[df["Serotype"] == i]["percent"].values[0],
-                           df.loc[df["Serotype"] == i]["median-multiplicity"].values[0], analysis.database)
+                           df.loc[df["Serotype"] == i]["median-multiplicity"].values[0], analysis)
 
         # if serotype hit is in a folder (genogroup) append folder to list
         if sero_obj.folder:

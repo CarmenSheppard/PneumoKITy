@@ -9,7 +9,7 @@ from run_scripts.tools import run_mash_screen, create_dataframe, \
     apply_filters, create_csv, get_variant_ids
 
 
-def sort_genes(gene, stage2_var_obj, allele_or_gene, session, database):
+def sort_genes(gene, stage2_var_obj, allele_or_gene, session):
     """
     Main run script for allele/gene presence stage2_var_obj.
     calls run_allele function for mash screen and collates results
@@ -17,18 +17,17 @@ def sort_genes(gene, stage2_var_obj, allele_or_gene, session, database):
     :param stage2_var_obj: stage2_var_obj class object
     :param allele_or_gene : type of stage2_var_obj "gene" or "allele"
     :param session: active database session
-    :param database: database path for retrieval of ref files
     :return: updated analysis or stage2_var object
     """
     genename = gene.genes.gene_name
 
     if allele_or_gene == "allele":
     # run screens against appropriate allele FASTAs
-        hit_genes = run_alleles(stage2_var_obj, genename, database)
+        hit_genes = run_alleles(stage2_var_obj,  genename)
 
     elif allele_or_gene == "gene_presence":
         # run screens against appropriate gene FASTAs
-        hit_genes = run_genes(stage2_var_obj, genename, database)
+        hit_genes = run_genes(stage2_var_obj, genename)
 
     else:
         #exit if unrecognised (coding error)
@@ -45,12 +44,11 @@ def sort_genes(gene, stage2_var_obj, allele_or_gene, session, database):
     return stage2_var_obj
 
 
-def run_alleles(stage2_var_obj, genename, database):
+def run_alleles(stage2_var_obj, genename):
     """
     Run allele determinations using mash screen cut off 90%
     :param stage2_var_obj: stage2_var_obj object
     :param genename: genename of allele
-    :param database: database path for ref files
     :return: list of alleles
     """
     hit_alleles = {}
@@ -58,12 +56,12 @@ def run_alleles(stage2_var_obj, genename, database):
 
     try:
         # get ref sketch for genename from database folder
-        ref_sketch = os.path.join(database, stage2_var_obj.folder,
+        ref_sketch = os.path.join(stage2_var_obj.database, stage2_var_obj.folder,
                                   f"{genename}.msh")
-
 
         # run mash screen on the files
         outfile = run_mash_screen(stage2_var_obj, ref_sketch, genename)
+
         #create dataframe from the TSV
         if os.path.getsize(outfile) == 0:
             stage2_var_obj.stage2_result = f" {genename} not found in isolate, possible variant"
@@ -120,26 +118,27 @@ def run_alleles(stage2_var_obj, genename, database):
         sys.stderr.write(f"CTV.db/file integrity error - {stage2_var_obj.sampleid}. Reference files not found")
         raise exceptions.CtvdbError()
 
-def run_genes(stage2_var_obj, genename, database):
+def run_genes(stage2_var_obj, genename):
     """
     Run presence/absence determinations using mash screen
     Present if >80%,  Absent if <20
     >50% - AMBER presence
     <50% - AMBER absence
-    :param analysis: stage2_var_obj object
-    :param genename: genename
+    :param stage2_var_obj: object run -either analysis or stage2 mixsero object
     :return: list of genes
     """
     hit_genes = {}
     hit_cut = 80
     try:
         # get ref sketch for genename from database folder
-        ref_sketch = os.path.join(database, stage2_var_obj.folder,
+        ref_sketch = os.path.join(stage2_var_obj.database, stage2_var_obj.folder,
                                   f"{genename}.msh")
 
 
         # run mash screen on the files
+
         outfile = run_mash_screen(stage2_var_obj, ref_sketch, genename)
+
         # No hits at all on MASH stage2_var_obj
         if os.path.getsize(outfile) == 0:
             hit_genes[genename] = "not_detected"

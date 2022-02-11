@@ -104,7 +104,10 @@ Once this is working you should be able to run PneumoKITy as detailed below.
 
 ### Running expected mixed samples 
 
-PneumoKITy accepts 3 input options, two for read input and one for assembly
+The first stage is to select run type as detailed above, either `pure` for runs expecting pure culture input (eg. reference
+samples from colony picks).  or `mix` for expected mixed samples eg. from carriage studies.
+
+For PURE culture analysis PneumoKITy accepts 3 input options, two for read input and one for assembly
  input. It mandatory to give at least one of these options. 
  
 **Option 1 -i**: a folder containing two fastq files (argument: `-i 
@@ -114,6 +117,8 @@ folder_path`)
 paths for two fastq files (argument: `-f read1_path read2_path`)
 
 **Option 3 -a**: A specified assembly file (argument: `-a path_to_assembly`)
+
+For MIX analysis PneumoKITy will only accept fastq files and therefore only Option 1 and Option 2 are available.
 
 
 ### Customisable settings (with default behaviour)
@@ -128,9 +133,10 @@ error will occur.
  
 **-t** (threads) Number of threads to use for subprocesses (default = 1) eg: `-t 8`
 
-**-m** (mash): path to mash software. By default PneumoKITy will use the 
-command  `mash` which will only work if the mash software is included in the
- `PATH` variable. Otherwise the path to the mash software file location
+**-m** (mash): path to mash software (If necessary). By default PneumoKITy will use the 
+command  `mash` which will only work if the mash software is recognised as included in 
+ `PATH` variable (eg if installed from conda and runnign in conda environment).
+Otherwise the path to the mash software file location
   **must** be provided eg: `-m path_to_mash/mash`.
 
 **-p** (minpercent): Alternative filter cut-off value for kmer percentage, ie 
@@ -168,31 +174,30 @@ An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish 
 
 ## Example command lines
 
-1. Input folder containing read 1 and read 2, 8 threads, path to mash, custom sample name.
+1.  Pure Culture analysis, input folder containing read 1 and read 2, 8 threads, path to mash, custom sample name.
 
-`python pneumokity.py -i my_input_folder -t 8 -m path_to_mash/mash -s my_name`
+`python pneumokity.py pure -i my_input_folder -t 8 -m path_to_mash/mash -s my_name`
 
-2. Input read files, path to mash, custom output_dir, collate file folder location
+2. Mix analysis, input read files, custom output_dir, collate file folder location
 
-`python pneumokity.py -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
+`python pneumokity.py mix -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
  -c path_to_collate_folder `
 
-3. Input fastq file paths, custom output directory, path to mash, custom kmer percentage cut off
+3. Mix analysis ,i nput fastq file paths, custom output directory,  custom kmer percentage cut off
 
-`python pneumokity.py -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
- -m path_to_mash/mash -k 75`
+`python pneumokity.py mix -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
+ -k 75`
 
-4. Input assembly, path to mash, custom initial kmer percentage cut off
+4. Pure analysis input assembly, custom initial kmer percentage cut off, specified sampleid for filename
+`python pneumokity.py pure -a path_to_assembly/assembly  -m path_to_mash/mash -k 75 -s mysampleid`
 
-`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -k 75`
+5. Pure analysis input assembly, collate file folder location
 
-5. Input assembly, path to mash ,collate file folder location
+`python pneumokity.py pure -a path_to_assembly/assembly  -c path_to_collate_folder`
 
-`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -c path_to_collate_folder`
+6. mix analysis input fastq folder, path to mash ,specified split character for filename
 
-6. Input assembly, path to mash ,specified split character for filename
-
-`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -S _`
+`python pneumokity.py  mix -i my_input_folder -m path_to_mash/mash -S _`
 
 
 ## How PneumoKITy works  
@@ -224,7 +229,11 @@ when run in normal mode
 can be determined to add further information (*future update*)
 - `variants`  - a serotype that cannot determined in stage 1 only - needs further 
 determination against capsular type variant database.
+PneumoKITy will attempt to subtype where variants exist in the limited database.
 - `mix` - Mixed serotypes are present
+- `mix_variants`  - mixed serotype analysis selected, and mix serotypes found which include some that cannot determined in stage 1 only - needs further 
+determination against capsular type variant database of subtypes determined by PneumoKITy. 
+- PneumoKITy will attempt to subtype where variants exist in the limited database.
 - `acapsular` - the kmer percentages against all capsular operon references were 20% and 
 suggests that the sample does NOT have a capsular operon present and may be an acapsular 
 organism. Check phenotype and species ID.
@@ -235,7 +244,7 @@ variant or due to poor sequencing quality.
 If the `variants` category is returned in stage 1 and the serotype has presence absence or allele variants
  then PneumoKITy proceeds to stage 2.
 
-**Stage 2** -  only two categories of variants are available in stage 2, these are
+**Stage 2 - Capsular Type Variants** -  only two categories of variants are available in stage 2, these are
 gene presence/absence and allele variants. Both of these methods are implemented using MASH in
 a similar procedure to described above. Only genogroups 15F_15A and 19A_19AF(variant) are able to fully
 determine in stage 2. However some genogroups contain types that can be separated using the kmer screening determinations
@@ -276,7 +285,8 @@ off (so usually reset to 81% unless the user has input a custom kmer percent
  those annoying situations when a sample would miss just below the cut off as sometimes happened with PneumoCaT1 while also warning the user that something may be wrong with the result. 
 If an AMBER result is obtained it could be due to either poor sequence quality, or a variant of the sequence which does not match very well with the reference sequences available in the CTVdb - please check the results. 
 
-Amber result status also occurs in stage 2 for unrecognised variant profiles.
+Amber result status also occurs in stage 2 for unrecognised variant profiles, or if a mixed result is obtained in an 
+expected pure culture run. 
 
    
 RED rag status alerts the user to failure of the serotyping. This could be 
@@ -294,7 +304,7 @@ PneumoKIty produces several output files.
 
 `SAMPLEID_serotyping_results.txt` *(All serotypes)*
 
-A text file contaning human-readable formatted information about the run metrics and sample results
+A text file containing human-readable formatted information about the run metrics and sample results
 
 `SAMPLEID_quality_system_data.csv` *(All serotypes)*
 
@@ -342,6 +352,11 @@ if the sample has failed to hit a serotype a description of the result is output
 **`stage 2 result`** - outcome of any stage 2 analysis, eg hit variant determined (eg detected, not detected)
 
 **`rag status`** - the overall quality status (traffic light system) of the run as described above.
+
+###Outputs specific for mixed culture analysis
+
+TO BE ADDED :)
+
 
 
 

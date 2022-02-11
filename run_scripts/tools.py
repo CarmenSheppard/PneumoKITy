@@ -109,13 +109,14 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     if not os.path.isfile(ref_sketch) or os.path.getsize(ref_sketch) == 0:
         raise CtvdbFileError(f" Check ctvdb folder for presence of {analysis.folder} subfolder "
                              f"and correct reference sketch file.\n")
-        sys.exit(1)
 
     elif run_type != "stage1":
         sys.stdout.write(f"Running stage 2 screen reference: {ref_sketch}\n")
 
     else:
+        sys.stdout.write(f"Running stage 1 screen\n")
         pass
+
 
     if analysis.fastq_files:
         argument = [analysis.mash, "screen", ref_sketch, "-p",
@@ -125,6 +126,7 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     else:
         argument = [analysis.mash, "screen",  ref_sketch, "-p",
                     analysis.threads, analysis.assembly]
+
 
     data = subprocess.run(argument, capture_output=True, check=True, timeout=3600)
     result = data.stdout.decode('utf-8')
