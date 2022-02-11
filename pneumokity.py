@@ -63,10 +63,13 @@ def main(input_args, workflow_version):
             mix_results = []
             for serovar in analysis.mixobjects:
 
+                #TODO SORT OUT PREDICTED SEROTYPE OUTPUT AND COLLATE DATA METHODS
                 if serovar.folder:
                     start_stage2(serovar, analysis.database)
+                    serovar.predicted_serotype = serovar.stage2_result
                     mix_results.append(serovar)
                 else:
+                    serovar.predicted_serotype = serovar.stage2_result
                     mix_results.append(serovar)
 
             analysis.mixobjects = mix_results

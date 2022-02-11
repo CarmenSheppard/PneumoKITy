@@ -42,9 +42,9 @@ it will report genogroups of any mixed samples, PneumoKITy will assign these as 
 pure culture. 
 
 
-`mix` PneumoKITy is particularly sensitive to mixed serotypes - which could be useful for determination of types in multiple carriage.
+`mix` PneumoKITy is particularly sensitive to mixed serotypes - which is useful for determination of types in multiple carriage.
 When run in mix mode PneumoKITy uses less stringent cut-offs to increase sensitivity for detection of multiple serotype carriage and reports
-the results
+the results. 
 
    
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.
@@ -78,25 +78,24 @@ PneumoKITy requires the following packages installed before running:
 Due to the dependencies PneumoKITy can only be run on Linux based operating systems,
 however the software can be run on Windows 10 using the Windows Subsystem for Linux 
 [WSL](https://docs.microsoft.com/en-us/windows/wsl/). 
-Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoKITy. Please use 2.3 (or 2.0+, - 2.3 recommended). 
 
 An easy way to install the dependencies is to use a Python 3 conda or venv environment.  
 
 Install numpy, pandas and SQLalchemy in the environment (SQLite3 is likely to be bundled anyway).
 
-Download Mash 2.3 as a tar file from [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for linux or [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for OSX. 
+Mash 2.3 can be installed from conda using the bioconda channel - please ensure that the channel priorities in your
+conda environment are set up in the order as follows (later added channels have greater priority).
+If installed from default conda channels the version of mash is NOT compatible with
+PneumoKITy. 
 
-Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
+`conda config --add channels defaults `   
+`conda config --add channels bioconda`  
+`conda config --add channels conda-forge`
 
-Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.3/mash` unless you have fully installed the software or added it to your PATH variable.
-If successful you will see the Mash software command line help options. 
+Then run `conda install mash` to install mash. Check the mash version with `mash --version`
+PneumoKITy has been tested with versions 2.0 to 2.3.
 
-For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
-
-Eg: `export PATH="/home/username/mash-Linux64-v2.3:$PATH"`
-
-
-The above can be added to ~/.profile to preserve the path variable for future sessions. 
+ 
 
 Once this is working you should be able to run PneumoKITy as detailed below.
 
