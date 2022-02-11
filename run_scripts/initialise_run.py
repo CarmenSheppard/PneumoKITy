@@ -53,7 +53,11 @@ def parse_args(workflow_version):
                         help='Split-to character for sample name [Default = .]',
                         default=".")
 
-
+    parent_parser.add_argument("-p", "--minpercent", type=int,
+            default = 90,
+            help = "Initial minimum %% kmer count/total, N.B PneumoKITy auto drops top hit % if no hits fount until "
+                   "a minimum of 70% hit.  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
+                    "Default = 90")
     parent_parser.add_argument('--database', '-d',
                         help='path to alternative ctvdb folder'
                              '(must contain mandatory files  - see docs") '
@@ -105,11 +109,7 @@ def parse_args(workflow_version):
                        help='Specify assembly input file path [REQUIRED '
                             'OPTION 3]')
 
-    pure_parser.add_argument("-p", "--minpercent", type=int,
-            default = 90,
-            help = "Initial minimum %% kmer count/total, N.B PneumoKITy auto drops top hit % if no hits fount until "
-                   "a minimum of 70% hit.  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
-                    "Default = 90")
+
 
     pure_parser.add_argument("-n", "--minmulti", type=int,
                         default=10,
@@ -135,11 +135,7 @@ def parse_args(workflow_version):
     'files: read1 read2 '
     '[REQUIRED - OPTION 2]')
 
-    # auto default to 70 for mix.
-    mix_parser.add_argument("-p", "--minpercent", type=int,
-            default = 90,
-            help = "Initial minimum %% kmer count/total,  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
-                    "Default = 70")
+
 
     # auto default to 4 for mixed input
     mix_parser.add_argument("-n", "--minmulti", type=int,
@@ -551,7 +547,7 @@ RED: Analysis failed
 class MixSero:
     """Create object for storing results of mixed analysis, runs queries to get variour """
 
-    def __init__(self, serotype_hit, percent, mm, analysis):
+    def __init__(self, serotype_hit, percent_hit, mm, analysis):
         session = session_maker(analysis.database)
         self.database = analysis.database
         self.sampleid = analysis.sampleid
@@ -571,7 +567,7 @@ class MixSero:
         if self.grp_id:
             self.grp_id = self.grp_id[0]
         self.mm = mm
-        self.percent = percent  # individual top hits and percent (dict)
+        self.percent_hit = percent_hit  # individual top hits and percent (dict)
         self.pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == serotype_hit).first()[0]
         session.close()
         self.maxpercent = 0

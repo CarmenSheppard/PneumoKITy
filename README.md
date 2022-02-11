@@ -43,8 +43,9 @@ pure culture.
 
 
 `mix` PneumoKITy is particularly sensitive to mixed serotypes - which is useful for determination of types in multiple carriage.
-When run in mix mode PneumoKITy uses less stringent cut-offs to increase sensitivity for detection of multiple serotype carriage and reports
-the results. 
+When run in mix mode PneumoKITy reports stage 2 variants where possible within mixtures of multiple 
+serotype carriage and reports the results slightly differently.  Mixtures are not automatically assigned an AMBER rag status.
+
 
    
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.

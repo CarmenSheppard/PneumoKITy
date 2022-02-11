@@ -72,8 +72,6 @@ def open_tsv_filter(tsvfile, minpercent, minmulti):
     """
 
     df = create_dataframe(tsvfile)
-    filename = os.path.basename(tsvfile)[:-4]
-
     # Apply filters
     filtered_df, original, top_hits = \
         apply_filters(df, minpercent, minmulti)
