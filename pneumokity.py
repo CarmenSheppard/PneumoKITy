@@ -57,13 +57,19 @@ def main(input_args, workflow_version):
     # check for found folder from CTVdb
         if analysis.folder:
             # if folder then this is not a mixed variant analysis - proceed with standard variant search
-            start_stage2(analysis, analysis.database)
+             analysis = start_stage2(analysis, analysis.database)
 
         elif analysis.category == Category.mixed_variants:
+            mix_results = []
             for serovar in analysis.mixobjects:
+
                 if serovar.folder:
                     start_stage2(serovar, analysis.database)
+                    mix_results.append(serovar)
+                else:
+                    mix_results.append(serovar)
 
+            analysis.mixobjects = mix_results
         else:
 
             sys.stderr.write("ERROR: unexpected output from stage 1 for "

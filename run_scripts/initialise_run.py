@@ -572,7 +572,7 @@ class MixSero:
         self.stage1_result = None
         self.stage2_result = None
         self.stage2_hits = None
-        self.rag_status = 'RED'
+        self.rag_status = 'GREEN'
         # catch unexpected phenotype hit - CTVdb error
         if not self.pheno:
             sys.stderr.write(f"Stage 1 hit {serotype_hit} unexpected - please check "

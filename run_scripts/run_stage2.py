@@ -37,11 +37,11 @@ def start_stage2(stage2_var_obj, database):
         if gene.var_type == "allele":
             #append gene-variant object to list
             alleles.append(gene)
-            sort_genes(gene, stage2_var_obj, gene.var_type, session)
+            sort_genes(gene, stage2_var_obj, gene.var_type, session, database)
 
         elif gene.var_type == "gene_presence":
             genes.append(gene)
-            sort_genes(gene, stage2_var_obj, gene.var_type, session)
+            sort_genes(gene, stage2_var_obj, gene.var_type, session, database)
 
         elif gene.var_type == "snp":
             stage2_var_obj.predicted_serotype = "Group"
@@ -58,11 +58,9 @@ def start_stage2(stage2_var_obj, database):
 
     session.close()
 
-    # TODO update code for mixture detection to provide % mix estimation for easier mix interpretation
-
     stage2_var_obj.stage2_output = f"""
 Stage 2 variants: {stage2_var_obj.stage2_result}
 Stage 2 hits: {stage2_var_obj.stage2_hits}
 """
-
+    return stage2_var_obj
 
