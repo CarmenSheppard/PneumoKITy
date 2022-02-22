@@ -320,6 +320,14 @@ def handle_results(analysis):
     if analysis.csv_collate:
         collate_results(analysis.csv_collate, results)
         sys.stdout.write(f"Results collated at {analysis.csv_collate}/Collated_result_data.csv \n")
+
+    # if nixed serotype run
+    if analysis.runtype == 'mix':
+
+
+        print("yay")
+
+
     sys.stdout.write(f"CSV files written to {analysis.output_dir}.\n")
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
     sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")
