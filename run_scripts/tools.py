@@ -308,9 +308,8 @@ def collate_results(collate_dir, results):
         sys.exit(1)
 
 def handle_results(analysis):
-    #creates output files and write to stdout for results.
-    analysis.write_report()
 
+    from run_scripts.initialise_run import Category
     quality, results = analysis.create_objdf()
     # write csv
     create_csv(quality, analysis.output_dir, f"{analysis.sampleid}_quality_system_data.csv")
@@ -321,12 +320,23 @@ def handle_results(analysis):
         collate_results(analysis.csv_collate, results)
         sys.stdout.write(f"Results collated at {analysis.csv_collate}/Collated_result_data.csv \n")
 
-    # if nixed serotype run
-    if analysis.runtype == 'mix':
+    if analysis.runtype == 'mix' and analysis.category == Category.mix:
+        # if mixed serotype run - handle mixed serotypes (no variants)
+        mixstring, mix_df = analysis.handle_mixed(False)
 
+    elif analysis == 'mix' and analysis.category == Category.mixed_variants:
+        # if mixed serotype run - handle mixed serotypes (with variants)
+        mixstring, mix_df = analysis.handle_mixed(True)
 
-        print("yay")
+    else:
+        mixstring = "Mixed serotypes not found"
+        mix_df = None
 
+    if mix_df is not None:
+        create_csv(mix_df, analysis.output_dir, f"{analysis.sampleid}_mixed_serotypes.csv")
+
+    #creates output files and write to stdout for results.
+    analysis.write_report(mixstring)
 
     sys.stdout.write(f"CSV files written to {analysis.output_dir}.\n")
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")

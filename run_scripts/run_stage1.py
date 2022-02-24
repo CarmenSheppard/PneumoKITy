@@ -61,7 +61,7 @@ def translate_mixmm(mix_mm, session):
     df["mm_percent"] = df["mm"].apply(lambda x: x / total * 100)
     df["mm_percent"] = df["mm_percent"].round(2)
 
-    new_mixmm = list(zip(df.serotype, df.mm_percent))
+    new_mixmm = dict(zip(df.serotype, df.mm_percent))
 
     return new_mixmm
 
@@ -162,7 +162,7 @@ def group_check_mix(df, analysis):
             sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
             mix_mm = pd.Series(df["median-multiplicity"].values, index=df.Serotype).to_dict()
             analysis.mix_mm = translate_mixmm(mix_mm, session)
-            sys.stdout.write(f"Estimated abundance of mixed types (%) - {mix_mm}\n")
+            sys.stdout.write(f"Estimated abundance of mixed types (%) - {analysis.mix_mm}\n")
             session.close()
         else:
             analysis.category = Category.subtype

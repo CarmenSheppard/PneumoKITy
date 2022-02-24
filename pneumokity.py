@@ -78,7 +78,6 @@ def main(input_args, workflow_version):
             typed = []
             for serovar in analysis.mixobjects:
 
-                #TODO SORT OUT PREDICTED SEROTYPE OUTPUT AND COLLATE DATA METHODS
                 if serovar.folder:
                     start_stage2(serovar)
                     serovar.predicted_serotype = serovar.stage2_result
@@ -102,7 +101,6 @@ def main(input_args, workflow_version):
         analysis.predicted_serotype = analysis.stage1_result
         # write text report and create csv of analysis object attributes
         handle_results(analysis)
-
 
 
     # cleanup temp dir

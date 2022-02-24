@@ -17,6 +17,7 @@ from Database_tools.sqlalchemydeclarative import Serotype, Group
 from Database_tools.db_functions import session_maker
 from exceptions import CtvdbFileError
 
+
 class Category(Enum):
     # deal with categories from stage 1
     type = 1
@@ -27,6 +28,7 @@ class Category(Enum):
     no_hits = 6
     mixed_variants = 7
 
+
 def parse_args(workflow_version):
     """
     Set up subparsers for expected pure culture run or mixed detection run.
@@ -35,46 +37,46 @@ def parse_args(workflow_version):
     """
     parent_parser = argparse.ArgumentParser(description="Parent Parser", add_help=False, prog="PneumoKITy")
 
-    #arguments common to both methods
+    # arguments common to both methods
     parent_parser.add_argument('--version', '-v', action='version',
-                        version=workflow_version)
+                               version=workflow_version)
 
     parent_parser.add_argument('--mash', '-m',
-                        help='please provide the path for mash [OPTIONAL]; '
-                             'defaults to "mash"',
-                        default='mash')
+                               help='please provide the path for mash [OPTIONAL]; '
+                                    'defaults to "mash"',
+                               default='mash')
 
     parent_parser.add_argument('--sampleid', '-s',
-                        help='Sample ID [OPTIONAL]; '
-                             'otherwise splits on first "." for fastq file 1, '
-                             'or uses base filename of assembly')
+                               help='Sample ID [OPTIONAL]; '
+                                    'otherwise splits on first "." for fastq file 1, '
+                                    'or uses base filename of assembly')
 
     parent_parser.add_argument('--split', '-S',
-                        help='Split-to character for sample name [Default = .]',
-                        default=".")
+                               help='Split-to character for sample name [Default = .]',
+                               default=".")
 
     parent_parser.add_argument("-p", "--minpercent", type=int,
-            default = 90,
-            help = "Initial minimum %% kmer count/total, N.B PneumoKITy auto drops top hit % if no hits fount until "
-                   "a minimum of 70% hit.  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
-                    "Default = 90")
+                               default=90,
+                               help="Initial minimum %% kmer count/total, N.B PneumoKITy auto drops top hit % if no hits fount until "
+                                    "a minimum of 70% hit.  INTEGER. Value between 20 and 100 accepted [OPTIONAL]; "
+                                    "Default = 90")
     parent_parser.add_argument('--database', '-d',
-                        help='path to alternative ctvdb folder'
-                             '(must contain mandatory files  - see docs") '
-                             '[OPTIONAL] defaults to /ctvdb directory')
+                               help='path to alternative ctvdb folder'
+                                    '(must contain mandatory files  - see docs") '
+                                    '[OPTIONAL] defaults to /ctvdb directory')
 
     parent_parser.add_argument('--output_dir', '-o',
-                        help='please provide an output directory [OPTIONAL]; '
-                             'if none provided a pneumo_capsular_typing folder'
-                             ' will be created in the directory containing the'
-                             ' fastq files')
+                               help='please provide an output directory [OPTIONAL]; '
+                                    'if none provided a pneumo_capsular_typing folder'
+                                    ' will be created in the directory containing the'
+                                    ' fastq files')
 
     parent_parser.add_argument('--threads', '-t', default=1, type=int,
-                        help='Number of threads to use [Default = 1]')
+                               help='Number of threads to use [Default = 1]')
 
     parent_parser.add_argument('--collate', '-c', type=str,
-                        help='path to EXISTING folder for collating results. Adds results to file "Collated_results.csv"'
-                             ' at the specified location [OPTIONAL]. Useful for collation of multiple runs.')
+                               help='path to EXISTING folder for collating results. Adds results to file "Collated_results.csv"'
+                                    ' at the specified location [OPTIONAL]. Useful for collation of multiple runs.')
 
     # create main parser to add subparsers to (inherit parent parser options)
     main_parser = argparse.ArgumentParser()
@@ -82,67 +84,59 @@ def parse_args(workflow_version):
     # create sub parsers
     subparsers = main_parser.add_subparsers(title="actions", required=True, dest="run_type",
                                             help="Choose expected Mixed ('mix') or "
-                                             "expected pure ['pure'] input. "
-                                             "This changes PneumoKITy's run and "
-                                              "output behaviour to suit"
-                                               " (see documentation).")
+                                                 "expected pure ['pure'] input. "
+                                                 "This changes PneumoKITy's run and "
+                                                 "output behaviour to suit"
+                                                 " (see documentation).")
 
     pure_parser = subparsers.add_parser("pure", parents=[parent_parser], description="subparser pure", help=
-                                            "Expected pure culture input args")
-
+    "Expected pure culture input args")
 
     # input group options for expected pure input.
     input_group = pure_parser.add_mutually_exclusive_group(required=True)
 
-
     input_group.add_argument('--input_dir', '-i',
-                       help='please provide the path to the directory '
-                            'containing two fastq files (paired fastq for '
-                            'one sample)'
-                            '[REQUIRED - OPTION 1]')
+                             help='please provide the path to the directory '
+                                  'containing two fastq files (paired fastq for '
+                                  'one sample)'
+                                  '[REQUIRED - OPTION 1]')
 
     input_group.add_argument('--fastqs', '-f', nargs=2, help=' paths to fastq '
-                                                       'files: read1 read2 '
-                                                       '[REQUIRED - OPTION 2]')
+                                                             'files: read1 read2 '
+                                                             '[REQUIRED - OPTION 2]')
 
     input_group.add_argument('--assembly', '-a',
-                       help='Specify assembly input file path [REQUIRED '
-                            'OPTION 3]')
-
-
+                             help='Specify assembly input file path [REQUIRED '
+                                  'OPTION 3]')
 
     pure_parser.add_argument("-n", "--minmulti", type=int,
-                        default=10,
-                        help="minimum kmer multiplicity (read input only).["
-                             "OPTIONAL];"
-                             " Default = 10 for reads,uses 1 for assembly inputs")
-
+                             default=10,
+                             help="minimum kmer multiplicity (read input only).["
+                                  "OPTIONAL];"
+                                  " Default = 10 for reads,uses 1 for assembly inputs")
 
     mix_parser = subparsers.add_parser("mix", parents=[parent_parser], description="subparser mix", help=
-                "Expected mixed serotype input - args")
-
+    "Expected mixed serotype input - args")
 
     # input group options for expected mix input.
     mix_input_group = mix_parser.add_mutually_exclusive_group(required=True)
 
     mix_input_group.add_argument('--input_dir', '-i',
-    help = 'please provide the path to the directory '
-    'containing two fastq files (paired fastq for '
-    'one sample)'
-    '[REQUIRED - OPTION 1]')
+                                 help='please provide the path to the directory '
+                                      'containing two fastq files (paired fastq for '
+                                      'one sample)'
+                                      '[REQUIRED - OPTION 1]')
 
     mix_input_group.add_argument('--fastqs', '-f', nargs=2, help=' paths to fastq '
-    'files: read1 read2 '
-    '[REQUIRED - OPTION 2]')
-
-
+                                                                 'files: read1 read2 '
+                                                                 '[REQUIRED - OPTION 2]')
 
     # auto default to 4 for mixed input
     mix_parser.add_argument("-n", "--minmulti", type=int,
-            default = 4,
-            help = "minimum kmer multiplicity .["
-            "OPTIONAL];"
-            " Default = 4")
+                            default=4,
+                            help="minimum kmer multiplicity .["
+                                 "OPTIONAL];"
+                                 " Default = 4")
 
     try:
         args = main_parser.parse_args()
@@ -155,35 +149,35 @@ def parse_args(workflow_version):
 
 
 class Analysis:
-
     """Parent Class object for analysis objects- update class attributes based on inputs,
         """
+
     def __init__(self, inputs, version):
         """set up analysis object according to input options
         :param inputs: input arguments (args)
         """
 
-        self.workflow = version # version of PneumoKITy workflow
-        self.minmulti = inputs.minmulti #minimum multiplicity cut off value
-        self.category = None # category for stage 2 analysis or not
-        self.folder = None # folder (genogroup) for stage 2 analysis
+        self.workflow = version  # version of PneumoKITy workflow
+        self.minmulti = inputs.minmulti  # minimum multiplicity cut off value
+        self.category = None  # category for stage 2 analysis or not
+        self.folder = None  # folder (genogroup) for stage 2 analysis
         self.stage1_result = ""
         self.stage2_result = {}
         self.stage2_varids = None
-        self.split = str(inputs.split) #input split value
-        self.mash_v = "" # version of Mash used
-        self.threads = str(inputs.threads) # number of threads used for subprocesses
-        self.predicted_serotype = "" # final serotype predicted phenotype result
-        self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only" # output of stage 2 formatted for text report
+        self.split = str(inputs.split)  # input split value
+        self.mash_v = ""  # version of Mash used
+        self.threads = str(inputs.threads)  # number of threads used for subprocesses
+        self.predicted_serotype = ""  # final serotype predicted phenotype result
+        self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only"  # output of stage 2 formatted for text report
         self.rag_status = "RED"
-        self.top_hits = "" # top five hits from stage 1 analysis
+        self.top_hits = ""  # top five hits from stage 1 analysis
         self.max_mm = ""  # max median multiplicity in stage 1 analysis
-        self.stage2_hits = {} # metrics for stage 2 hits
-        self.max_percent = "" # percentage of max top hit
-        self.gene_list = [] # genelist for stage 2 analysis
-        self.grp_id = None # database id of group for stage 3
-        self.csv_collate = None # folder for collating of results
-        self.mix_mm = None # initialise mixture estimation (multiplicity) for if sample Mixed (for extimating ratios)
+        self.stage2_hits = {}  # metrics for stage 2 hits
+        self.max_percent = ""  # percentage of max top hit
+        self.gene_list = []  # genelist for stage 2 analysis
+        self.grp_id = None  # database id of group for stage 3
+        self.csv_collate = None  # folder for collating of results
+        self.mix_mm = None  # initialise mixture estimation (multiplicity) for if sample Mixed (for extimating ratios)
         # Add and check given mash path
         self.mash = inputs.mash
         self.mash_v = check_version(self.mash)
@@ -245,7 +239,6 @@ class Analysis:
 
 
 class AnalysisPure(Analysis):
-
     """Create child object for pure culture analysis - update class attributes based on inputs,
         includes methods for creation of report and csv from object"""
 
@@ -254,9 +247,8 @@ class AnalysisPure(Analysis):
         :param inputs: input arguments (args)
         """
         # inherit everything from parent class
-        super().__init__(inputs,version)
+        super().__init__(inputs, version)
         self.runtype = "pure"
-
 
         # option 3 input assembly path/ file existence check
         if inputs.assembly:
@@ -271,7 +263,6 @@ class AnalysisPure(Analysis):
                 sys.stderr.write("ERROR: Check input assembly path\n")
                 sys.exit(1)
 
-
         # deal with output directory options
         if not inputs.output_dir:
             self.output_dir = os.path.join(self.input_dir,
@@ -279,7 +270,6 @@ class AnalysisPure(Analysis):
         else:
             self.output_dir = os.path.join(inputs.output_dir,
                                            'pneumo_capsular_typing')
-
 
         # get sample id from files
         if not inputs.sampleid:
@@ -325,7 +315,7 @@ class AnalysisPure(Analysis):
             inputfiles = f"Assembly file:\t{self.assembly}"
         else:  # for fastq
             inputfiles = f"Fastq1:\t{self.fastq_files[0]}\nFastq2:\t" \
-                f"{self.fastq_files[1]}"
+                         f"{self.fastq_files[1]}"
 
         with open(os.path.join(self.output_dir,
                                f"{self.sampleid}_serotyping_results.txt"),
@@ -371,7 +361,6 @@ RED: Analysis failed
         sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
                          f"Output directory: {self.output_dir}\n")
 
-
     def create_objdf(self):
         """Creates result and quality dataframes from Analysis object"""
 
@@ -380,16 +369,15 @@ RED: Analysis failed
         frame = frame.transpose()
         # create separate dataframes of quality and result data
         quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
-                             "mash", "database", "output_dir","csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits","max_mm","max_percent", "folder", "stage1_result", "mix_mm",
-                                "stage2_varids","stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"],
+                                "mash", "database", "output_dir", "csv_collate"], axis=1)
+        results = frame.filter(["sampleid", "top_hits", "max_mm", "max_percent", "folder", "stage1_result", "mix_mm",
+                                "stage2_varids", "stage2_hits", "stage2_result", "predicted_serotype", "rag_status"],
                                axis=1)
 
         return quality, results
 
 
 class AnalysisMixed(Analysis):
-
     """Create child object for expected mixed culture analysis - update class attributes based on inputs,
         includes methods for creation of report and csv from object"""
 
@@ -398,7 +386,7 @@ class AnalysisMixed(Analysis):
         :param inputs: input arguments (args)
         """
         # inherit everything from parent class
-        super().__init__(inputs,version)
+        super().__init__(inputs, version)
         self.runtype = "mix"
         self.mixobjects = []
 
@@ -408,7 +396,7 @@ class AnalysisMixed(Analysis):
             glob_pattern = "*fastq*"
             if os.path.isdir(inputs.input_dir):
                 self.fastq_files = sorted(glob.glob(os.path.join(inputs.input_dir,
-                                                          glob_pattern)))
+                                                                 glob_pattern)))
                 self.input_dir = inputs.input_dir
                 self.assembly = None
 
@@ -478,11 +466,51 @@ class AnalysisMixed(Analysis):
             sys.stderr.write("ERROR: cannot access/write to output paths\n")
             sys.exit(1)
 
-    def write_report(self):
+    def handle_mixed(self, variants):
+        # class function to produce output for csv file and report
+        mixed_output = pd.DataFrame(columns=["Predicted phenotype", "TopHits (Hit,percent,median_multiplicity)",
+                                             "Estimated % abundance in mix", "RAG status"])
+
+        # dict to collect predicted serotypes ( to avoid duplication) and collect mm to recreate mix MM( update with
+        # subtyped if needed.
+        serotypes = {}
+        for sero in self.mixobjects:
+            add_on_dict ={}
+            if sero.pheno not in serotypes.keys():
+                serotypes[sero.pheno] = sero.mm
+                add_on_dict["Predicted phenotype"] = sero.pheno
+                # create tuple within top hit for others to append if there were other top hits with same pheno
+                top_hit = [(sero.serotype_hit, round(sero.percent_hit, 2), sero.mm)]
+                add_on_dict["TopHits (Hit,percent,median_multiplicity)"] = top_hit
+                add_on_dict["RAG status"] = self.rag_status
+
+            else:
+                # if predicted sero, append to list already configured in dataframe
+                top_hit = (sero.serotype_hit, sero.percent_hit, sero.mm)
+                add_on_dict["TopHits (Hit,percent,median_multiplicity)"].append(top_hit)
+                # if multiple hits to pheno RAG status should be green, if one of them is GREEN
+                # if not already GREEN add latest RAG
+                if add_on_dict["RAG status"] != "GREEN":
+                    add_on_dict["RAG status"] = self.rag_status
+            mixed_output = mixed_output.append(add_on_dict, ignore_index=True)
+
+        if variants == False:
+            mixed_output["Estimated % abundance in mix"] = mixed_output["Predicted phenotype"].map(self.mix_mm)
+
+        else:
+            # remake mix-mm output with updated pheno output if variants in mix
+            print("yay")
+
+        # create string version of output for report
+        mixstring = mixed_output.to_string(index=False)
+
+        return mixstring, mixed_output
+
+    def write_report(self, mixstring):
         # Class function to write report output from completed mixed object
 
         inputfiles = f"Fastq1:\t{self.fastq_files[0]}\nFastq2:\t" \
-                f"{self.fastq_files[1]}"
+                     f"{self.fastq_files[1]}"
 
         with open(os.path.join(self.output_dir,
                                f"{self.sampleid}_serotyping_results.txt"),
@@ -512,7 +540,12 @@ Stage 1 maximum median multiplicity for top hits:\t{self.max_mm}
 Stage 1 Estimated abundance of mix (%) (if mixed only):\t{self.mix_mm}
 {self.stage2_output}
 
-Predicted serotype result:\t {self.predicted_serotype}
+Predicted serotype result(s):\t {self.predicted_serotype}
+
+Mixed output (if sample mixed:
+
+{mixstring}
+
 Result RAG status:\t {self.rag_status}
 
 
@@ -527,7 +560,6 @@ RED: Analysis failed
         sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
                          f"Output directory: {self.output_dir}\n")
 
-
     def create_objdf(self):
         """Creates result and quality dataframes from Analysis object"""
 
@@ -536,9 +568,9 @@ RED: Analysis failed
         frame = frame.transpose()
         # create separate dataframes of quality and result data
         quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
-                             "mash", "database", "output_dir","csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits","max_mm","max_percent", "folder", "stage1_result", "mix_mm",
-                                "stage2_varids","stage2_hits", "stage2_result",  "predicted_serotype", "rag_status"],
+                                "mash", "database", "output_dir", "csv_collate"], axis=1)
+        results = frame.filter(["sampleid", "top_hits", "max_mm", "max_percent", "folder", "stage1_result", "mix_mm",
+                                "stage2_varids", "stage2_hits", "stage2_result", "predicted_serotype", "rag_status"],
                                axis=1)
 
         return quality, results
@@ -558,7 +590,8 @@ class MixSero:
         self.mash = analysis.mash
         self.serotype_hit = serotype_hit
         # query for group  and group id if serotype is in group
-        self.folder = session.query(Group.group_name).join(Serotype).filter(Serotype.serotype_hit == serotype_hit).first()
+        self.folder = session.query(Group.group_name).join(Serotype).filter(
+            Serotype.serotype_hit == serotype_hit).first()
         # format query object
         if self.folder:
             self.folder = self.folder[0]
@@ -571,7 +604,7 @@ class MixSero:
         self.pheno = session.query(Serotype.predicted_pheno).filter(Serotype.serotype_hit == serotype_hit).first()[0]
         session.close()
         self.maxpercent = 0
-        #self.stage2_type = None
+        # self.stage2_type = None
         self.predicted_serotype = ""
         self.stage1_result = ""
         self.stage2_result = {}
@@ -580,7 +613,6 @@ class MixSero:
         # catch unexpected phenotype hit - CTVdb error
         if not self.pheno:
             sys.stderr.write(f"Stage 1 hit {serotype_hit} unexpected - please check "
-                         f"integrity of CTVdb, all reference sequences MUST"
-                         f" be accounted for in CTVdb.\n")
+                             f"integrity of CTVdb, all reference sequences MUST"
+                             f" be accounted for in CTVdb.\n")
             raise CtvdbFileError
-
