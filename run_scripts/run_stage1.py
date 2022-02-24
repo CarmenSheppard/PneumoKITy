@@ -304,7 +304,7 @@ def run_parse_mix(analysis, tsvfile):
 
         if os.path.isfile(tsvfile) and os.path.getsize(tsvfile) > 0:
             # check file is not empty then open and create df
-            filtered_df, original, analysis.max_percent, analysis.top_hits, analysis.max_MM = \
+            filtered_df, original, analysis.max_percent, analysis.top_hits, analysis.max_mm = \
                 open_tsv_filter(tsvfile, analysis.minpercent, analysis.minmulti)
 
             if not filtered_df.empty:
@@ -357,7 +357,7 @@ def run_parse_pure(analysis, tsvfile):
 
         if os.path.isfile(tsvfile) and os.path.getsize(tsvfile) > 0:
             # check file is not empty then open and create df
-            filtered_df, original, analysis.max_percent, analysis.top_hits, analysis.max_MM = \
+            filtered_df, original, analysis.max_percent, analysis.top_hits, analysis.max_mm = \
                 open_tsv_filter(tsvfile, analysis.minpercent, analysis.minmulti)
 
             if not filtered_df.empty:

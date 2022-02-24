@@ -328,15 +328,19 @@ def handle_results(analysis):
         # if mixed serotype run - handle mixed serotypes (with variants)
         mixstring, mix_df = analysis.handle_mixed(True)
 
+
+    elif analysis.runtype == 'pure':
+        mix_df = None
+        analysis.write_report()
+
     else:
         mixstring = "Mixed serotypes not found"
         mix_df = None
 
     if mix_df is not None:
         create_csv(mix_df, analysis.output_dir, f"{analysis.sampleid}_mixed_serotypes.csv")
-
-    #creates output files and write to stdout for results.
-    analysis.write_report(mixstring)
+        #creates output files and write to stdout for results.
+        analysis.write_report(mixstring)
 
     sys.stdout.write(f"CSV files written to {analysis.output_dir}.\n")
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
