@@ -468,7 +468,7 @@ class AnalysisMixed(Analysis):
 
     def handle_mixed(self, variants):
         # class function to produce output for csv file and report
-        mixed_output = pd.DataFrame(columns=["Predicted phenotype", "TopHits (Hit,percent,median_multiplicity)",
+        mixed_output = pd.DataFrame(columns=["Predicted phenotype", "TopHit (Hit,percent,median_multiplicity)",
                                              "Estimated % abundance in mix", "RAG status"])
 
         # dict to collect predicted serotypes ( to avoid duplication) and collect mm to recreate mix MM( update with
@@ -481,7 +481,7 @@ class AnalysisMixed(Analysis):
                 add_on_dict["Predicted phenotype"] = sero.pheno
                 # create tuple within top hit for others to append if there were other top hits with same pheno
                 top_hit = (sero.serotype_hit, round(sero.percent_hit, 2), sero.mm)
-                add_on_dict["TopHits (Hit,percent,median_multiplicity)"] = top_hit
+                add_on_dict["TopHit (Hit,percent,median_multiplicity)"] = top_hit
                 add_on_dict["RAG status"] = self.rag_status
 
             mixed_output = mixed_output.append(add_on_dict, ignore_index=True)
@@ -494,7 +494,7 @@ class AnalysisMixed(Analysis):
             seros = {}
             for row, column in mixed_output.iterrows():
                 seros[mixed_output.iloc[row]["Predicted phenotype"]] = \
-                    mixed_output.iloc[row]["TopHits (Hit,percent,median_multiplicity)"][2]
+                    mixed_output.iloc[row]["TopHit (Hit,percent,median_multiplicity)"][2]
 
             for i in seros:
                 mixed_output["Estimated % abundance in mix"][mixed_output["Predicted phenotype"] == i] = seros[i]
