@@ -3,16 +3,17 @@
 Main PneumoKITY script run serotyping from WGS data (Fastq or assembly)
 1. Run MASH screen tsv output -> tmp folder
 2. Parse mash screen output to apply filters, create csv output files
-Carmen Sheppard 2019-2021
+Carmen Sheppard 2022
 """
 import os
 import sys
-from run_scripts.initialise_run import Analysis, parse_args, Category
+from run_scripts.initialise_run import AnalysisMixed, AnalysisPure, parse_args, Category
 from run_scripts.tools import run_mash_screen, handle_results, cleanup
-from run_scripts.run_stage1 import run_parse
-from run_scripts.run_stage2 import start_analysis
+from run_scripts.run_stage1 import run_parse_pure, run_parse_mix
+from run_scripts.run_stage2 import start_stage2
+from exceptions import CtvdbError
 
-version = "PneumoKITy V1.0b"
+version = "PneumoKITy V1.0b2"
 
 
 def main(input_args, workflow_version):
@@ -22,10 +23,16 @@ def main(input_args, workflow_version):
     Runs stage2
     """
 
-    sys.stdout.write(f"\nRunning {workflow_version}\n")
+    sys.stdout.write(f"\nRunning {workflow_version} for {args.run_type} serotype determination\n")
 
-    # set up analysis object using inputs from commandline
-    analysis = Analysis(input_args, workflow_version)
+    # determine run type to set up object
+    if args.run_type == "pure":
+        # set up analysis object using inputs from commandline
+        analysis = AnalysisPure(input_args, workflow_version)
+
+    else:
+        analysis = AnalysisMixed(input_args, workflow_version)
+
     sys.stdout.write(f"\nSample: {analysis.sampleid}\n")
 
     # Run Stage 1 Serotype analysis.
@@ -36,39 +43,70 @@ def main(input_args, workflow_version):
     tsvfile = run_mash_screen(analysis, reference)
 
     sys.stdout.write(f"Used {analysis.mash_v}\n")
-    run_parse(analysis, tsvfile)
-    # TODO add subtype to stage 2 later as 19F can type in stage 1 but has
-    #  subtypes
+    if analysis.runtype == "pure":
+        run_parse_pure(analysis, tsvfile)
 
-    # if typed in stage 1 only and not going through stringent analysis
-    if analysis.category == Category.variants:
-        # Run Stage 2 Serotype analysis.
-        # -------------------------------
-        # check for found folder from CTVdb
+    else:
+        run_parse_mix(analysis, tsvfile)
+
+    # sort out results
+
+    if analysis.category == Category.variants or analysis.category == Category.mixed_variants:
+    # Run Stage 2 Serotype analysis.
+    # -------------------------------
+    # check for found folder from CTVdb
         if analysis.folder:
-            start_analysis(analysis)
+            # if folder then this is not a mixed variant analysis - proceed with standard variant search
+            start_stage2(analysis)
 
-        # Write report file for stage 2
+        elif analysis.category == Category.mixed_variants:
+            check = []
+            new_objs =[]
+              # get unique types to run (or it will continually run subtypes).
+            for serovar in analysis.mixobjects:
+                if serovar.folder:
+                    if serovar.folder not in check:
+                        check.append(serovar.folder)
+                        new_objs.append(serovar)
+                else:
+                    if serovar.pheno not in check:
+                        check.append(serovar.pheno)
+                        new_objs.append(serovar)
+            #update mixobjects with cut down list
+            analysis.mixobjects = new_objs
+
+            typed = []
+            for serovar in analysis.mixobjects:
+
+                if serovar.folder:
+                    start_stage2(serovar)
+                    serovar.predicted_serotype = serovar.stage2_result
+                    typed.append(serovar)
+                else:
+                    serovar.predicted_serotype = serovar.stage2_result
+                    typed.append(serovar)
+
+                analysis.mixobjects = typed
+                predicted_serotypes = []
+                for i in analysis.mixobjects:
+                    predicted_serotypes.append(i.pheno)
+            # create output
+            analysis.predicted_serotype = set(predicted_serotypes)
         else:
+
             sys.stderr.write("ERROR: unexpected output from stage 1 for "
                              f"{analysis.stage1_result}, no appropriate "
                              "CTVdb folder specified\n")
             analysis.stage1_result = "No CTV folder available"
+            raise CtvdbError('No CTV folder available')
 
-        handle_results(analysis)
-
-
-    elif analysis.category == Category.subtype:
-        #TODO UPDATE THIS WHEN SUBTYPE PROPERLY HANDLED OR REMOVE IF NOT NEEDED
-
-        analysis.predicted_serotype = analysis.stage1_result
-        # write text report and create csv of analysis object attributes
         handle_results(analysis)
 
     else:
         analysis.predicted_serotype = analysis.stage1_result
         # write text report and create csv of analysis object attributes
         handle_results(analysis)
+
 
     # cleanup temp dir
     cleanup(analysis)

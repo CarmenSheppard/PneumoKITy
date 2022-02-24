@@ -109,13 +109,14 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     if not os.path.isfile(ref_sketch) or os.path.getsize(ref_sketch) == 0:
         raise CtvdbFileError(f" Check ctvdb folder for presence of {analysis.folder} subfolder "
                              f"and correct reference sketch file.\n")
-        sys.exit(1)
 
     elif run_type != "stage1":
         sys.stdout.write(f"Running stage 2 screen reference: {ref_sketch}\n")
 
     else:
+        sys.stdout.write(f"Running stage 1 screen\n")
         pass
+
 
     if analysis.fastq_files:
         argument = [analysis.mash, "screen", ref_sketch, "-p",
@@ -125,6 +126,7 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
     else:
         argument = [analysis.mash, "screen",  ref_sketch, "-p",
                     analysis.threads, analysis.assembly]
+
 
     data = subprocess.run(argument, capture_output=True, check=True, timeout=3600)
     result = data.stdout.decode('utf-8')
@@ -262,24 +264,27 @@ def find_phenotype(analysis, session):
     detected_vars = []
 
     # create list of var ids from analysis
-    for i in analysis.stage2_varids:
-        if i[0] != 0: # ignore undetected (0)
-            detected_vars.append(i[0])
+    # catch variants not found.
+    try:
+        for i in analysis.stage2_varids:
+            if i[0] != 0: # ignore undetected (0)
+                detected_vars.append(i[0])
 
-   #interpret results
-    for serotype in expected_vars:
-        a = set(expected_vars[serotype])
-        b = set(detected_vars)
+       #interpret results
+        for serotype in expected_vars:
+            a = set(expected_vars[serotype])
+            b = set(detected_vars)
 
-        if a == b:
-            analysis.predicted_serotype = serotype
-            break
-        if  a != b and not analysis.predicted_serotype:
-            analysis.predicted_serotype = f"Serotype within {analysis.stage1_result} unexpected variant pattern"
+            if a == b:
+                analysis.predicted_serotype = serotype
+                break
+            if  a != b and not analysis.predicted_serotype:
+                analysis.predicted_serotype = f"Serotype within {analysis.folder} unexpected variant pattern"
 
-        else:
-            analysis.predicted_serotype = analysis.stage1_result
-
+            else:
+                analysis.predicted_serotype = analysis.stage1_result
+    except IndexError:
+        analysis.predicted_serotype = f"{analysis.stage1_result}: {analysis.stage2_result}"
     sys.stdout.write(f"{analysis.predicted_serotype}\n")
 
 
@@ -303,9 +308,8 @@ def collate_results(collate_dir, results):
         sys.exit(1)
 
 def handle_results(analysis):
-    #creates output files and write to stdout for results.
-    analysis.write_report()
 
+    from run_scripts.initialise_run import Category
     quality, results = analysis.create_objdf()
     # write csv
     create_csv(quality, analysis.output_dir, f"{analysis.sampleid}_quality_system_data.csv")
@@ -315,6 +319,25 @@ def handle_results(analysis):
     if analysis.csv_collate:
         collate_results(analysis.csv_collate, results)
         sys.stdout.write(f"Results collated at {analysis.csv_collate}/Collated_result_data.csv \n")
+
+    if analysis.runtype == 'mix' and analysis.category == Category.mix:
+        # if mixed serotype run - handle mixed serotypes (no variants)
+        mixstring, mix_df = analysis.handle_mixed(False)
+
+    elif analysis.runtype == 'mix' and analysis.category == Category.mixed_variants:
+        # if mixed serotype run - handle mixed serotypes (with variants)
+        mixstring, mix_df = analysis.handle_mixed(True)
+
+    else:
+        mixstring = "Mixed serotypes not found"
+        mix_df = None
+
+    if mix_df is not None:
+        create_csv(mix_df, analysis.output_dir, f"{analysis.sampleid}_mixed_serotypes.csv")
+
+    #creates output files and write to stdout for results.
+    analysis.write_report(mixstring)
+
     sys.stdout.write(f"CSV files written to {analysis.output_dir}.\n")
     sys.stdout.write(f"Analysis RAG status: {analysis.rag_status} \n")
     sys.stdout.write(f"Predicted serotype is {analysis.predicted_serotype}\n")

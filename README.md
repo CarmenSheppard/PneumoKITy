@@ -13,23 +13,39 @@
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
-lite version of the in-development PneumoCaT2. It is a from the ground up, redevelopment of the original [PneumoCaT](https://github.com/phe-bioinformatics/PneumoCaT)
-capsular typing tool, written for **Python 3.7+**, using different methods. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
-kmer based analysis.  As PneumoCaT2 is not ready yet, we decided to create a lite version (PneumoKITy) basis,
-as this lite version could still be very useful for fast serotype assessment and detection of mixed serotypes in fastQ data 
-even though it is not capable of fully serotyping all serotypes. Further determinations in PneumoCaT2 will remove the speed and sensitivity that PneumoKITy posesses.
-PneumoKITy can fully  serotype about 58% of the serotypes defined by the SSI Diagnostica typing sera, and can get to serogroup, subgroup or genogroup level for the remianing types. PneumoKITy and provides some useful information regarding  some described genetic subtypes and genetic types. 
+lite version of the in-development PneumoCaT2. It is written for **Python 3.7+**. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+kmer based analysis. We decided to create a lite version (PneumoKITy) as this his tool has significant value 
+for both sensitive detection of mixed serotypes in fastQ data and is also significantly faster for serotype screening than existing methods which may mean
+it has utility  either as a quick assessment method which has input type flexibility for running PURE cultures, and when using fastq data it can be run on
+expected mixed serotype samples (eg. Carriage study culture -enriched samples or even deep sequenced primary swabs) in order to attempt to assess serotype composition in 
+these more complex situations.
 
 
 PneumoKITy, like the original PneumoCaT tool assigns capsular types to
-*S.pneumoniae* genomic data  using a using a two step approach, however PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
-
+*S.pneumoniae* genomic data  using a using a two step approach, But PneumoKITy, is limited only to second stage determinations that can be assessed using presence or absence or gene allele variants.
+However due to the extra specificity of the MASH method, PneumoKITy fully  serotype about 58% of the serotypes defined 
+by the SSI Diagnostica typing sera, and can get to serogroup, or subgroup level for the remaining types. In addition 
+PneumoKITy and provides some useful information regarding  some described genetic subtypes and genetic types. 
 Serotypes that require determination using alternative variants such as SNPs cannot be distinquished using PneumoKITy.
 PneumoKITy has the advantage that it can be used on assembly files OR illumina fastq read files and it is incredibly fast.
 
-PneumoKITy is particularly sensitive to mixed serotypes - which could be useful for determination of types in multiple carriage.
+PneumoKITy has a useful RAG (red - amber- green) status flag which alerts users to the status of the results, with green 
+flagged samples passing within expected metrics, amber flagged metrics indicating that a result was obtained but that the results
+should be checked as some outcomes were not within range, or RED indicating a failure to serotype. 
 
-If used on expected pure cultures we recommend setting the median multiplicity cut off (-n) to 10 to avoid oversensitive detection of unintentional contamination.
+
+**PneumoKITy has two run options:**
+
+`pure`  suitable for analysis of expected pure cultures. This method which will increase specificity and 
+reduce over reporting of mixed serotypes which may be present due to high levels of DNA from pure culture isolates. Although
+it will report genogroups of any mixed samples, PneumoKITy will assign these as an AMBER RAG status due to them being unexpected in a 
+pure culture. 
+
+
+`mix` PneumoKITy is particularly sensitive to mixed serotypes - which is useful for determination of types in multiple carriage.
+When run in mix mode PneumoKITy reports stage 2 variants where possible within mixtures of multiple 
+serotype carriage and reports the results slightly differently.  Mixtures are not automatically assigned an AMBER rag status.
+
 
    
 PneumoKITy uses very different methods to previous PneumoCaT versions and requires a new running environment.
@@ -40,8 +56,10 @@ PneumoKITy uses very different methods to previous PneumoCaT versions and requir
  (subtyping etc is planned in a future update). 
 
 For PneumoKITy specifically any snp or gene_function variants have been removed from the CTVdb as it is not possible to perform
-these determinations usign kmer screening alone, so the database is very small. 
-The database is populated from the included excel template in database_tools. 
+these determinations using kmer screening alone, so the database is very small. 
+
+
+The database is populated from the included Excel template in database_tools. 
 
 At present the database import script can only import new data and has not yet been programmed with any functions to update existing records (future update)
 
@@ -61,32 +79,36 @@ PneumoKITy requires the following packages installed before running:
 Due to the dependencies PneumoKITy can only be run on Linux based operating systems,
 however the software can be run on Windows 10 using the Windows Subsystem for Linux 
 [WSL](https://docs.microsoft.com/en-us/windows/wsl/). 
-Please note if using conda environments the version of mash installed from Conda (1.X) is NOT Compatible with PneumoKITy. Please use 2.3 (or 2.0+, - 2.3 recommended). 
 
 An easy way to install the dependencies is to use a Python 3 conda or venv environment.  
 
 Install numpy, pandas and SQLalchemy in the environment (SQLite3 is likely to be bundled anyway).
 
-Download Mash 2.3 as a tar file from [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for linux or [here](https://github.com/marbl/Mash/releases/download/v2.3/mash-Linux64-v2.3.tar) for OSX. 
+Mash 2.3 can be installed from conda using the bioconda channel - please ensure that the channel priorities in your
+conda environment are set up in the order as follows (later added channels have greater priority).
+If installed from default conda channels the version of mash is NOT compatible with
+PneumoKITy. 
 
-Move the mash tar file into a relevant place on your system and untar e.g. `tar -xvf foo.tar`
+`conda config --add channels defaults `   
+`conda config --add channels bioconda`  
+`conda config --add channels conda-forge`
 
-Now you should be able to run mash, check that it gives the command line help by simply using the mash command. You  will need specify the full path to the mash file - eg. `/home/software/mash-Linux64-v2.3/mash` unless you have fully installed the software or added it to your PATH variable.
-If successful you will see the Mash software command line help options. 
+Then run `conda install mash` to install mash. Check the mash version with `mash --version`
+PneumoKITy has been tested with versions 2.0 to 2.3.
 
-For convenience, add the mash folder to your path variable, if successful, then PneumoKITy can be run without the need to specify the MASH location each time. 
-
-Eg: `export PATH="/home/username/mash-Linux64-v2.3:$PATH"`
-
-
-The above can be added to ~/.profile to preserve the path variable for future sessions. 
+ 
 
 Once this is working you should be able to run PneumoKITy as detailed below.
 
 ## Running PneumoKITy
 #### Mandatory commandline inputs
 
-PneumoKITy accepts 3 input options, two for read input and one for assembly
+### Running expected mixed samples 
+
+The first stage is to select run type as detailed above, either `pure` for runs expecting pure culture input (eg. reference
+samples from colony picks).  or `mix` for expected mixed samples eg. from carriage studies.
+
+For PURE culture analysis PneumoKITy accepts 3 input options, two for read input and one for assembly
  input. It mandatory to give at least one of these options. 
  
 **Option 1 -i**: a folder containing two fastq files (argument: `-i 
@@ -96,6 +118,8 @@ folder_path`)
 paths for two fastq files (argument: `-f read1_path read2_path`)
 
 **Option 3 -a**: A specified assembly file (argument: `-a path_to_assembly`)
+
+For MIX analysis PneumoKITy will only accept fastq files and therefore only Option 1 and Option 2 are available.
 
 
 ### Customisable settings (with default behaviour)
@@ -110,9 +134,10 @@ error will occur.
  
 **-t** (threads) Number of threads to use for subprocesses (default = 1) eg: `-t 8`
 
-**-m** (mash): path to mash software. By default PneumoKITy will use the 
-command  `mash` which will only work if the mash software is included in the
- `PATH` variable. Otherwise the path to the mash software file location
+**-m** (mash): path to mash software (If necessary). By default PneumoKITy will use the 
+command  `mash` which will only work if the mash software is recognised as included in 
+ `PATH` variable (eg if installed from conda and runnign in conda environment).
+Otherwise the path to the mash software file location
   **must** be provided eg: `-m path_to_mash/mash`.
 
 **-p** (minpercent): Alternative filter cut-off value for kmer percentage, ie 
@@ -150,31 +175,30 @@ An alternative ctvdb folder can be specified (ADVANCED USERS ONLY). If you wish 
 
 ## Example command lines
 
-1. Input folder containing read 1 and read 2, 8 threads, path to mash, custom sample name.
+1.  Pure Culture analysis, input folder containing read 1 and read 2, 8 threads, path to mash, custom sample name.
 
-`python pneumokity.py -i my_input_folder -t 8 -m path_to_mash/mash -s my_name`
+`python pneumokity.py pure -i my_input_folder -t 8 -m path_to_mash/mash -s my_name`
 
-2. Input read files, path to mash, custom output_dir, collate file folder location
+2. Mix analysis, input read files, custom output_dir, collate file folder location
 
-`python pneumokity.py -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
+`python pneumokity.py mix -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
  -c path_to_collate_folder `
 
-3. Input fastq file paths, custom output directory, path to mash, custom kmer percentage cut off
+3. Mix analysis ,i nput fastq file paths, custom output directory,  custom kmer percentage cut off
 
-`python pneumokity.py -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
- -m path_to_mash/mash -k 75`
+`python pneumokity.py mix -f path_to_fastq/fastq1 path_to_fastq/fastq2 -o my_output_dir
+ -k 75`
 
-4. Input assembly, path to mash, custom initial kmer percentage cut off
+4. Pure analysis input assembly, custom initial kmer percentage cut off, specified sampleid for filename
+`python pneumokity.py pure -a path_to_assembly/assembly  -m path_to_mash/mash -k 75 -s mysampleid`
 
-`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -k 75`
+5. Pure analysis input assembly, collate file folder location
 
-5. Input assembly, path to mash ,collate file folder location
+`python pneumokity.py pure -a path_to_assembly/assembly  -c path_to_collate_folder`
 
-`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -c path_to_collate_folder`
+6. mix analysis input fastq folder, path to mash ,specified split character for filename
 
-6. Input assembly, path to mash ,specified split character for filename
-
-`python pneumokity.py -a path_to_assembly/assembly  -m path_to_mash/mash -S _`
+`python pneumokity.py  mix -i my_input_folder -m path_to_mash/mash -S _`
 
 
 ## How PneumoKITy works  
@@ -206,7 +230,11 @@ when run in normal mode
 can be determined to add further information (*future update*)
 - `variants`  - a serotype that cannot determined in stage 1 only - needs further 
 determination against capsular type variant database.
+PneumoKITy will attempt to subtype where variants exist in the limited database.
 - `mix` - Mixed serotypes are present
+- `mix_variants`  - mixed serotype analysis selected, and mix serotypes found which include some that cannot determined in stage 1 only - needs further 
+determination against capsular type variant database of subtypes determined by PneumoKITy. 
+- PneumoKITy will attempt to subtype where variants exist in the limited database.
 - `acapsular` - the kmer percentages against all capsular operon references were 20% and 
 suggests that the sample does NOT have a capsular operon present and may be an acapsular 
 organism. Check phenotype and species ID.
@@ -217,7 +245,7 @@ variant or due to poor sequencing quality.
 If the `variants` category is returned in stage 1 and the serotype has presence absence or allele variants
  then PneumoKITy proceeds to stage 2.
 
-**Stage 2** -  only two categories of variants are available in stage 2, these are
+**Stage 2 - Capsular Type Variants** -  only two categories of variants are available in stage 2, these are
 gene presence/absence and allele variants. Both of these methods are implemented using MASH in
 a similar procedure to described above. Only genogroups 15F_15A and 19A_19AF(variant) are able to fully
 determine in stage 2. However some genogroups contain types that can be separated using the kmer screening determinations
@@ -258,7 +286,8 @@ off (so usually reset to 81% unless the user has input a custom kmer percent
  those annoying situations when a sample would miss just below the cut off as sometimes happened with PneumoCaT1 while also warning the user that something may be wrong with the result. 
 If an AMBER result is obtained it could be due to either poor sequence quality, or a variant of the sequence which does not match very well with the reference sequences available in the CTVdb - please check the results. 
 
-Amber result status also occurs in stage 2 for unrecognised variant profiles.
+Amber result status also occurs in stage 2 for unrecognised variant profiles, or if a mixed result is obtained in an 
+expected pure culture run. 
 
    
 RED rag status alerts the user to failure of the serotyping. This could be 
@@ -276,7 +305,7 @@ PneumoKIty produces several output files.
 
 `SAMPLEID_serotyping_results.txt` *(All serotypes)*
 
-A text file contaning human-readable formatted information about the run metrics and sample results
+A text file containing human-readable formatted information about the run metrics and sample results
 
 `SAMPLEID_quality_system_data.csv` *(All serotypes)*
 
@@ -324,6 +353,11 @@ if the sample has failed to hit a serotype a description of the result is output
 **`stage 2 result`** - outcome of any stage 2 analysis, eg hit variant determined (eg detected, not detected)
 
 **`rag status`** - the overall quality status (traffic light system) of the run as described above.
+
+###Outputs specific for mixed culture analysis
+
+TO BE ADDED :)
+
 
 
 
