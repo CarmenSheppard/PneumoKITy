@@ -107,6 +107,7 @@ def run_alleles(stage2_var_obj, genename):
                     stage2_var_obj.rag_status = "AMBER"
                     sys.stdout.write(f"Allele {genename}- median multiplicity below {stage2_var_obj.minmulti} "
                                      f"check seq quality\n")
+                    stage2_var_obj.stage2_result = stage2_var_obj.folder
 
                 # for samples with intermediate %match - unusual alleles
                 else:
