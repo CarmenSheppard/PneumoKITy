@@ -87,6 +87,11 @@ def main(input_args, workflow_version):
                     typed.append(serovar)
 
                 analysis.mixobjects = typed
+                predicted_serotypes = []
+                for i in analysis.mixobjects:
+                    predicted_serotypes.append(i.pheno)
+            # create output
+            analysis.predicted_serotype = set(predicted_serotypes)
         else:
 
             sys.stderr.write("ERROR: unexpected output from stage 1 for "

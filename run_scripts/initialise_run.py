@@ -480,32 +480,21 @@ class AnalysisMixed(Analysis):
                 serotypes[sero.pheno] = sero.mm
                 add_on_dict["Predicted phenotype"] = sero.pheno
                 # create tuple within top hit for others to append if there were other top hits with same pheno
-                top_hit = [(sero.serotype_hit, round(sero.percent_hit, 2), sero.mm)]
+                top_hit = (sero.serotype_hit, round(sero.percent_hit, 2), sero.mm)
                 add_on_dict["TopHits (Hit,percent,median_multiplicity)"] = top_hit
                 add_on_dict["RAG status"] = self.rag_status
 
-            else:
-                # if predicted sero, append to list already configured in dataframe
-                top_hit = (sero.serotype_hit, sero.percent_hit, sero.mm)
-                add_on_dict["TopHits (Hit,percent,median_multiplicity)"].append(top_hit)
-                # if multiple hits to pheno RAG status should be green, if one of them is GREEN
-                # if not already GREEN add latest RAG
-                if add_on_dict["RAG status"] != "GREEN":
-                    add_on_dict["RAG status"] = self.rag_status
             mixed_output = mixed_output.append(add_on_dict, ignore_index=True)
 
-        if variants == False:
+        if not variants:
             mixed_output["Estimated % abundance in mix"] = mixed_output["Predicted phenotype"].map(self.mix_mm)
 
         else:
             # remake mix-mm output with updated pheno output if variants in mix
             seros = {}
             for row, column in mixed_output.iterrows():
-                mms = []
-                for mm in mixed_output.iloc[row]["TopHits (Hit,percent,median_multiplicity)"]:
-                    mms.append(mm[2])
-                max_mm = max(mms)
-                seros[mixed_output.iloc[row]["Predicted phenotype"]] = max_mm
+                seros[mixed_output.iloc[row]["Predicted phenotype"]] = \
+                    mixed_output.iloc[row]["TopHits (Hit,percent,median_multiplicity)"][2]
 
             for i in seros:
                 mixed_output["Estimated % abundance in mix"][mixed_output["Predicted phenotype"] == i] = seros[i]
@@ -516,7 +505,6 @@ class AnalysisMixed(Analysis):
                 lambda x: x / total * 100)
 
         mixed_output["Estimated % abundance in mix"].round(decimals=2)
-
 
         # create string version of output for report
         mixstring = mixed_output.to_string(index=False)
