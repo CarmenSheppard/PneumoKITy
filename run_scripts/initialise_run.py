@@ -514,7 +514,8 @@ class AnalysisMixed(Analysis):
             # convert to percentage
             mixed_output["Estimated % abundance in mix"] = mixed_output["Estimated % abundance in mix"].apply(
                 lambda x: x / total * 100)
-            mixed_output["Estimated % abundance in mix"].round(decimals =2)
+
+        mixed_output["Estimated % abundance in mix"].round(decimals=2)
 
 
         # create string version of output for report
