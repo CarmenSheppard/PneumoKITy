@@ -324,6 +324,10 @@ csv file containing all of the stage1 screen MASH run hits.
 
 csv files containing MASH screen run hits information for the relevant variant genes.
 
+`SAMPLEID_mixed_serotypes.csv` *(Mix run and when Mixed serotypes are detected only)*
+
+csv file containing details of mixed serotypes found in the sample.
+
 
 ## Interpretation of results
 
@@ -354,10 +358,9 @@ if the sample has failed to hit a serotype a description of the result is output
 
 **`rag status`** - the overall quality status (traffic light system) of the run as described above.
 
-###Outputs specific for mixed culture analysis
+### Outputs specific for mixed culture analysis
 
-TO BE ADDED :)
-
+When mix detection is selected on run, PneumoKity will attempt to subtype any serotypes within the mix that are subtypeable using the limited collection in the PneumoKITy CTVdb. PneumoKITy will alos output a csv file contining details of the mixtures for each sample, and add a table into the report.txt file. 
 
 
 
