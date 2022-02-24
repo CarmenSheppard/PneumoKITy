@@ -324,7 +324,7 @@ def handle_results(analysis):
         # if mixed serotype run - handle mixed serotypes (no variants)
         mixstring, mix_df = analysis.handle_mixed(False)
 
-    elif analysis == 'mix' and analysis.category == Category.mixed_variants:
+    elif analysis.runtype == 'mix' and analysis.category == Category.mixed_variants:
         # if mixed serotype run - handle mixed serotypes (with variants)
         mixstring, mix_df = analysis.handle_mixed(True)
 

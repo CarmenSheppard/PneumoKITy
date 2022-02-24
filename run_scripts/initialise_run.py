@@ -475,7 +475,7 @@ class AnalysisMixed(Analysis):
         # subtyped if needed.
         serotypes = {}
         for sero in self.mixobjects:
-            add_on_dict ={}
+            add_on_dict = {}
             if sero.pheno not in serotypes.keys():
                 serotypes[sero.pheno] = sero.mm
                 add_on_dict["Predicted phenotype"] = sero.pheno
@@ -499,7 +499,23 @@ class AnalysisMixed(Analysis):
 
         else:
             # remake mix-mm output with updated pheno output if variants in mix
-            print("yay")
+            seros = {}
+            for row, column in mixed_output.iterrows():
+                mms = []
+                for mm in mixed_output.iloc[row]["TopHits (Hit,percent,median_multiplicity)"]:
+                    mms.append(mm[2])
+                max_mm = max(mms)
+                seros[mixed_output.iloc[row]["Predicted phenotype"]] = max_mm
+
+            for i in seros:
+                mixed_output["Estimated % abundance in mix"][mixed_output["Predicted phenotype"] == i] = seros[i]
+
+            total = sum(mixed_output["Estimated % abundance in mix"])
+            # convert to percentage
+            mixed_output["Estimated % abundance in mix"] = mixed_output["Estimated % abundance in mix"].apply(
+                lambda x: x / total * 100)
+            mixed_output["Estimated % abundance in mix"].round(decimals =2)
+
 
         # create string version of output for report
         mixstring = mixed_output.to_string(index=False)
