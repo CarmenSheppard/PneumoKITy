@@ -11,6 +11,7 @@
 * [Quality checks](https://github.com/CarmenSheppard/PneumoKITy#Quality-checks)
 * [PneumoKITy Output](https://github.com/CarmenSheppard/PneumoKITy#Output-files)
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
+* [Licence agreement](https://github.com/CarmenSheppard/PneumoKITy#licence-agreement)
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite version of the in-development PneumoCaT2. It is written for **Python 3.7+**. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
@@ -363,7 +364,9 @@ if the sample has failed to hit a serotype a description of the result is output
 When mix detection is selected on run, PneumoKity will attempt to subtype any serotypes within the mix that are subtypeable using the limited collection in the PneumoKITy CTVdb. PneumoKITy will alos output a csv file contining details of the mixtures for each sample, and add a table into the report.txt file. 
 
 
+### Licence Agreement 
 
+This software is covered by GNU General Public License, version 3 (GPL-3.0).
 
 
 
