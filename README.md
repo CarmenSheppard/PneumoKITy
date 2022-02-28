@@ -2,7 +2,7 @@
 
 ## Table of content
 
-* Introduction
+* [Introduction](https://github.com/CarmenSheppard/PneumoKITy#Introduction)
 * [Dependencies](https://github.com/CarmenSheppard/PneumoKITy#dependencies)
 * [Running PneumoKITy](https://github.com/CarmenSheppard/PneumoKITy#running-PneumoKITy)
 * [User customisable options](https://github.com/CarmenSheppard/PneumoKITy#User-customisable-options)
@@ -12,6 +12,8 @@
 * [PneumoKITy Output](https://github.com/CarmenSheppard/PneumoKITy#Output-files)
 * [Interpretation of results](https://github.com/CarmenSheppard/PneumoKITy#Interpretation-of-results)
 * [Licence agreement](https://github.com/CarmenSheppard/PneumoKITy#licence-agreement)
+
+## Introduction
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite version of the in-development PneumoCaT2. It is written for **Python 3.7+**. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
@@ -104,8 +106,6 @@ Once this is working you should be able to run PneumoKITy as detailed below.
 ## Running PneumoKITy
 #### Mandatory commandline inputs
 
-### Running expected mixed samples 
-
 The first stage is to select run type as detailed above, either `pure` for runs expecting pure culture input (eg. reference
 samples from colony picks).  or `mix` for expected mixed samples eg. from carriage studies.
 
@@ -161,7 +161,7 @@ PneumoKITy will default to the assembly file name or the fastq file name
 PneumoKITy will default to using ".". Eg if using `-S _`, filename `sampleid_1.fastq.gz` becomes sampleID `sampleid`
 (split on first "_").
 
-**-c** (collate): Specify a folder for PneumoKITy to collate results from the run into a file called "Collated_result_data.csv"
+**-c** (collate): Specify a folder for PneumoKITy to collate results from the run into a file called "Collated_result_data.csv" (folder *MUST* already exist).
 This is useful when running multiple PneumoKITy jobs for a particular project, for example via a queue submission system or Bash loop command. The basic result data will be appended to this file until either the flag is not specified, a different folder is specified or the resulting file is moved or renamed. In rare instances multiple processing MAY result in this file not being writable, and a result beng missed from the collation. The original data files from the run will be saved in their output location.
 
 **-d** (database): path to capsular type variant database (ctvdb). By default this 
@@ -219,7 +219,8 @@ serotype reference sequence, calculated by PneumoKITy.
 -n median multiplicity -the median number of multiples of a given kmer in the dataset,
 given in mash screen output. Low kmer multiplicity could be caused by 
 sequencing errors or mixed samples - only applicable for input read files if
- assembly files are input this value is automatically set to 1. The default for fastq is 4.
+ assembly files are input this value is automatically set to 1.  By default for 
+ fastq input data  this value is set to 10 for xpected PURE culture runs and 4 for expected MIXED culture runs.
 
 
 This results in several stage 1 outcome categories and also come with a RAG 
