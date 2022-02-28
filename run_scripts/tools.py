@@ -322,12 +322,13 @@ def handle_results(analysis):
 
     if analysis.runtype == 'mix' and analysis.category == Category.mix:
         # if mixed serotype run - handle mixed serotypes (no variants)
-        mixstring, mix_df = analysis.handle_mixed(False)
+        mixstring, mix_df, analysis.mix_mm = analysis.handle_mixed(False)
+        analysis.stage2_output = "Analysed in PneumoKITy stage 1 only"
 
     elif analysis.runtype == 'mix' and analysis.category == Category.mixed_variants:
         # if mixed serotype run - handle mixed serotypes (with variants)
-        mixstring, mix_df = analysis.handle_mixed(True)
-
+        mixstring, mix_df,analysis.mix_mm = analysis.handle_mixed(True)
+        analysis.stage2_output = "Analysed in stage 2 - with limited subtype determination"
 
     elif analysis.runtype == 'pure':
         mix_df = None

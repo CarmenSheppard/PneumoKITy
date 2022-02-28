@@ -467,6 +467,13 @@ class AnalysisMixed(Analysis):
             sys.exit(1)
 
     def handle_mixed(self, variants):
+        """
+        output handler for mixed output to update any that have variants to tehe final result and
+        recalculate mix-mm plus create a csv file of mixture data for saving
+
+        :param variants: boolean - if mixture has variants or not
+        return: string of dataframe, dataframe and mix-mm update dict
+        """
         # class function to produce output for csv file and report
         mixed_output = pd.DataFrame(columns=["Predicted phenotype", "TopHit (Hit,percent,median_multiplicity)",
                                              "Estimated % abundance in mix", "RAG status"])
@@ -483,8 +490,7 @@ class AnalysisMixed(Analysis):
                 top_hit = (sero.serotype_hit, round(sero.percent_hit, 2), sero.mm)
                 add_on_dict["TopHit (Hit,percent,median_multiplicity)"] = top_hit
                 add_on_dict["RAG status"] = self.rag_status
-
-            mixed_output = mixed_output.append(add_on_dict, ignore_index=True)
+                mixed_output = mixed_output.append(add_on_dict, ignore_index=True)
 
         if not variants:
             mixed_output["Estimated % abundance in mix"] = mixed_output["Predicted phenotype"].map(self.mix_mm)
@@ -504,12 +510,16 @@ class AnalysisMixed(Analysis):
             mixed_output["Estimated % abundance in mix"] = mixed_output["Estimated % abundance in mix"].apply(
                 lambda x: x / total * 100)
 
-        mixed_output["Estimated % abundance in mix"].round(decimals=2)
+        mixed_output["Estimated % abundance in mix"] = mixed_output["Estimated % abundance in mix"].round(decimals=2)
 
         # create string version of output for report
         mixstring = mixed_output.to_string(index=False)
 
-        return mixstring, mixed_output
+        # update mixmm in Analysis - for collate etc.
+        mix_mm_update = dict(zip(mixed_output["Predicted phenotype"],
+                                 mixed_output["Estimated % abundance in mix"]))
+
+        return mixstring, mixed_output, mix_mm_update
 
     def write_report(self, mixstring):
         # Class function to write report output from completed mixed object
@@ -543,6 +553,7 @@ Stage 1 top hits: \t{self.top_hits}
 Stage 1 max kmer percentage:\t{self.max_percent}
 Stage 1 maximum median multiplicity for top hits:\t{self.max_mm}
 Stage 1 Estimated abundance of mix (%) (if mixed only):\t{self.mix_mm}
+
 {self.stage2_output}
 
 Predicted serotype result(s):\t {self.predicted_serotype}
