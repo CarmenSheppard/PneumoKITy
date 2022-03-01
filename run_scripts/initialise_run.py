@@ -467,7 +467,7 @@ class AnalysisMixed(Analysis):
 
     def handle_mixed(self, variants):
         """
-        output handler for mixed output to update any that have variants to tehe final result and
+        output handler for mixed output to update any that have variants to the final result and
         recalculate mix-mm plus create a csv file of mixture data for saving
 
         :param variants: boolean - if mixture has variants or not
@@ -489,7 +489,7 @@ class AnalysisMixed(Analysis):
                 top_hit = (sero.serotype_hit, round(sero.percent_hit, 2), sero.mm)
                 add_on_dict["TopHit (Hit,percent,median_multiplicity)"] = top_hit
                 add_on_dict["RAG status"] = self.rag_status
-                mixed_output = mixed_output.append(add_on_dict, ignore_index=True)
+                mixed_output = mixed_output.append(add_on_dict, ignore_index=True, sort=False)
 
         if not variants:
             mixed_output["Estimated % abundance in mix"] = mixed_output["Predicted phenotype"].map(self.mix_mm)
