@@ -1,6 +1,6 @@
 """ Python 3.6+
 Data import from Excel file and addition to CTVdb
-Carmen Sheppard 2020
+Carmen Sheppard 2020-2022
 """
 import argparse
 import os
@@ -8,7 +8,7 @@ import sys
 
 import pandas as pd
 
-import ctvdb
+
 from Database_tools.db_functions import searchexact, session_maker
 from Database_tools.sqlalchemydeclarative import Serotype, SerotypeVariants, Group, Variants, Genes, \
     VariantGroup
@@ -302,12 +302,6 @@ def add_variant(df, dbpath):
             # commit and close session
             session.commit()
             session.close()
-
-
-    # KeyError if any headers are not as expected
-    # except KeyError:
-    #     sys.stderr.write('ERROR: error occurred while checking input check format of file.\n')
-    #     sys.exit(1)
 
 
 def add_serotypevariants(df, dbpath):

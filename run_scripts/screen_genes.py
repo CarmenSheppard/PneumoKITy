@@ -1,6 +1,6 @@
 """python 3.7+
 Run allele stage2_var_obj methods.
-Carmen Sheppard 2019-2021
+Carmen Sheppard 2019-2022
 """
 import sys
 import os
@@ -135,9 +135,7 @@ def run_genes(stage2_var_obj, genename):
         ref_sketch = os.path.join(stage2_var_obj.database, stage2_var_obj.folder,
                                   f"{genename}.msh")
 
-
         # run mash screen on the files
-
         outfile = run_mash_screen(stage2_var_obj, ref_sketch, genename)
 
         # No hits at all on MASH stage2_var_obj

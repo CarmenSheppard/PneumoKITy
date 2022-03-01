@@ -1,5 +1,5 @@
 """python 3.7+,
-PneumoCaT2 run initialisation.
+PneumoKITy run initialisation.
 Set up command line arguments, custom error, Enum categories initialise analysis run object
 and deal with options from command line arguments
 
@@ -168,7 +168,7 @@ class Analysis:
         self.mash_v = ""  # version of Mash used
         self.threads = str(inputs.threads)  # number of threads used for subprocesses
         self.predicted_serotype = ""  # final serotype predicted phenotype result
-        self.stage2_output = "Analysed in PneumoCaT2 Stage 1 only"  # output of stage 2 formatted for text report
+        self.stage2_output = "Analysed in PneumoKITy Stage 1 only"  # output of stage 2 formatted for text report
         self.rag_status = "RED"
         self.top_hits = ""  # top five hits from stage 1 analysis
         self.max_mm = ""  # max median multiplicity in stage 1 analysis
@@ -342,7 +342,7 @@ Run Metrics
 Workflow version\t{self.workflow}
 Analysis type = Expected pure culture
 {inputfiles}
-Input kmer percent cut-off:\t{self.minpercent}
+Kmer percent cut-off:\t{self.minpercent}
 Median multiplicity cut-off:\t{self.minmulti}
 CTV.db path:\t{self.database}
 Mash Version:\t{self.mash_v}
@@ -537,7 +537,7 @@ Run Metrics
 Workflow version\t{self.workflow}
 Analysis type = Expected mixed culture
 {inputfiles}
-Input kmer percent cut-off:\t{self.minpercent}
+Kmer percent cut-off:\t{self.minpercent}
 Median multiplicity cut-off:\t{self.minmulti}
 CTV.db path:\t{self.database}
 Mash Version:\t{self.mash_v}
@@ -578,7 +578,9 @@ RED: Analysis failed
 
 
 class MixSero:
-    """Create object for storing results of mixed analysis, runs queries to get variour """
+    """Create object for storing results of mixed analysis, runs queries to get variants
+    This object is passed into stage 2 analyses the same way as the original analysis object and stores data
+    for collation"""
 
     def __init__(self, serotype_hit, percent_hit, mm, analysis):
         session = session_maker(analysis.database)

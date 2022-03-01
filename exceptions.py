@@ -1,6 +1,6 @@
 """
-Define custom exceptions for PneumoCaT2.
-Carmen Sheppard 2020
+Define custom exceptions for PneumoKITy.
+Carmen Sheppard 2020-2022
 """
 class CtvdbError(Exception):
     """create custom error for missing or mismatching information in DB. Allows custom messages"""
