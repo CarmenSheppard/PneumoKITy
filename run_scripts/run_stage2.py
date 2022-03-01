@@ -1,7 +1,7 @@
 """python 3.7+
 Decide which methods are needed in stage 2, run analysis scripts and collate  and compare results to expected for
 serotypes
-Carmen Sheppard 2019-2021
+Carmen Sheppard 2019-2022
 """
 import sys
 from Database_tools.db_functions import session_maker
@@ -23,7 +23,6 @@ def start_stage2(stage2_var_obj):
     stage2_var_obj.gene_list = session.query(Variants).join(VariantGroup).join(Genes).\
         filter(VariantGroup.grp_id == stage2_var_obj.grp_id).group_by(Genes.gene_name).all()
 
-
     # create lists for gene names
     alleles = []
     genes = []
@@ -33,7 +32,6 @@ def start_stage2(stage2_var_obj):
     # go through different variants and run analyses
     for gene in stage2_var_obj.gene_list:
         # sort variant types
-
         if gene.var_type == "allele":
             #append gene-variant object to list
             alleles.append(gene)
@@ -42,12 +40,6 @@ def start_stage2(stage2_var_obj):
         elif gene.var_type == "gene_presence":
             genes.append(gene)
             sort_genes(gene, stage2_var_obj, gene.var_type, session)
-
-        elif gene.var_type == "snp":
-            stage2_var_obj.predicted_serotype = "Group"
-
-        elif gene.var_type == "gene_nonfunc":
-            stage2_var_obj.predicted_serotype = "Group"
 
         else:
             # raise exception for types of variants not found (eg error in DB)

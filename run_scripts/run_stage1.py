@@ -1,6 +1,6 @@
 """python 3.7+
 Run MASH screen and parse output
-Carmen Sheppard 2019-2021
+Carmen Sheppard 2019-2022
 """
 
 import os
@@ -291,7 +291,6 @@ def group_check_pure(df, analysis):
             raise CtvdbError(f"Stage 1 group unexpected - please check "
                              f"integrity of CTVdb, all groups MUST"
                              f" be accounted for in CTVdb.\n")
-     #
 
     return analysis
 
@@ -369,8 +368,6 @@ def run_parse_pure(analysis, tsvfile):
 
                 if analysis.category == Category.mix:
                     analysis.rag_status = "AMBER"
-
-
                 else:
                     analysis.rag_status = "GREEN"
 
@@ -407,7 +404,6 @@ def run_parse_pure(analysis, tsvfile):
                                             ascending=False)
 
             create_csv(original, analysis.output_dir, f"{analysis.sampleid}_alldata.csv")
-
 
         else:
             sys.stderr.write("ERROR: No Mash data - empty file\n")

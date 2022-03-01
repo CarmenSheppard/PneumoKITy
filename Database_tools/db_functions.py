@@ -1,12 +1,11 @@
 """
 Script to set up DB sessions and other common functions for accessing CTV.db
 Python 3.7+
-Carmen Sheppard 2020-2021
+Carmen Sheppard 2020-2022
 """
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from Database_tools.sqlalchemydeclarative import Base
 
 
