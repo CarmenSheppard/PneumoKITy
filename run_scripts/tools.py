@@ -1,6 +1,6 @@
 """ Python 3.7+
 Tools for PneumoKITy - used in more than one of the other run scripts
-Carmen Sheppard 2019-2021
+Carmen Sheppard 2019-2022
 """
 import pandas as pd
 import numpy as np

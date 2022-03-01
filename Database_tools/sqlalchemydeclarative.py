@@ -2,7 +2,7 @@
 Python 3.7+
 Database SQLalchemy declarative script for ORM.
 Creates CTV.db structure
-Carmen Sheppard 2020-21
+Carmen Sheppard 2020-22
 """
 
 from sqlalchemy import Boolean, Column, String, Integer, ForeignKey
@@ -30,10 +30,6 @@ class Group(Base):
     group_id = relationship("Serotype", backref=backref("genogroup", lazy="joined"))
     grp_id = relationship("VariantGroup", backref=backref("genogroup", lazy="joined"))
 
-    # readable representation of class object
-    # def __repr__(self):
-    #     return f"<Group(id = {self.id}, group_name= {self.group_name})>"
-
 
 class Genes(Base):
     """
@@ -46,18 +42,10 @@ class Genes(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     # name of gene
     gene_name = Column(String, primary_key=False)
-    # any gene annotation (extra info field) TODO UPDATE IN FUTURE VERSION
-    # annotation = Column(String, primary_key=False)
-    # # reference FASTA file (??? or pubmed ref) TODO UPDATE IN FUTURE VERSION
-    # reference = Column(String, primary_key=False)
 
     # relationships- one to many
     gene = relationship("Variants", backref=backref("genes", lazy="joined"))
     gene_id = relationship("OperonGene", backref=backref("genes", lazy="joined"))
-
-    # readable representation of class object
-    # def __repr__(self):
-    #     return f"<Genes(id = {self.id}, gene_name= {self.gene_name}, annotation = {self.annotation})>"
 
 
 # Set up tables dependent on above tables only
@@ -83,11 +71,6 @@ class Serotype(Base):
     sero_id = relationship("SerotypeVariants", backref=backref("serotype", lazy="joined"))
     serotype_id = relationship("OperonGene", backref=backref("serotype", lazy="joined"))
 
-    # readable representation of class object
-    # def __repr__(self):
-    #     return f"<Serotype(id = {self.id}, Serotype(predicted_phenotype = {self.predicted_pheno}," \
-    #            f" serotype_hit = {self.serotype_hit}, group_id ={self.group_id}, subtype= {self.subtype})>"
-
 
 class Variants(Base):
     """
@@ -107,11 +90,6 @@ class Variants(Base):
     variant_id = relationship("SerotypeVariants", backref=backref("variants", lazy="joined"))
     var_id = relationship("VariantGroup", backref=backref("variants", lazy="joined"))
 
-    # # readable representation of class object
-    # def __repr__(self):
-    #     return f"<Variants(id = {self.id}, var_type {self.var_type}, gene= {self.gene}," \
-    #            f"position = {self.position}, var1 = {self.var1}, alt_vars = {self.alt_vars})>"
-
 
 class OperonGene(Base):
     """
@@ -128,11 +106,6 @@ class OperonGene(Base):
     # Numerical order of the genes in the operon for the hit serotype
     operon_position = Column(Integer, primary_key=False)
 
-
-    # # readable representation of class object
-    # def __repr__(self):
-    #     return f"<OperonGene(id = {self.id}, serotype_id {self.serotype_id}, gene_id = {self.gene_id}," \
-    #            f"operon_position = {self.operon_position})>"
 
 
 # set tables with joins

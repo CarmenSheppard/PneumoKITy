@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """python 3.7+, tested with Mash version 2.0 to 2.3
-Main PneumoKITY script run serotyping from WGS data (Fastq or assembly)
+Main PneumoKITY script run serotyping from WGS data
+Expected pure (Fastq OR assembly) / Expected Mix (fastq only) input
 1. Run MASH screen tsv output -> tmp folder
-2. Parse mash screen output to apply filters, create csv output files
-Carmen Sheppard 2022
+2. Parse mash screen output to apply filters, interpret data create csv output files
+Carmen Sheppard 2019-2022
 """
 import os
 import sys
@@ -13,7 +14,7 @@ from run_scripts.run_stage1 import run_parse_pure, run_parse_mix
 from run_scripts.run_stage2 import start_stage2
 from exceptions import CtvdbError
 
-version = "PneumoKITy V1.0b2"
+version = "PneumoKITy V1.0"
 
 
 def main(input_args, workflow_version):
