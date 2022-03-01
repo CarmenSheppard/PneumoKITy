@@ -388,8 +388,7 @@ def run_parse_pure(analysis, tsvfile):
                     # rerun filter
                     filtered_df, original, analysis.top_hits = apply_filters(original,
                                                                              minpercent, analysis.minmulti)
-                    analysis.category, analysis.stage1_result, analysis.folder, analysis.grp_id, analysis.mix_mm \
-                        = group_check_pure(filtered_df, analysis.database)
+                    analysis = group_check_pure(filtered_df, analysis)
 
                 if analysis.max_percent < 20:
                     analysis.category = Category.acapsular
