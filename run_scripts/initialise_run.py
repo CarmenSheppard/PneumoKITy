@@ -237,6 +237,20 @@ class Analysis:
                              "between 20 and 100.\n")
             sys.exit(1)
 
+    def create_objdf(self):
+        """Creates result and quality dataframes from Analysis object"""
+
+        attribs = vars(self)
+        frame = pd.DataFrame.from_dict(attribs, orient="index")
+        frame = frame.transpose()
+        # create separate dataframes of quality and result data
+        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
+                                "mash", "database", "output_dir", "csv_collate"], axis=1)
+        results = frame.filter(["sampleid", "top_hits", "max_mm", "max_percent", "folder", "stage1_result", "mix_mm",
+                                "stage2_varids", "stage2_hits", "stage2_result", "predicted_serotype", "rag_status"],
+                               axis=1)
+
+        return quality, results
 
 class AnalysisPure(Analysis):
     """Create child object for pure culture analysis - update class attributes based on inputs,
@@ -321,9 +335,8 @@ class AnalysisPure(Analysis):
                                f"{self.sampleid}_serotyping_results.txt"),
                   "w+") as f:
             f.write(f"""----------------------------------------
-PneumoKITy serotyping result report
+{self.sampleid} PneumoKITy serotyping result report
 ----------------------------------------
-
 Run Metrics
 ----------------------------------------
 Workflow version\t{self.workflow}
@@ -361,20 +374,6 @@ RED: Analysis failed
         sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
                          f"Output directory: {self.output_dir}\n")
 
-    def create_objdf(self):
-        """Creates result and quality dataframes from Analysis object"""
-
-        attribs = vars(self)
-        frame = pd.DataFrame.from_dict(attribs, orient="index")
-        frame = frame.transpose()
-        # create separate dataframes of quality and result data
-        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
-                                "mash", "database", "output_dir", "csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits", "max_mm", "max_percent", "folder", "stage1_result", "mix_mm",
-                                "stage2_varids", "stage2_hits", "stage2_result", "predicted_serotype", "rag_status"],
-                               axis=1)
-
-        return quality, results
 
 
 class AnalysisMixed(Analysis):
@@ -521,9 +520,8 @@ class AnalysisMixed(Analysis):
                                f"{self.sampleid}_serotyping_results.txt"),
                   "w+") as f:
             f.write(f"""----------------------------------------
-PneumoKITy serotyping result report
+{self.sampleid} PneumoKITy serotyping result report 
 ----------------------------------------
-
 Run Metrics
 ----------------------------------------
 Workflow version\t{self.workflow}
@@ -547,7 +545,7 @@ Stage 1 Estimated abundance of mix (%) (if mixed only):\t{self.mix_mm}
 
 Predicted serotype result(s):\t {self.predicted_serotype}
 
-Mixed output (if sample mixed:
+Mixed output (if sample mixed):
 
 {mixstring}
 
@@ -565,20 +563,7 @@ RED: Analysis failed
         sys.stdout.write(f"{self.sampleid}_serotyping_results.txt written.\n"
                          f"Output directory: {self.output_dir}\n")
 
-    def create_objdf(self):
-        """Creates result and quality dataframes from Analysis object"""
 
-        attribs = vars(self)
-        frame = pd.DataFrame.from_dict(attribs, orient="index")
-        frame = frame.transpose()
-        # create separate dataframes of quality and result data
-        quality = frame.filter(["sampleid", "workflow", "input_dir", "fastq_files", "assembly", "minpercent",
-                                "mash", "database", "output_dir", "csv_collate"], axis=1)
-        results = frame.filter(["sampleid", "top_hits", "max_mm", "max_percent", "folder", "stage1_result", "mix_mm",
-                                "stage2_varids", "stage2_hits", "stage2_result", "predicted_serotype", "rag_status"],
-                               axis=1)
-
-        return quality, results
 
 
 class MixSero:
