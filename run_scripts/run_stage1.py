@@ -49,7 +49,7 @@ def translate_mixmm(mix_mm, session):
     """
 
     mix_keys = list(mix_mm.keys())
-    df = pd.DataFrame(columns=["serotype", "mm"])
+    df = pd.DataFrame(columns=["serotype", "mm"], dtype=object)
     for hit in mix_keys:
         pheno = list(get_pheno_list([hit], session))[0]
         df = df.append({"serotype": pheno, "mm": mix_mm[hit]}, ignore_index=True)

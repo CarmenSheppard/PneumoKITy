@@ -475,7 +475,7 @@ class AnalysisMixed(Analysis):
         """
         # class function to produce output for csv file and report
         mixed_output = pd.DataFrame(columns=["Predicted phenotype", "TopHit (Hit,percent,median_multiplicity)",
-                                             "Estimated % abundance in mix", "RAG status"])
+                                             "Estimated % abundance in mix", "RAG status"], dtype=object)
 
         # dict to collect predicted serotypes ( to avoid duplication) and collect mm to recreate mix MM( update with
         # subtyped if needed.
