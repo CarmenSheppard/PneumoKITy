@@ -320,6 +320,17 @@ def run_parse_mix(analysis, tsvfile):
                     analysis.rag_status = "RED"
                     analysis.stage1_result = "Median multiplicity low, check sequence quality."
 
+                # second chance, amber rag status for low top hits
+                elif analysis.max_percent >= 70 and analysis.minpercent >= 70:
+                    analysis.rag_status = "AMBER"
+                    # reduce minpercent cut off to: max percentage - 10%
+                    minpercent = analysis.max_percent - (analysis.max_percent * 0.1)
+                    # rerun filter
+                    filtered_df, original, analysis.top_hits = apply_filters(original,
+                                                                             minpercent, analysis.minmulti)
+                    analysis = group_check_mix(filtered_df, analysis)
+
+
                 elif analysis.max_percent < 20:
                     analysis.category = Category.acapsular
                     analysis.stage1_result = "Below 20% hit - inadequate DNA or acapsular organism"                                            "organism, check species identity and sequence quality."
