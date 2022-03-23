@@ -264,7 +264,7 @@ def group_check_pure(df, analysis):
         pheno = set(get_pheno_list(results, session))
         if len(pheno) > 1:
             analysis.category = Category.mix
-            stage1_result = f"Mixed serotypes- {pheno}"
+            analysis.stage1_result = f"Mixed serotypes- {pheno}"
             sys.stdout.write(f"Mixed serotypes found - {pheno}\n")
             # if not assembly (mm >1) look for median multiplicity of hits and create dict
             if max(df["median-multiplicity"]) > 1:
