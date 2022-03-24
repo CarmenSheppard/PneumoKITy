@@ -39,15 +39,15 @@ should be checked as some outcomes were not within range, or RED indicating a fa
 
 **PneumoKITy has two run options:**
 
-`pure`  suitable for analysis of expected pure cultures. This method which will increase specificity and 
+`pure`  suitable for analysis of expected pure cultures. For this run method both fastq and assembly inputs can be used for analysis. This method which will increase specificity and 
 reduce over reporting of mixed serotypes which may be present due to high levels of DNA from pure culture isolates. Although
 it will report genogroups of any mixed samples, PneumoKITy will assign these as an AMBER RAG status due to them being unexpected in a 
 pure culture. 
 
 
-`mix` PneumoKITy is particularly sensitive to mixed serotypes - which is useful for determination of types in multiple carriage.
+`mix` PneumoKITy is particularly sensitive to mixed serotypes when run with fastq data - which is useful for determination of types in multiple carriage.
 When run in mix mode PneumoKITy reports stage 2 variants where possible within mixtures of multiple 
-serotype carriage and reports the results slightly differently.  Mixtures are not automatically assigned an AMBER rag status.
+serotype carriage and reports the results slightly differently.  Mixtures are not automatically assigned an AMBER rag status. MIX analysismethod can ONLY be used with fastq inputs. 
 
 
    
