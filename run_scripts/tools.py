@@ -127,9 +127,12 @@ def run_mash_screen(analysis, ref_sketch, run_type="stage1"):
         argument = [analysis.mash, "screen",  ref_sketch, "-p",
                     analysis.threads, analysis.assembly]
 
-
-    data = subprocess.run(argument, capture_output=True, check=True, timeout=3600)
-    result = data.stdout.decode('utf-8')
+    try:
+        data = subprocess.run(argument, capture_output=True, check=True, timeout=3600)
+        result = data.stdout.decode('utf-8')
+    except subprocess.CalledProcessError:
+        sys.stderr.write("Error with MASH subprocess - please check input file integrity")
+        sys.exit(1)
     # TODO write mash output to log file once logging implemented in PneumoKITy
     #sys.stderr.write(data.stderr.decode('utf-8'))
     outfile = os.path.join(analysis.output_dir, f"{analysis.sampleid}_tmp",
