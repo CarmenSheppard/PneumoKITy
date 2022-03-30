@@ -162,6 +162,7 @@ def run_genes(stage2_var_obj, genename):
 
             # find max percent hit for result display
             max_percent = round(original['percent'].max(), 2)
+            max_mm = round(original['median-multiplicity'].max(), 2)
             stage2_var_obj.stage2_hits[genename] = max_percent
 
             #analyse outputs
@@ -188,6 +189,14 @@ def run_genes(stage2_var_obj, genename):
                         stage2_var_obj.rag_status = "AMBER"
                     hit_genes[genename] = "detected"
                     sys.stdout.write(f"Gene {genename} detected, however {max_percent} hit to gene, possible variant \n")
+               # catch samples with low median multiplicity
+                elif max_mm < stage2_var_obj.minmulti and max_percent > hit_cut:
+                    if stage2_var_obj.rag_status == "GREEN":
+                        stage2_var_obj.rag_status = "AMBER"
+                    hit_genes[genename] = "detected"
+                    sys.stdout.write(
+                        f"Gene {genename} detected, however median_multiplicity below {stage2_var_obj.minmulti}"
+                        f" - check sequence depth\n")
 
                 else:
                     # NB this shouldn't be triggered if all options covered above
