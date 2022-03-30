@@ -194,7 +194,7 @@ def group_check_pure(df, analysis):
     :param analysis: analysis object
     :return:strings of group and results
     """
-    folder = None
+
     results = []
 
     # collate the data results together on one line and create result list
@@ -284,7 +284,7 @@ def group_check_pure(df, analysis):
                 analysis.folder = record.genogroup.group_name
                 analysis.grp_id = record.group_id
             analysis.category = Category.variants
-            analysis.stage1_result = folder
+            analysis.stage1_result = analysis.folder
             session.close()
 
         else:
