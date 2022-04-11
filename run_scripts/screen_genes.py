@@ -91,7 +91,7 @@ def run_alleles(stage2_var_obj, genename):
                     result = rows.Allele
                     hit_alleles[genename] = result
                     stage2_var_obj.stage2_hits[genename] = [result, max_percent]
-                    sys.stdout.write(f"Completed {genename} allele stage2_var_obj.\n")
+                    sys.stdout.write(f"Completed {genename} allele analysis.\n")
 
             else:  # for samples with no hits
                 hit_alleles[genename] = 0

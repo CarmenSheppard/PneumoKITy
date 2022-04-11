@@ -220,7 +220,7 @@ serotype reference sequence, calculated by PneumoKITy.
 given in mash screen output. Low kmer multiplicity could be caused by 
 sequencing errors or mixed samples - only applicable for input read files if
  assembly files are input this value is automatically set to 1.  By default for 
- fastq input data  this value is set to 10 for xpected PURE culture runs and 4 for expected MIXED culture runs.
+ fastq input data  this value is set to 10 for expected PURE culture runs and 4 for expected MIXED culture runs.
 
 
 This results in several stage 1 outcome categories and also come with a RAG 
