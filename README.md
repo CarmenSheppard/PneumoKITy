@@ -16,7 +16,7 @@
 ## Introduction
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
-lite version of the in-development PneumoCaT2. It is written for **Python 3.7+**. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
+lite serotyping tool, developed for speed and sensitivity for mixed serotype calling and using experience of development and use of PneumoCaT to inform it's development. It is written for **Python 3.7+**. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
 kmer based analysis. We decided to create a lite version (PneumoKITy) as this his tool has significant value 
 for both sensitive detection of mixed serotypes in fastQ data and is also significantly faster for serotype screening than existing methods which may mean
 it has utility  either as a quick assessment method which has input type flexibility for running PURE cultures, and when using fastq data it can be run on
