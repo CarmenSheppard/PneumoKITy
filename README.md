@@ -3,7 +3,7 @@
 ## Table of content
 
 * [Introduction](https://github.com/CarmenSheppard/PneumoKITy#Introduction)
-* [Dependencies](https://github.com/CarmenSheppard/PneumoKITy#dependencies)
+* [Dependencies](https://github.com/CarmenSheppard/PneumoKITy#Dependencies-and-getting-up-and-running)
 * [Running PneumoKITy](https://github.com/CarmenSheppard/PneumoKITy#running-PneumoKITy)
 * [User customisable options](https://github.com/CarmenSheppard/PneumoKITy#User-customisable-options)
 * [Example command lines](https://github.com/CarmenSheppard/PneumoKITy#Example-command-lines)
