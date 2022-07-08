@@ -489,7 +489,8 @@ class AnalysisMixed(Analysis):
                 top_hit = (sero.serotype_hit, round(sero.percent_hit, 2), sero.mm)
                 add_on_dict["TopHit (Hit,percent,median_multiplicity)"] = top_hit
                 add_on_dict["RAG status"] = self.rag_status
-                mixed_output = mixed_output.append(add_on_dict, ignore_index=True, sort=False)
+                mixed_output = pd.concat([mixed_output, pd.DataFrame.from_records([add_on_dict])])
+                # mixed_output = mixed_output.append(add_on_dict, ignore_index=True, sort=False)
 
         if not variants:
             mixed_output["Estimated % abundance in mix"] = mixed_output["Predicted phenotype"].map(self.mix_mm)

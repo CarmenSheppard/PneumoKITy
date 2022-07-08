@@ -52,7 +52,7 @@ def translate_mixmm(mix_mm, session):
     df = pd.DataFrame(columns=["serotype", "mm"], dtype=object)
     for hit in mix_keys:
         pheno = list(get_pheno_list([hit], session))[0]
-        df = df.append({"serotype": pheno, "mm": mix_mm[hit]}, ignore_index=True, sort=False)
+        df = pd.concat([df, pd.DataFrame.from_records([{'serotype': pheno, 'mm': mix_mm[hit]}])])
 
     # group dataframe keeping max mm value for duplicates
     df = df.groupby("serotype", as_index=False).max()
