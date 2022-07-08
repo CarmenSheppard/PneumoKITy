@@ -316,7 +316,7 @@ def run_parse_mix(analysis, tsvfile):
 
             else:  # for samples with no hits
                 # catch samples with very low median multiplicity values for interpretation
-                if analysis.max_percent >= 70 and analysis.max_mm < analysis.minmulti:
+                if analysis.max_percent >= 70 and analysis.max_mm <= analysis.minmulti:
                     analysis.rag_status = "RED"
                     analysis.stage1_result = "Median multiplicity low, check sequence quality."
 
@@ -386,6 +386,7 @@ def run_parse_pure(analysis, tsvfile):
                 # catch samples with very low median multiplicity values for interpretation
                 if analysis.max_percent >= 70 and analysis.max_mm < analysis.minmulti:
                     analysis.rag_status = "RED"
+                    analysis.category=Category.no_hits
                     analysis.stage1_result = "Median multiplicity low, check sequence quality."
 
                 # second chance, amber rag status for low top hits
