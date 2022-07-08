@@ -333,7 +333,7 @@ def run_parse_mix(analysis, tsvfile):
 
                 elif analysis.max_percent < 20:
                     analysis.category = Category.acapsular
-                    analysis.stage1_result = "Below 20% hit - inadequate DNA or acapsular organism"                                            "organism, check species identity and sequence quality."
+                    analysis.stage1_result = "Below 20% hit - inadequate DNA or  atypical acapsular organism"                                            "organism, check species identity and sequence quality."
 
                 else:
                     analysis.category = Category.no_hits
@@ -400,8 +400,8 @@ def run_parse_pure(analysis, tsvfile):
 
                 elif analysis.max_percent < 20:
                     analysis.category = Category.acapsular
-                    analysis.stage1_result = "Below 20% hit - possible acapsular" \
-                                             " organism, check species identity and sequence quality."
+                    analysis.stage1_result = "Below 20% hit -check species identity and sequence quality, or for " \
+                                             " atypical acapsular S.pneumoniae."
 
                 else:
                     analysis.category = Category.no_hits

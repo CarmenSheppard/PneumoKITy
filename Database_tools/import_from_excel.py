@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument('--infile', '-i', help="Input excel file path", required=True)
 
     parser.add_argument('--serotype', '-s', help="Import only SEROTYPE sheet (ONLY for TYPES not in a group)"
-                                                 "- see documentation for help")
+                                                 "- see documentation for help", action="store_true")
     try:
         args = parser.parse_args()
 
@@ -416,6 +416,6 @@ if __name__ == "__main__":
 
     # if only serotype sheet added.
     else:
-        sdf = add_serotype(dfs['Serotype'])
+        sdf = add_serotype(dfs['Serotype'], db_path)
 
     sys.stdout.write("Database updated\n")
