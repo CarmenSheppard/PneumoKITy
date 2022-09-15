@@ -1,4 +1,4 @@
-# README for PneumoKITy
+# README for PneumoKITy - Non_CAP branch - EXPERIMENTAL
 
 ## Table of content
 
@@ -14,6 +14,10 @@
 * [Licence agreement](https://github.com/CarmenSheppard/PneumoKITy#licence-agreement)
 
 ## Introduction
+
+**PLEASE NOTE** - this repository branch provides an *experimental* database version and related code which includes sequences designed to determine Non-encapsulated pneumococci which are NOT included in the main MASTER branch This is intended to improve detection for these organisms as they are of major interest and importance. However, please note that the included sequences are not expected to be exhaustive as the sequence variation in these organisms appears to be extensive, this branch is intended for development only and has not been fully validated against sets of known sequences like the master branch of the repository. Users are encourage to use this branch, validate the results and develop it further.
+
+
 
 PneumoKITy (**Pneumo**coccal **K**mer **I**ntegrated **Ty**ping) is a 
 lite serotyping tool, developed for speed and sensitivity for mixed serotype calling and using experience of development and use of PneumoCaT to inform it's development. It is written for **Python 3.7+**. PneumoKITy uses the excellent tool [MASH](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0997-x) for 
