@@ -369,6 +369,8 @@ When mix detection is selected on run, PneumoKity will attempt to subtype any se
 
 This software is covered by GNU General Public License, version 3 (GPL-3.0).
 
+### CITATION: [Sheppard et al 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC9837567/)
+
 
 
 
