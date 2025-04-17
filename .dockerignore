@@ -1,0 +1,3 @@
+# .dockerignore
+Database_tools/CTVdb_import_standard_template.xlsx
+requirements.txt
