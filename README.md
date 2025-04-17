@@ -4,6 +4,7 @@
 
 * [Introduction](https://github.com/CarmenSheppard/PneumoKITy#Introduction)
 * [Dependencies](https://github.com/CarmenSheppard/PneumoKITy#Dependencies-and-getting-up-and-running)
+* [Docker](https://github.com/CarmenSheppard/PneumoKITy#Running-PneumoKITy-with-Docker)
 * [Running PneumoKITy](https://github.com/CarmenSheppard/PneumoKITy#running-PneumoKITy)
 * [User customisable options](https://github.com/CarmenSheppard/PneumoKITy#User-customisable-options)
 * [Example command lines](https://github.com/CarmenSheppard/PneumoKITy#Example-command-lines)
@@ -99,9 +100,15 @@ PneumoKITy.
 Then run `conda install mash` to install mash. Check the mash version with `mash --version`
 PneumoKITy has been tested with versions 2.0 to 2.3.
 
- 
+## Running PneumoKITy with Docker
 
-Once this is working you should be able to run PneumoKITy as detailed below.
+### Build the Docker Image
+```docker build -t pneumokity:latest .```
+### Run the image with set up input and output folders  (example of pure run with assemblies)
+`docker run --rm -v /path/to/local/input:/app/input -v /path/to/local/output:/app/output pneumokity:latest pure --input /app/input/sample.txt --output /app/output `
+
+ 
+Once you have it installed  and working you should be able to run PneumoKITy as detailed below (add specific Docker folders/commands as needed)
 
 ## Running PneumoKITy
 #### Mandatory commandline inputs
