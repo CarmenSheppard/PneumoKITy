@@ -105,7 +105,7 @@ PneumoKITy has been tested with versions 2.0 to 2.3.
 ### Build the Docker Image
 ```docker build -t pneumokity:latest .```
 ### Run the image with set up input and output folders  (example of pure run with assembly input)
-`docker run --rm -v /path/to/local/input:/app/input -v /path/to/local/output:/app/output pneumokity:latest pure -a /app/input/assembly.fasta -out /app/output `
+`docker run --rm -v /path/to/local/input:/app/input -v /path/to/local/output:/app/output pneumokity:latest pure -a /app/input/assembly.fasta -o /app/output `
 
  
 Once you have it installed  and working you should be able to run PneumoKITy as detailed below (add specific Docker folders/commands as needed)
