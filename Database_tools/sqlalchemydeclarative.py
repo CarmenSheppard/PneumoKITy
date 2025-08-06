@@ -7,7 +7,7 @@ Carmen Sheppard 2020-22
 
 from sqlalchemy import Boolean, Column, String, Integer, ForeignKey
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship, backref
 
 # initiates a base sqlalchemy class for python to SQLite translation

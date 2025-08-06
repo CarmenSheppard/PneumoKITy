@@ -4,10 +4,8 @@ Carmen Sheppard 2020-2022
 """
 import argparse
 import os
-import sys
-
 import pandas as pd
-
+import sys
 
 from Database_tools.db_functions import searchexact, session_maker
 from Database_tools.sqlalchemydeclarative import Serotype, SerotypeVariants, Group, Variants, Genes, \
@@ -59,10 +57,12 @@ def sort_sheets(args):
             # read in correct sheet (compensate for 0 indexing) specify datatypes for those that may be ambiguous
             # Although position is used as an int in the script, it must be specified as a float due to presence
             # of NaN rows it is impossible to set datatype = int when NaN's are present (numpy compatibility)
+            xls = pd.ExcelFile(args.infile)
+
             df = pd.read_excel(args.infile, sheet_name=int(table) - 1,
                                dtype={"predicted_pheno": str, "subtypes": bool,
                                       "alt_vars": str, "var1": str, "serotype_1": str,
-                                      "position": float},engine='openpyxl')
+                                      "position": float})# engine='openpyxl')
 
             # drop any empty rows
             df = df.dropna(how="all")
