@@ -7,7 +7,7 @@ Carmen Sheppard 2020-22
 
 from sqlalchemy import Boolean, Column, String, Integer, ForeignKey
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship, backref
 
 # initiates a base sqlalchemy class for python to SQLite translation
@@ -85,7 +85,6 @@ class Variants(Base):
     position = Column(Integer, primary_key=False, nullable=True)
     variant = Column(String, primary_key=False)
 
-
     # Set up one to many relationships
     variant_id = relationship("SerotypeVariants", backref=backref("variants", lazy="joined"))
     var_id = relationship("VariantGroup", backref=backref("variants", lazy="joined"))
@@ -105,7 +104,6 @@ class OperonGene(Base):
 
     # Numerical order of the genes in the operon for the hit serotype
     operon_position = Column(Integer, primary_key=False)
-
 
 
 # set tables with joins
@@ -129,8 +127,9 @@ class SerotypeVariants(Base):
     sero_id = Column(Integer, ForeignKey('serotype.id'))
     variant_id = Column(Integer, ForeignKey('variants.id'))
 
+
 if __name__ == "__main__":
-    #### CREATE DATABASE
+    # CREATE DATABASE
     engine = create_engine('sqlite:///../ctvdb/CTV.db')
 
     # Create all tables
