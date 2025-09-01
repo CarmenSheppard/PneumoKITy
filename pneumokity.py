@@ -14,7 +14,7 @@ from run_scripts.run_stage1 import run_parse_pure, run_parse_mix
 from run_scripts.run_stage2 import start_stage2
 from exceptions import CtvdbError
 
-version = "PneumoKITy V1.0"
+version = "PneumoKITy V1.0.1"
 
 
 def main(input_args, workflow_version):
